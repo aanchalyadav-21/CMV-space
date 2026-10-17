@@ -15,7 +15,9 @@
     <div class="top-bar">
         <div class="top-bar-left">
             <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
-            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+            <button class="btn-sos" onclick="openSosModal()" style="background-color: #DC2626 !important; color: #FFFFFF !important; border: 2px solid #FFFFFF !important; padding: 6px 18px !important; border-radius: 9999px !important; font-weight: 800 !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; gap: 6px !important;" title="Emergency Help">
+                🚨 EMERGENCY SOS
+            </button>
         </div>
         <div class="font-controls">
             <span>Font Size:</span>
@@ -76,7 +78,7 @@
 
         <div class="categories-grid">
             
-            <!-- Category 1: Grocery & Medicine (Primary Senior Volunteer Need) -->
+            <!-- Category 1: Grocery & Medicine -->
             <div class="category-card">
                 <div>
                     <div class="category-icon">🛒</div>
@@ -100,7 +102,7 @@
                 </a>
             </div>
 
-            <!-- Category 3: Hospital & Walking Companion -->
+            <!-- Category 3: Clinic & Walking Companion -->
             <div class="category-card">
                 <div>
                     <div class="category-icon">🩺</div>
@@ -112,15 +114,15 @@
                 </a>
             </div>
 
-            <!-- Category 4: Community Space Sharing (Option 3: Smart Space Booking) -->
-            <div class="category-card" style="border-color: #3B82F6; background: #F0F9FF;">
+            <!-- Category 4: Community Space Sharing (Now with the exact same consistent theme) -->
+            <div class="category-card">
                 <div>
                     <div class="category-icon">🏛️</div>
-                    <h3 style="color: #0369A1;">Community Space & Hall Sharing</h3>
+                    <h3>Community Space & Hall Sharing</h3>
                     <p>Reserve neighborhood halls, society clubhouses, or activity rooms for yoga, reading circles, and workshops.</p>
                 </div>
-                <a href="request-help.html?service=space" class="btn btn-primary" style="background-color: #0284C7;" id="btn-select-space">
-                    Reserve Community Space 🏛️ →
+                <a href="request-help.html?service=space" class="btn btn-primary" id="btn-select-space">
+                    Select This Service →
                 </a>
             </div>
 
@@ -148,7 +150,7 @@
     </footer>
 
     <!-- SOS Emergency Modal -->
-    <div id="sosModal" class="modal-overlay">
+    <div id="sosModal" class="modal-overlay" style="display: none;">
         <div class="modal-content modal-sos">
             <div class="modal-header">
                 <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
@@ -180,7 +182,7 @@
     </div>
 
     <!-- Grievance / Complaint Modal -->
-    <div id="complaintModal" class="modal-overlay">
+    <div id="complaintModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 style="color: var(--primary-color);">📝 File a Community Complaint</h2>

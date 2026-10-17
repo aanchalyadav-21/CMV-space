@@ -15,7 +15,9 @@
     <div class="top-bar">
         <div class="top-bar-left">
             <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
-            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+            <button class="btn-sos" onclick="openSosModal()" style="background-color: #DC2626 !important; color: #FFFFFF !important; border: 2px solid #FFFFFF !important; padding: 6px 18px !important; border-radius: 9999px !important; font-weight: 800 !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; gap: 6px !important;" title="Emergency Help">
+                🚨 EMERGENCY SOS
+            </button>
         </div>
         <div class="font-controls">
             <span>Font Size:</span>
@@ -73,13 +75,10 @@
                 A community-driven platform connecting local residents and senior citizens with trusted volunteers for micro-tasks and shared activity spaces.
             </p>
             
-            <!-- Primary Forward CTA Button (Exp 5 Forward Trigger) -->
+            <!-- Single, Unified Forward CTA Button (No more selecting twice!) -->
             <div class="hero-actions">
                 <a href="categories.html" class="btn btn-primary btn-large" id="btn-request-help">
-                    Request Volunteer Help Now →
-                </a>
-                <a href="categories.html?service=space" class="btn btn-secondary btn-large">
-                    Browse Community Spaces 🏛️
+                    Explore Community Services & Spaces →
                 </a>
             </div>
         </section>
@@ -119,8 +118,8 @@
         </p>
     </footer>
 
-    <!-- SOS Emergency Modal -->
-    <div id="sosModal" class="modal-overlay">
+    <!-- SOS Emergency Modal (Hidden until clicked) -->
+    <div id="sosModal" class="modal-overlay" style="display: none;">
         <div class="modal-content modal-sos">
             <div class="modal-header">
                 <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
@@ -151,8 +150,8 @@
         </div>
     </div>
 
-    <!-- Grievance / Complaint Modal -->
-    <div id="complaintModal" class="modal-overlay">
+    <!-- Grievance / Complaint Modal (Hidden until clicked) -->
+    <div id="complaintModal" class="modal-overlay" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
                 <h2 style="color: var(--primary-color);">📝 File a Community Complaint</h2>
