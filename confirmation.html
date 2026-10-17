@@ -11,14 +11,17 @@
 </head>
 <body>
 
-    <!-- Accessibility & Helpline Bar -->
+    <!-- Accessibility, Helpline & SOS Bar -->
     <div class="top-bar">
-        <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
         <div class="font-controls">
             <span>Font Size:</span>
-            <button onclick="changeFontSize('small')">A-</button>
-            <button onclick="changeFontSize('normal')">A</button>
-            <button onclick="changeFontSize('large')">A+</button>
+            <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+            <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+            <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
         </div>
     </div>
 
@@ -63,42 +66,42 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             MEMBER 5 CONTENT STARTS HERE (Screen 5: Success & Tracking)
-             ============================================================== -->
+        <!-- MEMBER 5 CONTENT (Screen 5: Success & Tracking) -->
         <div class="success-card">
             
-            <div class="success-icon">✓</div>
+            <div class="success-icon" id="successIcon">✓</div>
             
-            <h1 style="color: var(--accent-color); font-size: 2rem; margin-bottom: 8px;">
+            <h1 id="successHeading" style="color: var(--accent-color); font-size: 2rem; margin-bottom: 8px;">
                 Request Successfully Submitted!
             </h1>
-            <p style="color: var(--text-secondary); font-size: 1.15rem;">
+            <p id="successSubheading" style="color: var(--text-secondary); font-size: 1.15rem;">
                 Your request has been broadcasted to verified community volunteers in your area.
             </p>
 
             <!-- Tracking & Status Box (Exp 5 Final State Displayed) -->
             <div class="tracking-box">
                 <div class="tracking-row">
-                    <span>Reference Tracking ID:</span>
-                    <strong style="font-size: 1.2rem; letter-spacing: 1px;">#SYG-2026-8941</strong>
+                    <span id="lblTrackingId">Reference Tracking ID:</span>
+                    <strong id="valTrackingId" style="font-size: 1.2rem; letter-spacing: 1px;">#SYG-2026-8941</strong>
                 </div>
                 <div class="tracking-row">
                     <span>Current Status:</span>
-                    <span class="badge badge-pending">🟡 Looking for Nearby Volunteer (Pending)</span>
+                    <span class="badge" id="valStatusBadge" style="background-color: #FEF3C7; color: #D97706; border: 1px solid #FCD34D;">
+                        🟡 Looking for Nearby Volunteer (Pending)
+                    </span>
                 </div>
                 <div class="tracking-row">
-                    <span>Requested Service:</span>
+                    <span id="lblTarget">Requested Service:</span>
                     <strong id="finalService">Grocery & Medicine Delivery</strong>
                 </div>
-                <div class="tracking-row">
-                    <span>Estimated Volunteer Contact:</span>
-                    <strong>Within 30 Minutes</strong>
+                <div class="tracking-row" id="rowEstimated">
+                    <span>Estimated Contact:</span>
+                    <strong id="valEstimated">Within 30 Minutes</strong>
                 </div>
             </div>
 
             <!-- Senior Citizen Friendly Next Steps -->
-            <div class="support-box">
+            <div class="support-box" id="nextStepsBox">
                 📞 <strong>What happens next?</strong> A verified volunteer will call your phone before heading out. Keep your phone nearby. If you need urgent assistance, call our community desk at <strong>1800-200-4567</strong>.
             </div>
 
@@ -113,24 +116,129 @@
             </div>
 
         </div>
-        <!-- ==============================================================
-             MEMBER 5 CONTENT ENDS HERE
-             ============================================================== -->
 
     </main>
 
-    <!-- Shared Footer -->
+    <!-- Shared Footer with Grievance & SOS Link -->
     <footer class="main-footer">
         <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+        <p style="margin-top: 8px; font-size: 0.95rem;">
+            <a href="javascript:void(0)" onclick="openComplaintModal()" style="color: #FCA5A5; text-decoration: underline;">
+                ⚠️ Report an Issue / File Volunteer Complaint
+            </a>
+            &nbsp;•&nbsp;
+            <a href="javascript:void(0)" onclick="openSosModal()" style="color: #FCA5A5; text-decoration: underline;">
+                🚨 Emergency Assistance Desk
+            </a>
+        </p>
     </footer>
+
+    <!-- SOS Emergency Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Senior Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <p style="font-size: 1.05rem; margin-bottom: 20px; color: var(--text-primary);">
+                Do you need urgent medical or security assistance? Help is available 24/7.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left; justify-content: flex-start;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; justify-content: flex-start;">
+                    👮 Call DBIT Society Security Guard (022-2500-1111)
+                </a>
+                <a href="tel:9876500000" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
+                    👨‍👩‍👧 Alert Registered Emergency Family Contact
+                </a>
+            </div>
+            <div style="background-color: #FEE2E2; border: 1px solid #FCA5A5; padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #991B1B;">
+                GPS Location Alert: Flat 402, Shanti Niketan has been flagged for prioritized neighborhood patrol.
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close Emergency Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grievance / Complaint Modal -->
+    <div id="complaintModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: var(--primary-color);">📝 File a Community Complaint</h2>
+                <button class="modal-close-btn" onclick="closeComplaintModal()">&times;</button>
+            </div>
+            <div id="complaintSuccess" style="display: none; background-color: #DCFCE7; color: #166534; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-weight: 600;">
+                ✓ Complaint Registered (#CMP-2026-104). The DBIT Community Grievance Committee will investigate within 24 hours.
+            </div>
+            <form onsubmit="handleComplaintSubmit(event)">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Related Request / Reference ID (Optional):</label>
+                    <input type="text" class="form-control" placeholder="e.g. #SYG-2026-8941" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Issue Category:</label>
+                    <select class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                        <option value="">-- Choose Issue --</option>
+                        <option value="no-show">Volunteer did not arrive on time</option>
+                        <option value="behavior">Inappropriate behavior or conduct</option>
+                        <option value="space">Community space locked or unclean</option>
+                        <option value="other">Other neighborhood grievance</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Description of Problem:</label>
+                    <textarea class="form-control" rows="3" required placeholder="Describe what happened..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"></textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Your Contact Phone:</label>
+                    <input type="tel" class="form-control" value="+91 98765 43210" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeComplaintModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Complaint ✓</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Shared Script -->
     <script src="js/main.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const data = getHelpRequest();
-            if (data && data.category) {
-                document.getElementById('finalService').textContent = data.category;
+            if (data) {
+                if (data.isSpaceBooking) {
+                    // Adapt to Community Space Booking Pass!
+                    document.getElementById('successHeading').textContent = 'Community Space Booking Confirmed!';
+                    document.getElementById('successSubheading').textContent = 'Your neighborhood facility has been reserved for your community activity.';
+                    document.getElementById('lblTrackingId').textContent = 'Official Booking Pass ID:';
+                    document.getElementById('valTrackingId').textContent = '#SPACE-2026-502';
+                    
+                    const badge = document.getElementById('valStatusBadge');
+                    badge.textContent = '🟢 Hall Reserved & Key Handover Scheduled';
+                    badge.style.backgroundColor = '#DCFCE7';
+                    badge.style.color = '#16A34A';
+                    badge.style.borderColor = '#86EFAC';
+                    
+                    document.getElementById('lblTarget').textContent = 'Reserved Facility:';
+                    document.getElementById('finalService').textContent = data.hallName || 'St. Joseph Community Hall';
+                    
+                    document.getElementById('rowEstimated').innerHTML = `
+                        <span>Scheduled Date/Time:</span>
+                        <strong>Tomorrow, ${data.time || 'Morning (9 AM - 12 PM)'}</strong>
+                    `;
+                    
+                    document.getElementById('nextStepsBox').innerHTML = `
+                        🏛️ <strong>Key Collection & Access:</strong> Please present this digital booking pass to the DBIT Society Security Guard 15 minutes prior to your session to collect the room keys and air conditioning remotes. For cancellations, call the desk at <strong>1800-200-4567</strong>.
+                    `;
+                } else {
+                    if (data.category) document.getElementById('finalService').textContent = data.category;
+                }
             }
         });
     </script>

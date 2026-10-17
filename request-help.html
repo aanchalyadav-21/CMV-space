@@ -11,14 +11,17 @@
 </head>
 <body>
 
-    <!-- Accessibility & Helpline Bar -->
+    <!-- Accessibility, Helpline & SOS Bar -->
     <div class="top-bar">
-        <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
         <div class="font-controls">
             <span>Font Size:</span>
-            <button onclick="changeFontSize('small')">A-</button>
-            <button onclick="changeFontSize('normal')">A</button>
-            <button onclick="changeFontSize('large')">A+</button>
+            <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+            <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+            <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
         </div>
     </div>
 
@@ -63,14 +66,12 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             MEMBER 3 CONTENT STARTS HERE (Screen 3: Input Form)
-             ============================================================== -->
+        <!-- MEMBER 3 CONTENT (Screen 3: Input Form) -->
         <div class="form-card">
-            <h1 style="color: var(--primary-color); font-size: 1.85rem; margin-bottom: 8px;">
+            <h1 id="formHeading" style="color: var(--primary-color); font-size: 1.85rem; margin-bottom: 8px;">
                 Enter Your Request Details
             </h1>
-            <p style="color: var(--text-secondary); margin-bottom: 24px;">
+            <p id="formSubheading" style="color: var(--text-secondary); margin-bottom: 24px;">
                 Please fill in your contact information and where you need assistance. All information is kept safe.
             </p>
 
@@ -79,7 +80,7 @@
                 <!-- Field 1: Category of Help -->
                 <div class="form-group">
                     <label for="serviceCategory">Selected Service / Activity:</label>
-                    <select id="serviceCategory" class="form-control">
+                    <select id="serviceCategory" class="form-control" onchange="toggleFormMode()">
                         <option value="Grocery & Medicine Delivery" selected>🛒 Grocery & Medicine Delivery</option>
                         <option value="Smartphone & Digital Help">📱 Smartphone & Digital Help</option>
                         <option value="Clinic Companion & Walking">🩺 Clinic Companion & Walking</option>
@@ -95,19 +96,52 @@
 
                 <!-- Field 3: Contact Phone Number -->
                 <div class="form-group">
-                    <label for="userPhone">Phone Number (For Volunteer Call):</label>
+                    <label for="userPhone">Phone Number (For Volunteer Call or Booking SMS):</label>
                     <input type="tel" id="userPhone" class="form-control" value="+91 98765 43210" required placeholder="e.g. 98765 43210">
                 </div>
 
                 <!-- Field 4: Location / Address Landmark -->
                 <div class="form-group">
-                    <label for="userAddress">Address / Building Landmark:</label>
+                    <label for="userAddress">Address / Neighborhood Landmark:</label>
                     <input type="text" id="userAddress" class="form-control" value="Flat 402, Shanti Niketan, Sector 4, Kurla West" required placeholder="Flat no., Society name, Landmark">
+                </div>
+
+                <!-- DYNAMIC FIELD FOR COMMUNITY SPACES (Smart Option 3) -->
+                <div id="spaceFields" style="display: none; background: #F0F9FF; border: 2px dashed #0284C7; border-radius: 10px; padding: 18px; margin-bottom: 22px;">
+                    <h3 style="color: #0369A1; margin-bottom: 12px; font-size: 1.2rem;">🏛️ Community Space Reservation Details:</h3>
+                    
+                    <div class="form-group">
+                        <label for="hallName">Select Community Hall / Room:</label>
+                        <select id="hallName" class="form-control">
+                            <option value="St. Joseph Society Community Hall (Capacity: 80, AC, Audio)">St. Joseph Community Hall (Capacity: 80, AC, Audio)</option>
+                            <option value="Parish Senior Activity Room (Capacity: 35, Projector)">Parish Senior Activity Room (Capacity: 35, Projector)</option>
+                            <option value="Society Garden Gazebo (Capacity: 50, Open Air)">Society Garden Gazebo (Capacity: 50, Open Air)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="eventType">Purpose of Workshop / Activity:</label>
+                        <select id="eventType" class="form-control">
+                            <option value="Senior Yoga & Wellness Session">Senior Yoga & Wellness Session</option>
+                            <option value="Neighborhood Reading Circle & Book Club">Neighborhood Reading Circle & Book Club</option>
+                            <option value="Resident Welfare Association Meeting">Resident Welfare Association Meeting</option>
+                            <option value="Art & Craft Workshop for Children">Art & Craft Workshop for Children</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="guestCount">Expected Number of Attendees:</label>
+                        <select id="guestCount" class="form-control">
+                            <option value="15 - 30 People">15 - 30 People</option>
+                            <option value="30 - 50 People" selected>30 - 50 People</option>
+                            <option value="50 - 80 People">50 - 80 People</option>
+                        </select>
+                    </div>
                 </div>
 
                 <!-- Field 5: Preferred Time Slot -->
                 <div class="form-group">
-                    <label>Preferred Time Slot:</label>
+                    <label>Preferred Date / Time Slot:</label>
                     <div class="radio-group">
                         <label class="radio-label">
                             <input type="radio" name="preferredTime" value="Morning (9 AM - 12 PM)" checked>
@@ -124,8 +158,8 @@
                     </div>
                 </div>
 
-                <!-- Field 6: Simple Description / Notes -->
-                <div class="form-group">
+                <!-- Field 6: Simple Description / Notes (For volunteer requests) -->
+                <div class="form-group" id="volunteerNotesGroup">
                     <label for="userNotes">Brief Note (What needs to be done?):</label>
                     <textarea id="userNotes" class="form-control" rows="3" placeholder="e.g. Need someone to collect 2 boxes of blood pressure medicine from local chemist.">Need assistance picking up prescribed blood pressure medicines from Apex Chemist near the station.</textarea>
                 </div>
@@ -140,42 +174,148 @@
 
             </form>
         </div>
-        <!-- ==============================================================
-             MEMBER 3 CONTENT ENDS HERE
-             ============================================================== -->
 
     </main>
 
-    <!-- Shared Footer -->
+    <!-- Shared Footer with Grievance & SOS Link -->
     <footer class="main-footer">
         <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+        <p style="margin-top: 8px; font-size: 0.95rem;">
+            <a href="javascript:void(0)" onclick="openComplaintModal()" style="color: #FCA5A5; text-decoration: underline;">
+                ⚠️ Report an Issue / File Volunteer Complaint
+            </a>
+            &nbsp;•&nbsp;
+            <a href="javascript:void(0)" onclick="openSosModal()" style="color: #FCA5A5; text-decoration: underline;">
+                🚨 Emergency Assistance Desk
+            </a>
+        </p>
     </footer>
+
+    <!-- SOS Emergency Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Senior Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <p style="font-size: 1.05rem; margin-bottom: 20px; color: var(--text-primary);">
+                Do you need urgent medical or security assistance? Help is available 24/7.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left; justify-content: flex-start;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; justify-content: flex-start;">
+                    👮 Call DBIT Society Security Guard (022-2500-1111)
+                </a>
+                <a href="tel:9876500000" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
+                    👨‍👩‍👧 Alert Registered Emergency Family Contact
+                </a>
+            </div>
+            <div style="background-color: #FEE2E2; border: 1px solid #FCA5A5; padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #991B1B;">
+                GPS Location Alert: Flat 402, Shanti Niketan has been flagged for prioritized neighborhood patrol.
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close Emergency Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grievance / Complaint Modal -->
+    <div id="complaintModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: var(--primary-color);">📝 File a Community Complaint</h2>
+                <button class="modal-close-btn" onclick="closeComplaintModal()">&times;</button>
+            </div>
+            <div id="complaintSuccess" style="display: none; background-color: #DCFCE7; color: #166534; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-weight: 600;">
+                ✓ Complaint Registered (#CMP-2026-104). The DBIT Community Grievance Committee will investigate within 24 hours.
+            </div>
+            <form onsubmit="handleComplaintSubmit(event)">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Related Request / Reference ID (Optional):</label>
+                    <input type="text" class="form-control" placeholder="e.g. #SYG-2026-8941" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Issue Category:</label>
+                    <select class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                        <option value="">-- Choose Issue --</option>
+                        <option value="no-show">Volunteer did not arrive on time</option>
+                        <option value="behavior">Inappropriate behavior or conduct</option>
+                        <option value="space">Community space locked or unclean</option>
+                        <option value="other">Other neighborhood grievance</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Description of Problem:</label>
+                    <textarea class="form-control" rows="3" required placeholder="Describe what happened..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"></textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Your Contact Phone:</label>
+                    <input type="tel" class="form-control" value="+91 98765 43210" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeComplaintModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Complaint ✓</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Shared Script -->
     <script src="js/main.js"></script>
     <script>
-        // Check URL parameters if redirected from Screen 2
+        function toggleFormMode() {
+            const category = document.getElementById('serviceCategory').value;
+            const spaceFields = document.getElementById('spaceFields');
+            const volunteerNotes = document.getElementById('volunteerNotesGroup');
+            const heading = document.getElementById('formHeading');
+            const subheading = document.getElementById('formSubheading');
+
+            if (category === 'Community Space & Hall Sharing') {
+                spaceFields.style.display = 'block';
+                volunteerNotes.style.display = 'none';
+                heading.textContent = 'Reserve a Community Space or Hall';
+                subheading.textContent = 'Select the hall facility, expected group size, and event time for community activities.';
+            } else {
+                spaceFields.style.display = 'none';
+                volunteerNotes.style.display = 'block';
+                heading.textContent = 'Enter Your Request Details';
+                subheading.textContent = 'Please fill in your contact information and where you need assistance.';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
             const service = urlParams.get('service');
             const select = document.getElementById('serviceCategory');
             if (service === 'digital') select.value = 'Smartphone & Digital Help';
             if (service === 'companion') select.value = 'Clinic Companion & Walking';
-            if (service === 'space') select.value = 'Community Space & Hall Sharing';
+            if (service === 'space') {
+                select.value = 'Community Space & Hall Sharing';
+            }
+            toggleFormMode();
         });
 
-        // Save to demo state and navigate forward to Screen 4
         function handleFormSubmit(e) {
             e.preventDefault();
             const timeSlot = document.querySelector('input[name="preferredTime"]:checked')?.value || 'Morning (9 AM - 12 PM)';
+            const category = document.getElementById('serviceCategory').value;
+            const isSpace = category === 'Community Space & Hall Sharing';
             
             const formData = {
-                category: document.getElementById('serviceCategory').value,
+                category: category,
                 name: document.getElementById('userName').value,
                 phone: document.getElementById('userPhone').value,
                 address: document.getElementById('userAddress').value,
                 time: timeSlot,
-                notes: document.getElementById('userNotes').value
+                isSpaceBooking: isSpace,
+                hallName: isSpace ? document.getElementById('hallName').value : '',
+                eventType: isSpace ? document.getElementById('eventType').value : '',
+                guestCapacity: isSpace ? document.getElementById('guestCount').value : '',
+                notes: isSpace ? ('Workshop: ' + document.getElementById('eventType').value) : document.getElementById('userNotes').value
             };
             
             saveHelpRequest(formData);

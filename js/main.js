@@ -1,6 +1,6 @@
 // ==========================================================================
 // Sahyog Community Platform - Shared JavaScript
-// Supports Font Resizing (Senior Accessibility) and Simple Demo State
+// Supports Font Resizing, SOS Panic Modal, Complaint Filing, & Demo State
 // ==========================================================================
 
 // 1. Accessibility: Font Resizer
@@ -16,11 +16,9 @@ function changeFontSize(size) {
         root.classList.add('font-normal');
     }
 
-    // Save user preference
     localStorage.setItem('sahyog_font_size', size);
 }
 
-// Restore user font size preference on page load
 document.addEventListener('DOMContentLoaded', () => {
     const savedSize = localStorage.getItem('sahyog_font_size');
     if (savedSize) {
@@ -28,7 +26,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-// 2. Demo State Helper: Passes form data across Screen 3 -> Screen 4 -> Screen 5
+// 2. SOS Panic Button Modal Controls
+function openSosModal() {
+    const modal = document.getElementById('sosModal');
+    if (modal) modal.classList.add('active');
+}
+
+function closeSosModal() {
+    const modal = document.getElementById('sosModal');
+    if (modal) modal.classList.remove('active');
+}
+
+// 3. Complaint & Grievance Modal Controls
+function openComplaintModal() {
+    const modal = document.getElementById('complaintModal');
+    if (modal) modal.classList.add('active');
+}
+
+function closeComplaintModal() {
+    const modal = document.getElementById('complaintModal');
+    if (modal) modal.classList.remove('active');
+}
+
+function handleComplaintSubmit(e) {
+    e.preventDefault();
+    const alertBox = document.getElementById('complaintSuccess');
+    if (alertBox) {
+        alertBox.style.display = 'block';
+        setTimeout(() => {
+            closeComplaintModal();
+            alertBox.style.display = 'none';
+        }, 2500);
+    } else {
+        alert('Your complaint #CMP-2026-104 has been registered with the DBIT Grievance Desk.');
+        closeComplaintModal();
+    }
+}
+
+// 4. Demo State Helper: Stores Volunteer Requests OR Community Space Bookings
 function saveHelpRequest(data) {
     localStorage.setItem('sahyog_current_request', JSON.stringify(data));
 }
@@ -41,7 +76,11 @@ function getHelpRequest() {
         address: 'Flat 402, Shanti Niketan, Sector 4, Kurla West',
         time: 'Today, Morning (9:00 AM - 12:00 PM)',
         urgency: 'Today',
-        notes: 'Need someone to pick up prescribed blood pressure medicine from Apex Chemist.'
+        notes: 'Need someone to pick up prescribed blood pressure medicine from Apex Chemist.',
+        isSpaceBooking: false,
+        hallName: 'St. Joseph Community Activity Hall',
+        guestCapacity: '50 People',
+        eventType: 'Senior Wellness & Reading Circle'
     };
     
     const saved = localStorage.getItem('sahyog_current_request');

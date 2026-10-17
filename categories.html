@@ -11,14 +11,17 @@
 </head>
 <body>
 
-    <!-- Accessibility & Helpline Bar -->
+    <!-- Accessibility, Helpline & SOS Bar -->
     <div class="top-bar">
-        <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
         <div class="font-controls">
             <span>Font Size:</span>
-            <button onclick="changeFontSize('small')">A-</button>
-            <button onclick="changeFontSize('normal')">A</button>
-            <button onclick="changeFontSize('large')">A+</button>
+            <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+            <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+            <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
         </div>
     </div>
 
@@ -63,9 +66,7 @@
             </div>
         </div>
 
-        <!-- ==============================================================
-             MEMBER 2 CONTENT STARTS HERE (Screen 2: Service Selection)
-             ============================================================== -->
+        <!-- MEMBER 2 CONTENT (Screen 2: Service Selection) -->
         <div class="page-header">
             <h1>What Kind of Help Do You Need Today?</h1>
             <p style="color: var(--text-secondary); font-size: 1.15rem;">
@@ -82,7 +83,6 @@
                     <h3>Grocery & Medicine Delivery</h3>
                     <p>Have a friendly neighborhood volunteer pick up essential groceries, daily vegetables, or pharmacy prescriptions.</p>
                 </div>
-                <!-- Forward Trigger to Screen 3 -->
                 <a href="request-help.html?service=groceries" class="btn btn-primary" id="btn-select-grocery">
                     Select This Service →
                 </a>
@@ -112,15 +112,15 @@
                 </a>
             </div>
 
-            <!-- Category 4: Community Space Sharing (Second core feature!) -->
-            <div class="category-card">
+            <!-- Category 4: Community Space Sharing (Option 3: Smart Space Booking) -->
+            <div class="category-card" style="border-color: #3B82F6; background: #F0F9FF;">
                 <div>
                     <div class="category-icon">🏛️</div>
-                    <h3>Community Space & Hall Sharing</h3>
-                    <p>Request or reserve shared community halls, society clubhouses, or classroom spaces for workshops and gatherings.</p>
+                    <h3 style="color: #0369A1;">Community Space & Hall Sharing</h3>
+                    <p>Reserve neighborhood halls, society clubhouses, or activity rooms for yoga, reading circles, and workshops.</p>
                 </div>
-                <a href="request-help.html?service=space" class="btn btn-primary">
-                    Request Space Booking →
+                <a href="request-help.html?service=space" class="btn btn-primary" style="background-color: #0284C7;" id="btn-select-space">
+                    Reserve Community Space 🏛️ →
                 </a>
             </div>
 
@@ -130,16 +130,95 @@
         <div style="text-align: center; margin-top: 20px;">
             <a href="index.html" class="btn btn-secondary">← Back to Home</a>
         </div>
-        <!-- ==============================================================
-             MEMBER 2 CONTENT ENDS HERE
-             ============================================================== -->
 
     </main>
 
-    <!-- Shared Footer -->
+    <!-- Shared Footer with Grievance & SOS Link -->
     <footer class="main-footer">
         <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+        <p style="margin-top: 8px; font-size: 0.95rem;">
+            <a href="javascript:void(0)" onclick="openComplaintModal()" style="color: #FCA5A5; text-decoration: underline;">
+                ⚠️ Report an Issue / File Volunteer Complaint
+            </a>
+            &nbsp;•&nbsp;
+            <a href="javascript:void(0)" onclick="openSosModal()" style="color: #FCA5A5; text-decoration: underline;">
+                🚨 Emergency Assistance Desk
+            </a>
+        </p>
     </footer>
+
+    <!-- SOS Emergency Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Senior Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <p style="font-size: 1.05rem; margin-bottom: 20px; color: var(--text-primary);">
+                Do you need urgent medical or security assistance? Help is available 24/7.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left; justify-content: flex-start;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; justify-content: flex-start;">
+                    👮 Call DBIT Society Security Guard (022-2500-1111)
+                </a>
+                <a href="tel:9876500000" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
+                    👨‍👩‍👧 Alert Registered Emergency Family Contact
+                </a>
+            </div>
+            <div style="background-color: #FEE2E2; border: 1px solid #FCA5A5; padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #991B1B;">
+                GPS Location Alert: Flat 402, Shanti Niketan has been flagged for prioritized neighborhood patrol.
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close Emergency Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grievance / Complaint Modal -->
+    <div id="complaintModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: var(--primary-color);">📝 File a Community Complaint</h2>
+                <button class="modal-close-btn" onclick="closeComplaintModal()">&times;</button>
+            </div>
+            <div id="complaintSuccess" style="display: none; background-color: #DCFCE7; color: #166534; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-weight: 600;">
+                ✓ Complaint Registered (#CMP-2026-104). The DBIT Community Grievance Committee will investigate within 24 hours.
+            </div>
+            <form onsubmit="handleComplaintSubmit(event)">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Related Request / Reference ID (Optional):</label>
+                    <input type="text" class="form-control" placeholder="e.g. #SYG-2026-8941" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Issue Category:</label>
+                    <select class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" required>
+                        <option value="">-- Choose Issue --</option>
+                        <option value="no-show">Volunteer did not arrive on time</option>
+                        <option value="behavior">Inappropriate behavior or conduct</option>
+                        <option value="space">Community space locked or unclean</option>
+                        <option value="other">Other neighborhood grievance</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Description of Problem:</label>
+                    <textarea class="form-control" rows="3" required placeholder="Describe what happened..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"></textarea>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Your Contact Phone:</label>
+                    <input type="tel" class="form-control" value="+91 98765 43210" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeComplaintModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit Complaint ✓</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <!-- Shared Script -->
     <script src="js/main.js"></script>
