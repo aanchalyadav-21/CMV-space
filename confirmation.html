@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahyog Community - Screen 5: Request Confirmed</title>
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <!-- Member 5 Styles -->
+    <link rel="stylesheet" href="css/screen5.css">
+</head>
+<body>
+
+    <!-- Accessibility & Helpline Bar -->
+    <div class="top-bar">
+        <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')">A-</button>
+            <button onclick="changeFontSize('normal')">A</button>
+            <button onclick="changeFontSize('large')">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Sahyog</strong> Community</span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="categories.html">Services</a>
+            <a href="request-help.html">Request Help</a>
+            <a href="confirmation.html" class="active">Track Status</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+        
+        <!-- Journey Progress Indicator -->
+        <div class="flow-progress">
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Home</span>
+            </div>
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Select Service</span>
+            </div>
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Fill Request</span>
+            </div>
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Review Details</span>
+            </div>
+            <div class="flow-step completed active">
+                <span class="step-num">✓</span>
+                <span>Confirmed Status</span>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             MEMBER 5 CONTENT STARTS HERE (Screen 5: Success & Tracking)
+             ============================================================== -->
+        <div class="success-card">
+            
+            <div class="success-icon">✓</div>
+            
+            <h1 style="color: var(--accent-color); font-size: 2rem; margin-bottom: 8px;">
+                Request Successfully Submitted!
+            </h1>
+            <p style="color: var(--text-secondary); font-size: 1.15rem;">
+                Your request has been broadcasted to verified community volunteers in your area.
+            </p>
+
+            <!-- Tracking & Status Box (Exp 5 Final State Displayed) -->
+            <div class="tracking-box">
+                <div class="tracking-row">
+                    <span>Reference Tracking ID:</span>
+                    <strong style="font-size: 1.2rem; letter-spacing: 1px;">#SYG-2026-8941</strong>
+                </div>
+                <div class="tracking-row">
+                    <span>Current Status:</span>
+                    <span class="badge badge-pending">🟡 Looking for Nearby Volunteer (Pending)</span>
+                </div>
+                <div class="tracking-row">
+                    <span>Requested Service:</span>
+                    <strong id="finalService">Grocery & Medicine Delivery</strong>
+                </div>
+                <div class="tracking-row">
+                    <span>Estimated Volunteer Contact:</span>
+                    <strong>Within 30 Minutes</strong>
+                </div>
+            </div>
+
+            <!-- Senior Citizen Friendly Next Steps -->
+            <div class="support-box">
+                📞 <strong>What happens next?</strong> A verified volunteer will call your phone before heading out. Keep your phone nearby. If you need urgent assistance, call our community desk at <strong>1800-200-4567</strong>.
+            </div>
+
+            <!-- Actions (Return to Home & Print Receipt) -->
+            <div class="success-actions">
+                <a href="index.html" class="btn btn-primary btn-large" id="btn-return-home">
+                    🏠 Return to Home Page
+                </a>
+                <button onclick="window.print()" class="btn btn-secondary">
+                    🖨️ Print / Save Receipt
+                </button>
+            </div>
+
+        </div>
+        <!-- ==============================================================
+             MEMBER 5 CONTENT ENDS HERE
+             ============================================================== -->
+
+    </main>
+
+    <!-- Shared Footer -->
+    <footer class="main-footer">
+        <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+    </footer>
+
+    <!-- Shared Script -->
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = getHelpRequest();
+            if (data && data.category) {
+                document.getElementById('finalService').textContent = data.category;
+            }
+        });
+    </script>
+</body>
+</html>

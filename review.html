@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahyog Community - Screen 4: Review Details</title>
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <!-- Member 4 Styles -->
+    <link rel="stylesheet" href="css/screen4.css">
+</head>
+<body>
+
+    <!-- Accessibility & Helpline Bar -->
+    <div class="top-bar">
+        <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')">A-</button>
+            <button onclick="changeFontSize('normal')">A</button>
+            <button onclick="changeFontSize('large')">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Sahyog</strong> Community</span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="categories.html">Services</a>
+            <a href="request-help.html">Request Help</a>
+            <a href="confirmation.html" class="active">Track Status</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+        
+        <!-- Journey Progress Indicator -->
+        <div class="flow-progress">
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Home</span>
+            </div>
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Select Service</span>
+            </div>
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Fill Request</span>
+            </div>
+            <div class="flow-step active">
+                <span class="step-num">4</span>
+                <span>Review Details</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">5</span>
+                <span>Confirmed Status</span>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             MEMBER 4 CONTENT STARTS HERE (Screen 4: Verification / Review)
+             ============================================================== -->
+        <div class="review-card">
+            <h1 style="color: var(--primary-color); font-size: 1.85rem; margin-bottom: 8px;">
+                Review Your Request Details
+            </h1>
+            <p style="color: var(--text-secondary); margin-bottom: 20px;">
+                Please review the information below before final submission. You can click <strong>"Edit Details"</strong> if you need to make changes.
+            </p>
+
+            <div class="review-notice">
+                ℹ️ <strong>Senior Citizen Safety Guarantee:</strong> Volunteer assistance is 100% free of charge. Only verified neighborhood volunteers from DBIT Community Network are assigned.
+            </div>
+
+            <div class="review-list">
+                <div class="review-item">
+                    <span class="review-label">Service Type:</span>
+                    <span class="review-value" id="revService">🛒 Grocery & Medicine Delivery</span>
+                </div>
+                <div class="review-item">
+                    <span class="review-label">Requester Name:</span>
+                    <span class="review-value" id="revName">Ramesh Patel</span>
+                </div>
+                <div class="review-item">
+                    <span class="review-label">Contact Phone:</span>
+                    <span class="review-value" id="revPhone">+91 98765 43210</span>
+                </div>
+                <div class="review-item">
+                    <span class="review-label">Address / Landmark:</span>
+                    <span class="review-value" id="revAddress">Flat 402, Shanti Niketan, Sector 4, Kurla West</span>
+                </div>
+                <div class="review-item">
+                    <span class="review-label">Preferred Time:</span>
+                    <span class="review-value" id="revTime">Morning (9 AM - 12 PM)</span>
+                </div>
+                <div class="review-item">
+                    <span class="review-label">Special Instructions:</span>
+                    <span class="review-value" id="revNotes">Need assistance picking up prescribed blood pressure medicines from Apex Chemist.</span>
+                </div>
+            </div>
+
+            <!-- Forward & Backward Action Triggers (Exp 5 Requirement) -->
+            <div class="review-actions">
+                <a href="request-help.html" class="btn btn-secondary">
+                    ← Edit Details
+                </a>
+                <a href="confirmation.html" class="btn btn-primary btn-large" id="btn-confirm-submit">
+                    Confirm & Submit Request ✓
+                </a>
+            </div>
+
+        </div>
+        <!-- ==============================================================
+             MEMBER 4 CONTENT ENDS HERE
+             ============================================================== -->
+
+    </main>
+
+    <!-- Shared Footer -->
+    <footer class="main-footer">
+        <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+    </footer>
+
+    <!-- Shared Script -->
+    <script src="js/main.js"></script>
+    <script>
+        // Load data dynamically from demo state if available
+        document.addEventListener('DOMContentLoaded', () => {
+            const data = getHelpRequest();
+            if (data) {
+                if (data.category) document.getElementById('revService').textContent = data.category;
+                if (data.name) document.getElementById('revName').textContent = data.name;
+                if (data.phone) document.getElementById('revPhone').textContent = data.phone;
+                if (data.address) document.getElementById('revAddress').textContent = data.address;
+                if (data.time) document.getElementById('revTime').textContent = data.time;
+                if (data.notes) document.getElementById('revNotes').textContent = data.notes;
+            }
+        });
+    </script>
+</body>
+</html>

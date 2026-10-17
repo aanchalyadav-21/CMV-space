@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahyog Community - Screen 2: Choose Service</title>
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <!-- Member 2 Styles -->
+    <link rel="stylesheet" href="css/screen2.css">
+</head>
+<body>
+
+    <!-- Accessibility & Helpline Bar -->
+    <div class="top-bar">
+        <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')">A-</button>
+            <button onclick="changeFontSize('normal')">A</button>
+            <button onclick="changeFontSize('large')">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Sahyog</strong> Community</span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="categories.html" class="active">Services</a>
+            <a href="request-help.html">Request Help</a>
+            <a href="confirmation.html">Track Status</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+        
+        <!-- Journey Progress Indicator -->
+        <div class="flow-progress">
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Home</span>
+            </div>
+            <div class="flow-step active">
+                <span class="step-num">2</span>
+                <span>Select Service</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">3</span>
+                <span>Fill Request</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">4</span>
+                <span>Review Details</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">5</span>
+                <span>Confirmed Status</span>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             MEMBER 2 CONTENT STARTS HERE (Screen 2: Service Selection)
+             ============================================================== -->
+        <div class="page-header">
+            <h1>What Kind of Help Do You Need Today?</h1>
+            <p style="color: var(--text-secondary); font-size: 1.15rem;">
+                Click on any category card below to proceed to the request form.
+            </p>
+        </div>
+
+        <div class="categories-grid">
+            
+            <!-- Category 1: Grocery & Medicine (Primary Senior Volunteer Need) -->
+            <div class="category-card">
+                <div>
+                    <div class="category-icon">🛒</div>
+                    <h3>Grocery & Medicine Delivery</h3>
+                    <p>Have a friendly neighborhood volunteer pick up essential groceries, daily vegetables, or pharmacy prescriptions.</p>
+                </div>
+                <!-- Forward Trigger to Screen 3 -->
+                <a href="request-help.html?service=groceries" class="btn btn-primary" id="btn-select-grocery">
+                    Select This Service →
+                </a>
+            </div>
+
+            <!-- Category 2: Digital & Tech Assistance -->
+            <div class="category-card">
+                <div>
+                    <div class="category-icon">📱</div>
+                    <h3>Smartphone & Digital Help</h3>
+                    <p>In-person patient assistance with smartphone apps, utility bill payments, video calls with family, or pension portal forms.</p>
+                </div>
+                <a href="request-help.html?service=digital" class="btn btn-primary">
+                    Select This Service →
+                </a>
+            </div>
+
+            <!-- Category 3: Hospital & Walking Companion -->
+            <div class="category-card">
+                <div>
+                    <div class="category-icon">🩺</div>
+                    <h3>Clinic Companion & Walking</h3>
+                    <p>Accompaniment for morning park walks, hospital visits, or routine health checkups with a verified local volunteer.</p>
+                </div>
+                <a href="request-help.html?service=companion" class="btn btn-primary">
+                    Select This Service →
+                </a>
+            </div>
+
+            <!-- Category 4: Community Space Sharing (Second core feature!) -->
+            <div class="category-card">
+                <div>
+                    <div class="category-icon">🏛️</div>
+                    <h3>Community Space & Hall Sharing</h3>
+                    <p>Request or reserve shared community halls, society clubhouses, or classroom spaces for workshops and gatherings.</p>
+                </div>
+                <a href="request-help.html?service=space" class="btn btn-primary">
+                    Request Space Booking →
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Back to Home navigation -->
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="index.html" class="btn btn-secondary">← Back to Home</a>
+        </div>
+        <!-- ==============================================================
+             MEMBER 2 CONTENT ENDS HERE
+             ============================================================== -->
+
+    </main>
+
+    <!-- Shared Footer -->
+    <footer class="main-footer">
+        <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+    </footer>
+
+    <!-- Shared Script -->
+    <script src="js/main.js"></script>
+</body>
+</html>

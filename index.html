@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahyog Community - Screen 1: Home</title>
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <!-- Member 1 Styles -->
+    <link rel="stylesheet" href="css/screen1.css">
+</head>
+<body>
+
+    <!-- Accessibility & Helpline Bar -->
+    <div class="top-bar">
+        <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+            <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+            <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Sahyog</strong> Community</span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html" class="active">Home</a>
+            <a href="categories.html">Services</a>
+            <a href="request-help.html">Request Help</a>
+            <a href="confirmation.html">Track Status</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+        
+        <!-- Journey Progress Indicator -->
+        <div class="flow-progress">
+            <div class="flow-step active">
+                <span class="step-num">1</span>
+                <span>Home / Welcome</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">2</span>
+                <span>Select Service</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">3</span>
+                <span>Fill Request</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">4</span>
+                <span>Review Details</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">5</span>
+                <span>Confirmed Status</span>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             MEMBER 1 CONTENT STARTS HERE (Screen 1: Landing / Entry Screen)
+             ============================================================== -->
+        <section class="hero-section">
+            <h1 class="hero-title">Neighbourhood Help & Community Spaces Made Simple</h1>
+            <p class="hero-subtitle">
+                A community-driven platform connecting local residents and senior citizens with trusted volunteers for micro-tasks and shared activity spaces.
+            </p>
+            
+            <!-- Primary Forward CTA Button (Exp 5 Forward Trigger) -->
+            <div class="hero-actions">
+                <a href="categories.html" class="btn btn-primary btn-large" id="btn-request-help">
+                    Request Volunteer Help Now →
+                </a>
+                <a href="categories.html" class="btn btn-secondary btn-large">
+                    Browse Community Spaces 🏛️
+                </a>
+            </div>
+        </section>
+
+        <!-- Feature Highlights -->
+        <section class="feature-cards">
+            <div class="feature-card">
+                <div class="icon">🛒</div>
+                <h3>Micro-Volunteering</h3>
+                <p>Quick help with groceries, medicine pickup, digital forms, and daily companionship.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🏛️</div>
+                <h3>Shared Spaces</h3>
+                <p>Discover neighborhood halls, society rooms, and activity spaces for workshops.</p>
+            </div>
+            <div class="feature-card">
+                <div class="icon">🛡️</div>
+                <h3>Verified & Safe</h3>
+                <p>Every volunteer is verified by the local community committee for complete safety.</p>
+            </div>
+        </section>
+        <!-- ==============================================================
+             MEMBER 1 CONTENT ENDS HERE
+             ============================================================== -->
+
+    </main>
+
+    <!-- Shared Footer -->
+    <footer class="main-footer">
+        <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+        <p style="margin-top: 6px; font-size: 0.85rem; color: #94A3B8;">Built with Accessible HTML5, CSS3, and JavaScript</p>
+    </footer>
+
+    <!-- Shared Script -->
+    <script src="js/main.js"></script>
+</body>
+</html>

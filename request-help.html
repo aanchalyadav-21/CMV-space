@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahyog Community - Screen 3: Help Request Form</title>
+    <!-- Shared Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <!-- Member 3 Styles -->
+    <link rel="stylesheet" href="css/screen3.css">
+</head>
+<body>
+
+    <!-- Accessibility & Helpline Bar -->
+    <div class="top-bar">
+        <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')">A-</button>
+            <button onclick="changeFontSize('normal')">A</button>
+            <button onclick="changeFontSize('large')">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Sahyog</strong> Community</span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="categories.html">Services</a>
+            <a href="request-help.html" class="active">Request Help</a>
+            <a href="confirmation.html">Track Status</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+        
+        <!-- Journey Progress Indicator -->
+        <div class="flow-progress">
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Home</span>
+            </div>
+            <div class="flow-step completed">
+                <span class="step-num">✓</span>
+                <span>Select Service</span>
+            </div>
+            <div class="flow-step active">
+                <span class="step-num">3</span>
+                <span>Fill Request</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">4</span>
+                <span>Review Details</span>
+            </div>
+            <div class="flow-step">
+                <span class="step-num">5</span>
+                <span>Confirmed Status</span>
+            </div>
+        </div>
+
+        <!-- ==============================================================
+             MEMBER 3 CONTENT STARTS HERE (Screen 3: Input Form)
+             ============================================================== -->
+        <div class="form-card">
+            <h1 style="color: var(--primary-color); font-size: 1.85rem; margin-bottom: 8px;">
+                Enter Your Request Details
+            </h1>
+            <p style="color: var(--text-secondary); margin-bottom: 24px;">
+                Please fill in your contact information and where you need assistance. All information is kept safe.
+            </p>
+
+            <form id="helpForm" onsubmit="handleFormSubmit(event)">
+                
+                <!-- Field 1: Category of Help -->
+                <div class="form-group">
+                    <label for="serviceCategory">Selected Service / Activity:</label>
+                    <select id="serviceCategory" class="form-control">
+                        <option value="Grocery & Medicine Delivery" selected>🛒 Grocery & Medicine Delivery</option>
+                        <option value="Smartphone & Digital Help">📱 Smartphone & Digital Help</option>
+                        <option value="Clinic Companion & Walking">🩺 Clinic Companion & Walking</option>
+                        <option value="Community Space & Hall Sharing">🏛️ Community Space & Hall Sharing</option>
+                    </select>
+                </div>
+
+                <!-- Field 2: Senior / Requester Name -->
+                <div class="form-group">
+                    <label for="userName">Full Name:</label>
+                    <input type="text" id="userName" class="form-control" value="Ramesh Patel" required placeholder="Enter your full name">
+                </div>
+
+                <!-- Field 3: Contact Phone Number -->
+                <div class="form-group">
+                    <label for="userPhone">Phone Number (For Volunteer Call):</label>
+                    <input type="tel" id="userPhone" class="form-control" value="+91 98765 43210" required placeholder="e.g. 98765 43210">
+                </div>
+
+                <!-- Field 4: Location / Address Landmark -->
+                <div class="form-group">
+                    <label for="userAddress">Address / Building Landmark:</label>
+                    <input type="text" id="userAddress" class="form-control" value="Flat 402, Shanti Niketan, Sector 4, Kurla West" required placeholder="Flat no., Society name, Landmark">
+                </div>
+
+                <!-- Field 5: Preferred Time Slot -->
+                <div class="form-group">
+                    <label>Preferred Time Slot:</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="preferredTime" value="Morning (9 AM - 12 PM)" checked>
+                            Morning (9 AM - 12 PM)
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="preferredTime" value="Afternoon (1 PM - 4 PM)">
+                            Afternoon (1 PM - 4 PM)
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="preferredTime" value="Evening (5 PM - 8 PM)">
+                            Evening (5 PM - 8 PM)
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Field 6: Simple Description / Notes -->
+                <div class="form-group">
+                    <label for="userNotes">Brief Note (What needs to be done?):</label>
+                    <textarea id="userNotes" class="form-control" rows="3" placeholder="e.g. Need someone to collect 2 boxes of blood pressure medicine from local chemist.">Need assistance picking up prescribed blood pressure medicines from Apex Chemist near the station.</textarea>
+                </div>
+
+                <!-- Form Action Buttons (Forward Trigger to Screen 4) -->
+                <div class="form-actions">
+                    <a href="categories.html" class="btn btn-secondary">← Back</a>
+                    <button type="submit" class="btn btn-primary btn-large" id="btn-proceed-review">
+                        Proceed to Review Details →
+                    </button>
+                </div>
+
+            </form>
+        </div>
+        <!-- ==============================================================
+             MEMBER 3 CONTENT ENDS HERE
+             ============================================================== -->
+
+    </main>
+
+    <!-- Shared Footer -->
+    <footer class="main-footer">
+        <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+    </footer>
+
+    <!-- Shared Script -->
+    <script src="js/main.js"></script>
+    <script>
+        // Check URL parameters if redirected from Screen 2
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const service = urlParams.get('service');
+            const select = document.getElementById('serviceCategory');
+            if (service === 'digital') select.value = 'Smartphone & Digital Help';
+            if (service === 'companion') select.value = 'Clinic Companion & Walking';
+            if (service === 'space') select.value = 'Community Space & Hall Sharing';
+        });
+
+        // Save to demo state and navigate forward to Screen 4
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const timeSlot = document.querySelector('input[name="preferredTime"]:checked')?.value || 'Morning (9 AM - 12 PM)';
+            
+            const formData = {
+                category: document.getElementById('serviceCategory').value,
+                name: document.getElementById('userName').value,
+                phone: document.getElementById('userPhone').value,
+                address: document.getElementById('userAddress').value,
+                time: timeSlot,
+                notes: document.getElementById('userNotes').value
+            };
+            
+            saveHelpRequest(formData);
+            window.location.href = 'review.html';
+        }
+    </script>
+</body>
+</html>

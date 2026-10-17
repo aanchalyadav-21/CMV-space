@@ -1,0 +1,66 @@
+/* ==========================================================================
+   Screen 5: Success / Status / Confirmation Screen (Member 5)
+   File: css/screen5.css
+   ========================================================================== */
+
+.success-card {
+    background: var(--surface-color);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    padding: 40px;
+    max-width: 750px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background-color: var(--accent-light);
+    color: var(--accent-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 20px auto;
+    border: 3px solid #86EFAC;
+}
+
+.tracking-box {
+    background: #F8FAFC;
+    border: 2px dashed var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 20px;
+    margin: 24px 0;
+    text-align: left;
+}
+
+.tracking-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 1.05rem;
+}
+
+.tracking-row strong {
+    color: var(--primary-color);
+}
+
+.support-box {
+    background-color: #FEF3C7;
+    border: 1px solid #FCD34D;
+    border-radius: var(--radius-md);
+    padding: 16px;
+    margin: 24px 0;
+    font-size: 1rem;
+    color: #92400E;
+}
+
+.success-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+}
