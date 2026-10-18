@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sahyog Community - Screen 1: Home</title>
-    <!-- Shared Styles -->
-    <link rel="stylesheet" href="css/base.css">
+    <title>Reach Community - Screen 1: Home</title>
+    <!-- Shared Styles with cache-buster v=3 -->
+    <link rel="stylesheet" href="css/base.css?v=3">
     <!-- Member 1 Styles -->
-    <link rel="stylesheet" href="css/screen1.css">
+    <link rel="stylesheet" href="css/screen1.css?v=3">
 </head>
 <body>
 
@@ -15,6 +15,7 @@
     <div class="top-bar">
         <div class="top-bar-left">
             <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <!-- Bright Red SOS Button with inline fallback for 100% visibility -->
             <button class="btn-sos" onclick="openSosModal()" style="background-color: #DC2626 !important; color: #FFFFFF !important; border: 2px solid #FFFFFF !important; padding: 6px 18px !important; border-radius: 9999px !important; font-weight: 800 !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; gap: 6px !important;" title="Emergency Help">
                 🚨 EMERGENCY SOS
             </button>
@@ -27,17 +28,18 @@
         </div>
     </div>
 
-    <!-- Header Navigation -->
+    <!-- Header Navigation with Dedicated "File Complaint" Tab -->
     <header class="main-header">
         <a href="index.html" class="logo">
             <span style="font-size: 1.8rem;">🤝</span>
-            <span><strong>Sahyog</strong> Community</span>
+            <span><strong>Reach</strong> Community</span>
         </a>
         <nav class="main-nav">
             <a href="index.html" class="active">Home</a>
             <a href="categories.html">Services</a>
             <a href="request-help.html">Request Help</a>
             <a href="confirmation.html">Track Status</a>
+            <a href="complaints.html" style="color: #DC2626; font-weight: 700;">File Complaint</a>
         </nav>
     </header>
 
@@ -75,7 +77,7 @@
                 A community-driven platform connecting local residents and senior citizens with trusted volunteers for micro-tasks and shared activity spaces.
             </p>
             
-            <!-- Single, Unified Forward CTA Button (No more selecting twice!) -->
+            <!-- Single, Unified Forward CTA Button -->
             <div class="hero-actions">
                 <a href="categories.html" class="btn btn-primary btn-large" id="btn-request-help">
                     Explore Community Services & Spaces →
@@ -104,11 +106,11 @@
 
     </main>
 
-    <!-- Shared Footer with Grievance & SOS Link -->
+    <!-- Shared Footer with Link to Dedicated Complaints Page -->
     <footer class="main-footer">
-        <p><strong>Sahyog Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+        <p><strong>Reach Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
         <p style="margin-top: 8px; font-size: 0.95rem;">
-            <a href="javascript:void(0)" onclick="openComplaintModal()" style="color: #FCA5A5; text-decoration: underline;">
+            <a href="complaints.html" style="color: #FCA5A5; text-decoration: underline;">
                 ⚠️ Report an Issue / File Volunteer Complaint
             </a>
             &nbsp;•&nbsp;
@@ -118,7 +120,7 @@
         </p>
     </footer>
 
-    <!-- SOS Emergency Modal (Hidden until clicked) -->
+    <!-- SOS Emergency Modal -->
     <div id="sosModal" class="modal-overlay" style="display: none;">
         <div class="modal-content modal-sos">
             <div class="modal-header">
@@ -150,48 +152,7 @@
         </div>
     </div>
 
-    <!-- Grievance / Complaint Modal (Hidden until clicked) -->
-    <div id="complaintModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="color: var(--primary-color);">📝 File a Community Complaint</h2>
-                <button class="modal-close-btn" onclick="closeComplaintModal()">&times;</button>
-            </div>
-            <div id="complaintSuccess" style="display: none; background-color: #DCFCE7; color: #166534; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-weight: 600;">
-                ✓ Complaint Registered (#CMP-2026-104). The DBIT Community Grievance Committee will investigate within 24 hours.
-            </div>
-            <form onsubmit="handleComplaintSubmit(event)">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Related Request / Reference ID (Optional):</label>
-                    <input type="text" class="form-control" placeholder="e.g. #SYG-2026-8941" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Issue Category:</label>
-                    <select class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" required>
-                        <option value="">-- Choose Issue --</option>
-                        <option value="no-show">Volunteer did not arrive on time</option>
-                        <option value="behavior">Inappropriate behavior or conduct</option>
-                        <option value="space">Community space locked or unclean</option>
-                        <option value="other">Other neighborhood grievance</option>
-                    </select>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Description of Problem:</label>
-                    <textarea class="form-control" rows="3" required placeholder="Describe what happened..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"></textarea>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Your Contact Phone:</label>
-                    <input type="tel" class="form-control" value="+91 98765 43210" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeComplaintModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit Complaint ✓</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Shared Script -->
-    <script src="js/main.js"></script>
+    <!-- Shared Script with cache-buster v=3 -->
+    <script src="js/main.js?v=3"></script>
 </body>
 </html>

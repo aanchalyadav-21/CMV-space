@@ -1,4 +1,4 @@
-# 🤝 Sahyog Community Platform
+# 🤝 Reach Community Platform
 
 > **DBIT Department of Computer Engineering — AY 26-27**  
 > **Course:** 25CE3CEP01 Community Engagement Project  
@@ -7,7 +7,7 @@
 ---
 
 ## 📌 Project Overview
-**Sahyog** is an accessible, community-driven micro-volunteering and shared space platform. It allows local residents and senior citizens to request urgent help (grocery/medicine pickup, digital tech assistance, clinic companion) and reserve shared community halls for workshops and neighborhood activities.
+**Reach** is an accessible, community-driven micro-volunteering and shared space platform. It allows local residents and senior citizens to request urgent help (grocery/medicine pickup, digital tech assistance, clinic companion) and reserve shared community halls for workshops and neighborhood activities.
 
 ### 🌟 Key Human-Centric Safety Features:
 1. **🚨 Senior Emergency SOS Panic Button:** One-touch emergency assistance modal in the top header connecting elders directly to medical ambulance (108) and society security.

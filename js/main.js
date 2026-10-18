@@ -1,6 +1,6 @@
 // ==========================================================================
-// Sahyog Community Platform - Shared JavaScript
-// Supports Font Resizing, SOS Panic Modal, Complaint Filing, & Demo State
+// Reach Community Platform - Shared JavaScript
+// Supports Font Resizing, SOS Panic Modal, & Demo State
 // ==========================================================================
 
 // 1. Accessibility: Font Resizer
@@ -16,56 +16,34 @@ function changeFontSize(size) {
         root.classList.add('font-normal');
     }
 
-    localStorage.setItem('sahyog_font_size', size);
+    localStorage.setItem('reach_font_size', size);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const savedSize = localStorage.getItem('sahyog_font_size');
+    const savedSize = localStorage.getItem('reach_font_size') || localStorage.getItem('sahyog_font_size');
     if (savedSize) {
         changeFontSize(savedSize);
     }
 });
 
-// 2. SOS Panic Button Modal Controls
+// 2. SOS Panic Button Modal Controls (Direct inline display style to prevent cache issues)
 function openSosModal() {
     const modal = document.getElementById('sosModal');
-    if (modal) modal.classList.add('active');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
 }
 
 function closeSosModal() {
     const modal = document.getElementById('sosModal');
-    if (modal) modal.classList.remove('active');
-}
-
-// 3. Complaint & Grievance Modal Controls
-function openComplaintModal() {
-    const modal = document.getElementById('complaintModal');
-    if (modal) modal.classList.add('active');
-}
-
-function closeComplaintModal() {
-    const modal = document.getElementById('complaintModal');
-    if (modal) modal.classList.remove('active');
-}
-
-function handleComplaintSubmit(e) {
-    e.preventDefault();
-    const alertBox = document.getElementById('complaintSuccess');
-    if (alertBox) {
-        alertBox.style.display = 'block';
-        setTimeout(() => {
-            closeComplaintModal();
-            alertBox.style.display = 'none';
-        }, 2500);
-    } else {
-        alert('Your complaint #CMP-2026-104 has been registered with the DBIT Grievance Desk.');
-        closeComplaintModal();
+    if (modal) {
+        modal.style.display = 'none';
     }
 }
 
-// 4. Demo State Helper: Stores Volunteer Requests OR Community Space Bookings
+// 3. Demo State Helper: Stores Volunteer Requests OR Community Space Bookings
 function saveHelpRequest(data) {
-    localStorage.setItem('sahyog_current_request', JSON.stringify(data));
+    localStorage.setItem('reach_current_request', JSON.stringify(data));
 }
 
 function getHelpRequest() {
@@ -80,9 +58,9 @@ function getHelpRequest() {
         isSpaceBooking: false,
         hallName: 'St. Joseph Community Activity Hall',
         guestCapacity: '50 People',
-        eventType: 'Senior Wellness & Reading Circle'
+        eventType: 'Senior Yoga & Wellness Session'
     };
     
-    const saved = localStorage.getItem('sahyog_current_request');
+    const saved = localStorage.getItem('reach_current_request') || localStorage.getItem('sahyog_current_request');
     return saved ? JSON.parse(saved) : defaultData;
 }

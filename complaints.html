@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reach Community - File a Complaint / Grievance</title>
+    <!-- Shared Styles with cache-buster v=2 -->
+    <link rel="stylesheet" href="css/base.css?v=2">
+</head>
+<body>
+
+    <!-- Accessibility, Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" style="background-color: #DC2626 !important; color: #FFFFFF !important; border: 2px solid #FFFFFF !important; padding: 6px 16px; border-radius: 9999px; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;" title="Emergency Help">
+                🚨 EMERGENCY SOS
+            </button>
+        </div>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+            <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+            <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Reach</strong> Community</span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="categories.html">Services</a>
+            <a href="request-help.html">Request Help</a>
+            <a href="confirmation.html">Track Status</a>
+            <a href="complaints.html" class="active" style="color: #DC2626; font-weight: 700;">File Complaint</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+        
+        <div class="card" style="max-width: 750px; margin: 0 auto; padding: 32px;">
+            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                <span style="font-size: 2.2rem;">📝</span>
+                <h1 style="color: var(--primary-color); font-size: 1.85rem; margin: 0;">
+                    Community Grievance & Complaint Desk
+                </h1>
+            </div>
+            
+            <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 1.05rem;">
+                Your safety and trust are our top priority. If a volunteer did not show up, behaved inappropriately, or if a community space was unclean/locked, please submit details below. All complaints are investigated by the DBIT Student Committee within 24 hours.
+            </p>
+
+            <div id="complaintSuccessMsg" style="display: none; background-color: #DCFCE7; border: 2px solid #86EFAC; color: #166534; padding: 18px; border-radius: 10px; margin-bottom: 24px; font-size: 1.1rem;">
+                <strong>✓ Complaint Registered Successfully!</strong><br>
+                Your Tracking Reference: <strong>#CMP-2026-104</strong>.<br>
+                A committee representative will call you within 24 hours to resolve this issue.
+            </div>
+
+            <form id="complaintPageForm" onsubmit="handlePageComplaintSubmit(event)">
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 700; margin-bottom: 8px;">Related Request ID or Booking Pass (Optional):</label>
+                    <input type="text" class="form-control" placeholder="e.g. #SYG-2026-8941 or #SPACE-2026-502" style="width: 100%; padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.05rem;">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 700; margin-bottom: 8px;">Category of Grievance:</label>
+                    <select class="form-control" required style="width: 100%; padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.05rem;">
+                        <option value="">-- Please Select the Issue --</option>
+                        <option value="no-show">Volunteer failed to show up / Cancelled late</option>
+                        <option value="behavior">Inappropriate behavior or unprofessional conduct</option>
+                        <option value="space">Community space locked, keys unavailable, or hall unclean</option>
+                        <option value="payment">Volunteer demanded extra money / commercial charges</option>
+                        <option value="other">Other neighborhood grievance</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: 700; margin-bottom: 8px;">Description of What Happened:</label>
+                    <textarea class="form-control" rows="4" required placeholder="Please describe the incident in detail..." style="width: 100%; padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.05rem; font-family: inherit;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                    <label style="display: block; font-weight: 700; margin-bottom: 8px;">Your Contact Phone Number (For Resolution):</label>
+                    <input type="tel" class="form-control" value="+91 98765 43210" required style="width: 100%; padding: 12px 16px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1.05rem;">
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+                    <a href="index.html" class="btn btn-secondary">← Back to Home</a>
+                    <button type="submit" class="btn btn-primary btn-large" style="background-color: #DC2626; border-color: #DC2626;">
+                        Submit Official Complaint ✓
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- Shared Footer -->
+    <footer class="main-footer">
+        <p><strong>Reach Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+        <p style="margin-top: 8px; font-size: 0.95rem;">
+            <a href="complaints.html" style="color: #FCA5A5; text-decoration: underline;">
+                ⚠️ Report an Issue / File Volunteer Complaint
+            </a>
+            &nbsp;•&nbsp;
+            <a href="javascript:void(0)" onclick="openSosModal()" style="color: #FCA5A5; text-decoration: underline;">
+                🚨 Emergency Assistance Desk
+            </a>
+        </p>
+    </footer>
+
+    <!-- SOS Emergency Modal -->
+    <div id="sosModal" class="modal-overlay" style="display: none;">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Senior Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <p style="font-size: 1.05rem; margin-bottom: 20px; color: var(--text-primary);">
+                Do you need urgent medical or security assistance? Help is available 24/7.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left; justify-content: flex-start;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; justify-content: flex-start;">
+                    👮 Call DBIT Society Security Guard (022-2500-1111)
+                </a>
+                <a href="tel:9876500000" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
+                    👨‍👩‍👧 Alert Registered Emergency Family Contact
+                </a>
+            </div>
+            <div style="background-color: #FEE2E2; border: 1px solid #FCA5A5; padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #991B1B;">
+                GPS Location Alert: Flat 402, Shanti Niketan has been flagged for prioritized neighborhood patrol.
+            </div>
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close Emergency Alert</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Script with cache-buster v=2 -->
+    <script src="js/main.js?v=2"></script>
+    <script>
+        function handlePageComplaintSubmit(e) {
+            e.preventDefault();
+            document.getElementById('complaintPageForm').style.display = 'none';
+            document.getElementById('complaintSuccessMsg').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
