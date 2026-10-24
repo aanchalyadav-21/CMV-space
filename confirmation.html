@@ -308,39 +308,7 @@
                     </span>
                 </div>
 
-                <!-- Interactive Workflow Progression Controls (Cross-Window Synchronized) -->
-                <div id="liveSimulationControlCard" style="background: #F8FAFC; border: 1.5px solid #94A3B8; border-radius: 10px; padding: 16px 20px; margin: 18px 0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-                        <div style="display: flex; align-items: center; gap: 10px;">
-                            <span style="font-size: 1.35rem;">🚀</span>
-                            <div>
-                                <strong style="color: #0F172A; font-size: 1rem;">Live Mission Progression</strong>
-                                <p style="margin: 2px 0 0 0; font-size: 0.84rem; color: #475569;" id="lblNextActionGuide">
-                                    Volunteer assigned. Advance through the lifecycle below or from the Volunteer Operations window.
-                                </p>
-                            </div>
-                        </div>
-                        <a href="volunteer.html?tab=mytasks" target="_blank" class="btn btn-secondary" style="font-size: 0.82rem; padding: 5px 12px; border-radius: 6px; text-decoration: none;">
-                            Open Volunteer Window ↗
-                        </a>
-                    </div>
 
-                    <!-- Dynamic Action Buttons -->
-                    <div id="simActionButtons" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
-                        <button id="btnActionAssign" onclick="triggerSimAction('accept')" class="btn btn-primary" style="display: none; background: #059669; border-color: #047857; font-size: 0.88rem; padding: 8px 16px;">
-                            🦸 Simulate Volunteer Acceptance →
-                        </button>
-                        <button id="btnActionArrive" onclick="triggerSimAction('arrived')" class="btn btn-primary" style="background: #2563EB; border-color: #1D4ED8; font-size: 0.88rem; padding: 8px 16px;">
-                            🚶 Step 1: Volunteer Arrives at Doorstep →
-                        </button>
-                        <button id="btnActionStart" onclick="triggerSimAction('in_progress')" class="btn btn-primary" style="display: none; background: #D97706; border-color: #B45309; font-size: 0.88rem; padding: 8px 16px;">
-                            ▶️ Step 2: Start Errand Assistance →
-                        </button>
-                        <button id="btnActionComplete" onclick="triggerSimAction('completed')" class="btn btn-primary" style="display: none; background: #16A34A; border-color: #15803D; font-size: 0.88rem; padding: 8px 16px;">
-                            ✅ Step 3: Verify PIN (4829) & Complete Mission →
-                        </button>
-                    </div>
-                </div>
 
                 <!-- Task Completed Feedback & Rating Banner -->
                 <div id="feedbackPromptBox" style="display: none; background: #FEF3C7; border: 2px solid #F59E0B; border-radius: 10px; padding: 18px 20px; margin: 18px 0; text-align: center;">
@@ -683,44 +651,7 @@
         }
 
         function updateSimulationControls(stage) {
-            const card = document.getElementById('liveSimulationControlCard');
-            if (stage === 'completed') {
-                if (card) card.style.display = 'none';
-                return;
-            }
-            if (card) card.style.display = 'block';
-
-            const btnArrive = document.getElementById('btnActionArrive');
-            const btnStart = document.getElementById('btnActionStart');
-            const btnComplete = document.getElementById('btnActionComplete');
-            const btnAssign = document.getElementById('btnActionAssign');
-            const guide = document.getElementById('lblNextActionGuide');
-
-            if (stage === 'in_progress') {
-                if (guide) guide.textContent = '⚡ Task assistance underway! Next step: Senior verifies Handover PIN (4829) to complete the mission.';
-                if (btnAssign) btnAssign.style.display = 'none';
-                if (btnArrive) btnArrive.style.display = 'none';
-                if (btnStart) btnStart.style.display = 'none';
-                if (btnComplete) btnComplete.style.display = 'inline-flex';
-            } else if (stage === 'arrived') {
-                if (guide) guide.textContent = '🟢 Volunteer arrived at doorstep! Next step: Click "Start Errand Assistance" to begin.';
-                if (btnAssign) btnAssign.style.display = 'none';
-                if (btnArrive) btnArrive.style.display = 'none';
-                if (btnStart) btnStart.style.display = 'inline-flex';
-                if (btnComplete) btnComplete.style.display = 'none';
-            } else if (stage === 'accepted') {
-                if (guide) guide.textContent = '🛵 Volunteer is en route (~4 mins ETA). Next step: Volunteer reaches residence doorstep.';
-                if (btnAssign) btnAssign.style.display = 'none';
-                if (btnArrive) btnArrive.style.display = 'inline-flex';
-                if (btnStart) btnStart.style.display = 'none';
-                if (btnComplete) btnComplete.style.display = 'none';
-            } else {
-                if (guide) guide.textContent = '⏳ Waiting for volunteer. Open Volunteer Hub to accept, or click "Simulate Volunteer Acceptance" below.';
-                if (btnAssign) btnAssign.style.display = 'inline-flex';
-                if (btnArrive) btnArrive.style.display = 'none';
-                if (btnStart) btnStart.style.display = 'none';
-                if (btnComplete) btnComplete.style.display = 'none';
-            }
+            // Live simulation progression card removed per user requirement
         }
 
         function triggerSimAction(action) {

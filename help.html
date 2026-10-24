@@ -241,17 +241,21 @@
 
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
                     <div class="form-group">
-                        <label class="form-label">Preferred Date & Time:</label>
-                        <input type="text" id="taskTime" class="form-control" value="Today, 11:30 AM" placeholder="e.g. Today at 4 PM" required>
+                        <label class="form-label">Preferred Date:</label>
+                        <input type="date" id="taskDate" class="form-control" required>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Urgency Level:</label>
-                        <select id="taskUrgency" class="form-control">
-                            <option value="Today (Urgent)">⚡ Today (Urgent / Immediate)</option>
-                            <option value="Today (Flexible)">🕒 Today (Flexible Timing)</option>
-                            <option value="Tomorrow">📅 Tomorrow</option>
-                            <option value="Within 2 Days">🗓️ Within 2 Days</option>
-                        </select>
+                        <label class="form-label">Preferred Time:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="time" id="taskTime" class="form-control" value="11:30" required style="flex: 1;">
+                            <select id="taskTimeSlot" class="form-control" style="flex: 1;" onchange="if(this.value) document.getElementById('taskTime').value = this.value;">
+                                <option value="">Quick Slot</option>
+                                <option value="09:00">🌅 Morning (9:00 AM)</option>
+                                <option value="11:30" selected>☀️ Mid-Day (11:30 AM)</option>
+                                <option value="15:00">🌤️ Afternoon (3:00 PM)</option>
+                                <option value="18:00">🌇 Evening (6:00 PM)</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -364,13 +368,15 @@
             }
 
             const user = AuthSession.getCurrentUser();
+            const dateVal = document.getElementById('taskDate').value || new Date().toISOString().split('T')[0];
+            const timeVal = document.getElementById('taskTime').value || '11:30';
 
             const pendingRequest = {
                 category: selectedCategory,
                 title: document.getElementById('taskTitle').value,
                 location: document.getElementById('taskLocation').value,
-                time: document.getElementById('taskTime').value,
-                urgency: document.getElementById('taskUrgency').value,
+                date: dateVal,
+                time: timeVal,
                 notes: document.getElementById('taskNotes').value,
                 requester: user ? user.name : 'Resident',
                 requesterPhone: user ? user.phone : '+91 98765 43210'
@@ -384,14 +390,21 @@
         document.addEventListener('DOMContentLoaded', () => {
             checkAuthStatus();
 
+            const dateInput = document.getElementById('taskDate');
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (dateInput) {
+                dateInput.value = todayStr;
+                dateInput.min = todayStr;
+            }
+
             const saved = localStorage.getItem('reach_pending_request');
             if (saved) {
                 try {
                     const data = JSON.parse(saved);
                     pickCategory(data.category, data.title);
                     if (data.location) document.getElementById('taskLocation').value = data.location;
+                    if (data.date && dateInput) dateInput.value = data.date;
                     if (data.time) document.getElementById('taskTime').value = data.time;
-                    if (data.urgency) document.getElementById('taskUrgency').value = data.urgency;
                     if (data.notes) document.getElementById('taskNotes').value = data.notes;
                 } catch (e) {}
             }

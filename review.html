@@ -242,7 +242,7 @@
                 </div>
                 <div class="review-row">
                     <span class="review-label">Preferred Date & Time:</span>
-                    <span class="review-value">${d.time || 'Today'} (${d.urgency || 'Normal'})</span>
+                    <span class="review-value">${d.date ? d.date + ' • ' : ''}${d.time || '11:30 AM'}</span>
                 </div>
                 <div class="review-row" style="border-bottom: none;">
                     <span class="review-label">Special Notes / Skills:</span>
@@ -277,8 +277,8 @@
                 requester: user ? user.name : (currentDraft.requester || 'Resident Member'),
                 requesterPhone: user ? user.phone : (currentDraft.requesterPhone || '+91 98765 43210'),
                 location: currentDraft.location || 'Sector 4',
-                time: currentDraft.time || 'Today, 11:30 AM',
-                urgency: currentDraft.urgency || 'Today',
+                time: (currentDraft.date ? currentDraft.date + ' • ' : '') + (currentDraft.time || '11:30 AM'),
+                urgency: 'Scheduled',
                 skillsNeeded: currentDraft.skillsNeeded || currentDraft.notes || 'Helpful Neighbor',
                 status: 'Waiting for Volunteer',
                 assignedVolunteer: null,
