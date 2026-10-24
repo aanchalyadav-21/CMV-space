@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - Community Micro-Volunteering & Empty Space</title>
+    <!-- Base Styles and Portals Styles for cohesive modern UI -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/portals.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Clean, Uncluttered Modern Dashboard Styles */
+        .role-switch-container {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 10px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .role-pills-wrap {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .role-pill-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #CBD5E1;
+            background: #F8FAFC;
+            color: #334155;
+            transition: all 0.15s ease;
+        }
+
+        .role-pill-btn:hover {
+            border-color: #93C5FD;
+            background: #EFF6FF;
+            color: #1E40AF;
+        }
+
+        .role-pill-btn.active {
+            background: #1E40AF;
+            color: #FFFFFF;
+            border-color: #1E40AF;
+        }
+
+        /* Simplified Hero Banner */
+        .dash-hero-simple {
+            background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+            color: #FFFFFF;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .dash-hero-simple h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dash-hero-meta {
+            font-size: 0.95rem;
+            color: #DBEAFE;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .aadhaar-pill-tag {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #ECFDF5;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            font-weight: 600;
+        }
+
+        /* Simple 2-Card Action Grid */
+        .simple-action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+            margin-bottom: 24px;
+        }
+
+        .simple-action-card {
+            background: #FFFFFF;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 22px;
+            transition: all 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .simple-action-card:hover {
+            border-color: #2563EB;
+            box-shadow: 0 6px 14px rgba(37, 99, 235, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .simple-card-icon {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .simple-card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0 0 6px 0;
+        }
+
+        .simple-card-desc {
+            font-size: 0.92rem;
+            color: #64748B;
+            line-height: 1.45;
+            margin: 0 0 18px 0;
+            flex: 1;
+        }
+
+        /* Clean Activity Section */
+        .clean-section-card {
+            background: #FFFFFF;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .clean-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .clean-section-header h3 {
+            font-size: 1.18rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0;
+        }
+
+        .clean-item-row {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .clean-item-row:hover {
+            background: #FFFFFF;
+            border-color: #93C5FD;
+        }
+
+        /* Role Hint Banner */
+        .member-role-hint {
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.88rem;
+            color: #1E40AF;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+                <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+                <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html" class="active">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="explore.html?type=spaces">Community Spaces</a>
+            <div id="navUserSection"></div>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main class="page-container">
+
+        <!-- Simple Role Switcher Bar -->
+        <div class="role-switch-container">
+            <div class="role-pills-wrap">
+                <span style="font-size: 0.85rem; font-weight: 700; color: #64748B;">Role View:</span>
+                <button class="role-pill-btn active" id="pillMember" onclick="switchDashboardRole('member')">
+                    👵 Senior Resident
+                </button>
+                <button class="role-pill-btn" id="pillVolunteer" onclick="switchDashboardRole('volunteer')">
+                    🦸‍♂️ Volunteer
+                </button>
+                <button class="role-pill-btn" id="pillOwner" onclick="switchDashboardRole('owner')">
+                    🏛️ Space Owner
+                </button>
+                <button class="role-pill-btn" id="pillOrganizer" onclick="switchDashboardRole('organizer')">
+                    🤝 Event Organizer
+                </button>
+            </div>
+            <div>
+                <button onclick="AuthSession.logout();" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.88rem; font-weight: 600; cursor: pointer;">
+                    Sign Out 🚪
+                </button>
+            </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- ROLE A: SENIOR RESIDENT / COMMUNITY MEMBER                      -->
+        <!-- Simple, uncluttered: Request Help, Book Space, Track Requests   -->
+        <!-- NO accept or reject buttons!                                    -->
+        <!-- =============================================================== -->
+        <div id="sectionMember" style="display: none;">
+
+            <!-- Simple Member Hero -->
+            <div class="dash-hero-simple" style="background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);">
+                <div>
+                    <h1>
+                        <span>👵</span>
+                        <span>Welcome, <span id="memberName">Ramesh Patel</span></span>
+                    </h1>
+                    <div class="dash-hero-meta">
+                        <span>📍 Flat 402, Shanti Niketan, Sector 4</span>
+                        <span class="aadhaar-pill-tag" id="memberAadhaarBadge">
+                            🛡️ Aadhaar Verified (XXXX-XXXX-4103)
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <a href="help.html" class="btn" style="background: #10B981; color: white; padding: 10px 18px; font-weight: 700; border-radius: 8px; text-decoration: none;">
+                        + Request Errand Help 🛒
+                    </a>
+                </div>
+            </div>
+
+            <!-- Role explanation hint -->
+            <div class="member-role-hint">
+                <span>ℹ️</span>
+                <span>As a <strong>Senior Resident</strong>, you can request daily errand help or book neighborhood halls. To volunteer and accept tasks for others, switch to the <strong>🦸‍♂️ Volunteer</strong> tab above.</span>
+            </div>
+
+            <!-- 2 Simple Clean Action Cards for Senior Resident -->
+            <div class="simple-action-grid">
+                <div class="simple-action-card">
+                    <div>
+                        <div class="simple-card-icon">🛒</div>
+                        <h3 class="simple-card-title">Request Volunteer Help</h3>
+                        <p class="simple-card-desc">
+                            Need help picking up medicines from the chemist, grocery shopping, or walking assistance?
+                        </p>
+                    </div>
+                    <a href="help.html" class="btn btn-primary" style="width: 100%; text-align: center; padding: 11px;">
+                        Request Errand Help →
+                    </a>
+                </div>
+
+                <div class="simple-action-card">
+                    <div>
+                        <div class="simple-card-icon">🏛️</div>
+                        <h3 class="simple-card-title">Book a Community Space</h3>
+                        <p class="simple-card-desc">
+                            Find and reserve society clubhouses, activity halls, or terrace gardens for meetings or yoga.
+                        </p>
+                    </div>
+                    <a href="explore.html?type=spaces" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px; border-color: #0284C7; color: #0284C7;">
+                        Find Community Venues →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Member's Own Requests (Clean list with Track Status only) -->
+            <div class="clean-section-card">
+                <div class="clean-section-header">
+                    <h3>📦 My Recent Help Requests & Bookings</h3>
+                    <a href="help.html" style="font-size: 0.88rem; font-weight: 700; color: #2563EB; text-decoration: none;">
+                        + New Request
+                    </a>
+                </div>
+                <div id="memberRequestsList">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- ROLE B: COMMUNITY VOLUNTEER                                     -->
+        <!-- Simple: Browse open tasks, Accept errand, Track Duty            -->
+        <!-- =============================================================== -->
+        <div id="sectionVolunteer" style="display: none;">
+
+            <!-- Simple Volunteer Hero -->
+            <div class="dash-hero-simple" style="background: linear-gradient(135deg, #064E3B 0%, #059669 100%);">
+                <div>
+                    <h1>
+                        <span>🦸‍♂️</span>
+                        <span>Volunteer Hub — <span id="volName">Karan Verma</span></span>
+                    </h1>
+                    <div class="dash-hero-meta" style="color: #A7F3D0;">
+                        <span>⭐ Rating: <strong>4.9 / 5.0</strong></span>
+                        <span>•</span>
+                        <span>✅ <strong>42 Missions Completed</strong></span>
+                        <span class="aadhaar-pill-tag" style="background: rgba(4, 120, 87, 0.4);">
+                            🛡️ Aadhaar Verified Volunteer
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <button id="btnVolStatusToggle" onclick="toggleVolunteerDuty()" class="btn" style="background: #10B981; color: white; padding: 8px 16px; font-size: 0.88rem; font-weight: 700; border-radius: 20px;">
+                        🟢 Online & Ready
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2 Simple Action Cards for Volunteer -->
+            <div class="simple-action-grid">
+                <div class="simple-action-card">
+                    <div>
+                        <div class="simple-card-icon">🔍</div>
+                        <h3 class="simple-card-title">Browse Available Tasks</h3>
+                        <p class="simple-card-desc">
+                            View open requests from neighborhood seniors needing medicine delivery, groceries, or clinic walk assistance.
+                        </p>
+                    </div>
+                    <a href="explore.html?type=tasks" class="btn btn-accent" style="width: 100%; text-align: center; padding: 11px;">
+                        Browse All Tasks →
+                    </a>
+                </div>
+
+                <div class="simple-action-card">
+                    <div>
+                        <div class="simple-card-icon">🛵</div>
+                        <h3 class="simple-card-title">Active Duty Tracker</h3>
+                        <p class="simple-card-desc">
+                            View your accepted missions, share live location ETA, and enter senior citizen safety PINs.
+                        </p>
+                    </div>
+                    <a href="volunteer.html" class="btn btn-primary" style="width: 100%; text-align: center; padding: 11px;">
+                        Open Mission Tracker →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Open Tasks List for Volunteers -->
+            <div class="clean-section-card">
+                <div class="clean-section-header">
+                    <h3>⚡ Open Tasks Waiting for Volunteers</h3>
+                    <a href="explore.html?type=tasks" style="font-size: 0.88rem; font-weight: 700; color: #059669; text-decoration: none;">
+                        View All in Explorer →
+                    </a>
+                </div>
+                <div id="volTasksFeed">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- ROLE C: COMMUNITY SPACE OWNER                                   -->
+        <!-- Simple: Add venue, Approve/Decline bookings                     -->
+        <!-- =============================================================== -->
+        <div id="sectionOwner" style="display: none;">
+
+            <!-- Simple Owner Hero -->
+            <div class="dash-hero-simple" style="background: linear-gradient(135deg, #0C4A6E 0%, #0284C7 100%);">
+                <div>
+                    <h1>
+                        <span>🏛️</span>
+                        <span><span id="ownerName">Marian Welfare Trust</span></span>
+                    </h1>
+                    <div class="dash-hero-meta" style="color: #BAE6FD;">
+                        <span>🏛️ <strong>2 Managed Community Spaces</strong></span>
+                        <span class="aadhaar-pill-tag" style="background: rgba(3, 105, 161, 0.4);">
+                            🛡️ Verified Space Provider
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <a href="owner.html?tab=add" class="btn" style="background: #10B981; color: white; padding: 8px 16px; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.9rem;">
+                        + Add Space 🏛️
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2 Simple Action Cards for Space Owner -->
+            <div class="simple-action-grid">
+                <div class="simple-action-card">
+                    <div>
+                        <div class="simple-card-icon">📥</div>
+                        <h3 class="simple-card-title">Review Booking Requests</h3>
+                        <p class="simple-card-desc">
+                            Approve or decline venue reservations from resident groups and welfare NGOs.
+                        </p>
+                    </div>
+                    <a href="owner.html?tab=bookings" class="btn btn-primary" style="width: 100%; text-align: center; padding: 11px;">
+                        Manage Bookings →
+                    </a>
+                </div>
+
+                <div class="simple-action-card">
+                    <div>
+                        <div class="simple-card-icon">➕</div>
+                        <h3 class="simple-card-title">Manage Listed Venues</h3>
+                        <p class="simple-card-desc">
+                            Update venue capacity, free/subsidized community pricing, and available hours.
+                        </p>
+                    </div>
+                    <a href="owner.html?tab=add" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px; border-color: #0284C7; color: #0284C7;">
+                        Edit Listings →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Pending Bookings List -->
+            <div class="clean-section-card">
+                <div class="clean-section-header">
+                    <h3>📅 Pending Booking Requests</h3>
+                </div>
+                <div id="ownerBookingsList">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- ROLE D: EVENT ORGANIZER / NGO                                   -->
+        <!-- Simple: Create Activity, Check Status, Book Venue               -->
+        <!-- =============================================================== -->
+        <div id="sectionOrganizer" style="display: none;">
+
+            <!-- Simple Organizer Hero -->
+            <div class="dash-hero-simple" style="background: linear-gradient(135deg, #581C87 0%, #7C3AED 100%);">
+                <div>
+                    <h1>
+                        <span>🤝</span>
+                        <span><span id="orgName">Pooja Nair (CareForward NGO)</span></span>
+                    </h1>
+                    <div class="dash-hero-meta" style="color: #E9D5FF;">
+                        <span>🎯 <strong>Community Welfare Drives Coordinator</strong></span>
+                    </div>
+                </div>
+                <div>
+                    <a href="organize.html?tab=create" class="btn" style="background: #10B981; color: white; padding: 8px 16px; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.9rem;">
+                        + New Drive 🎯
+                    </a>
+                </div>
+            </div>
+
+            <!-- 2 Simple Action Cards for Organizer -->
+            <div class="simple-action-grid">
+                <div class="simple-action-card">
+                    <div>
+                        <div class="simple-card-icon">🎯</div>
+                        <h3 class="simple-card-title">Schedule Community Drive</h3>
+                        <p class="simple-card-desc">
+                            Create health checkup camps, tutoring sessions, or food distribution drives.
+                        </p>
+                    </div>
+                    <a href="organize.html?tab=create" class="btn btn-primary" style="width: 100%; text-align: center; padding: 11px;">
+                        Create Drive →
+                    </a>
+                </div>
+
+                <div class="simple-action-card">
+                    <div>
+                        <div class="simple-card-icon">🏛️</div>
+                        <h3 class="simple-card-title">Reserve Venue</h3>
+                        <p class="simple-card-desc">
+                            Browse verified neighborhood halls and clubhouses for your community drive.
+                        </p>
+                    </div>
+                    <a href="explore.html?type=spaces" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px; border-color: #7C3AED; color: #7C3AED;">
+                        Find Community Hall →
+                    </a>
+                </div>
+            </div>
+
+            <!-- Active Drives List -->
+            <div class="clean-section-card">
+                <div class="clean-section-header">
+                    <h3>🌟 Active Community Campaigns</h3>
+                </div>
+                <div id="orgActivitiesList">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- SOS Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <p style="color: #475569; font-size: 0.95rem; margin-bottom: 16px;">
+                Immediate emergency contacts desk:
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left; padding: 10px 16px; font-weight: 700;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; padding: 10px 16px; font-weight: 700;">
+                    👮 Call Local Society Guard (022-2500-1111)
+                </a>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 4px; font-size: 1rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.85rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        function loadDashboard() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const queryRole = urlParams.get('role');
+
+            if (!AuthSession.isLoggedIn()) {
+                if (queryRole) {
+                    AuthSession.login(queryRole);
+                } else {
+                    window.location.href = 'index.html#signInBox';
+                    return;
+                }
+            } else if (queryRole) {
+                localStorage.setItem('reach_auth_role', queryRole);
+            }
+
+            const currentRole = localStorage.getItem('reach_auth_role') || 'member';
+            const user = AuthSession.getCurrentUser() || DEFAULT_PROFILES[currentRole];
+
+            // Update role pill active state
+            const rolePillMap = {
+                member: 'pillMember',
+                volunteer: 'pillVolunteer',
+                owner: 'pillOwner',
+                organizer: 'pillOrganizer'
+            };
+
+            document.querySelectorAll('.role-pill-btn').forEach(b => b.classList.remove('active'));
+            const activePill = document.getElementById(rolePillMap[currentRole]);
+            if (activePill) activePill.classList.add('active');
+
+            // Hide all sections
+            ['sectionMember', 'sectionVolunteer', 'sectionOwner', 'sectionOrganizer'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+
+            // Show active section
+            if (currentRole === 'volunteer') {
+                document.getElementById('sectionVolunteer').style.display = 'block';
+                document.getElementById('volName').textContent = user.name || 'Karan Verma';
+                renderVolunteerTasks();
+            } else if (currentRole === 'owner') {
+                document.getElementById('sectionOwner').style.display = 'block';
+                document.getElementById('ownerName').textContent = user.name || 'Marian Welfare Trust';
+                renderOwnerBookings();
+            } else if (currentRole === 'organizer') {
+                document.getElementById('sectionOrganizer').style.display = 'block';
+                document.getElementById('orgName').textContent = user.name || 'Pooja Nair';
+                renderOrganizerActivities();
+            } else {
+                document.getElementById('sectionMember').style.display = 'block';
+                document.getElementById('memberName').textContent = user.name || 'Ramesh Patel';
+                
+                // Show Aadhaar badge if present in profile
+                const aadhaarBadge = document.getElementById('memberAadhaarBadge');
+                if (aadhaarBadge && user.aadhaarNumber) {
+                    const masked = user.aadhaarNumber.length > 8 ? 'XXXX-XXXX-' + user.aadhaarNumber.slice(-4) : user.aadhaarNumber;
+                    aadhaarBadge.innerHTML = `🛡️ Aadhaar Verified (${masked})`;
+                }
+                renderMemberRequests();
+            }
+        }
+
+        function switchDashboardRole(role) {
+            AuthSession.login(role);
+            window.location.href = 'dashboard.html?role=' + role;
+        }
+
+        function toggleVolunteerDuty() {
+            const btn = document.getElementById('btnVolStatusToggle');
+            if (btn.textContent.includes('Online')) {
+                btn.innerHTML = '⚪ Paused';
+                btn.style.background = '#64748B';
+                alert('Duty paused.');
+            } else {
+                btn.innerHTML = '🟢 Online & Ready';
+                btn.style.background = '#10B981';
+                alert('Duty active! Ready to help.');
+            }
+        }
+
+        // Render Member Requests (Simple, clean, NO accept/reject buttons)
+        function renderMemberRequests() {
+            const container = document.getElementById('memberRequestsList');
+            const tasks = AppStore.getTasks();
+            const bookings = AppStore.getBookings();
+            const user = AuthSession.getCurrentUser() || DEFAULT_PROFILES.member;
+
+            const myTasks = tasks.filter(t => t.requester === user.name || t.requesterPhone === user.phone);
+            const myBookings = bookings.filter(b => b.userName === user.name || b.userPhone === user.phone || b.requester === user.name);
+
+            if (myTasks.length === 0 && myBookings.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 28px 16px; color: #64748B;">
+                        <p style="margin-bottom: 12px; font-size: 0.95rem;">You do not have any active errand requests or bookings.</p>
+                        <a href="help.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">+ Request Help with Errands</a>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+            myTasks.forEach(t => {
+                const isWaiting = t.status === 'Waiting for Volunteer' || !t.assignedVolunteer;
+                const isCompleted = t.status === 'Task Completed';
+
+                html += `
+                    <div class="clean-item-row">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.15rem;">${t.category.includes('Medicine') ? '💊' : (t.category.includes('Groceries') ? '🛒' : '🤝')}</span>
+                                <strong style="color: #0F172A; font-size: 1.02rem;">${t.category}: ${t.title}</strong>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
+                                📍 ${t.location} • ⏰ ${t.time}
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge ${isWaiting ? 'badge-pending' : (isCompleted ? 'badge-success' : 'badge-primary')}">
+                                ${isWaiting ? '🟡 Waiting for Volunteer' : (isCompleted ? '✅ Completed' : '🟢 Volunteer En Route')}
+                            </span>
+                            <a href="confirmation.html?id=${t.id}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; font-weight: 600;">
+                                Track Status →
+                            </a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            myBookings.forEach(b => {
+                html += `
+                    <div class="clean-item-row">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <span style="font-size: 1.15rem;">🏛️</span>
+                                <strong style="color: #0369A1; font-size: 1.02rem;">${b.spaceName}</strong>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
+                                Purpose: ${b.purpose} • 📅 ${b.date}
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge ${b.status === 'Approved' ? 'badge-success' : 'badge-pending'}">${b.status}</span>
+                            <a href="confirmation.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">View Pass →</a>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Render Volunteer Tasks Feed
+        function renderVolunteerTasks() {
+            const container = document.getElementById('volTasksFeed');
+            const tasks = AppStore.getTasks();
+            let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+
+            tasks.forEach(t => {
+                const isWaiting = t.status === 'Waiting for Volunteer' || !t.assignedVolunteer;
+
+                html += `
+                    <div class="clean-item-row">
+                        <div style="flex: 1; min-width: 240px;">
+                            <strong style="color: #166534; font-size: 1.05rem;">
+                                ${t.category.includes('Medicine') ? '💊' : '🛒'} ${t.title}
+                            </strong>
+                            <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
+                                👤 ${t.requester} • 📍 ${t.location} • ⏰ ${t.time}
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            ${isWaiting ? `
+                                <button onclick="acceptTask('${t.id}')" class="btn btn-accent" style="padding: 7px 14px; font-size: 0.88rem; font-weight: 700;">
+                                    ✓ Accept Task
+                                </button>
+                            ` : `
+                                <span class="badge ${t.status === 'Task Completed' ? 'badge-success' : 'badge-primary'}">${t.status}</span>
+                                <a href="confirmation.html?id=${t.id}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Tracker →</a>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function acceptTask(taskId) {
+            const tasks = AppStore.getTasks();
+            const task = tasks.find(t => t.id === taskId);
+            if (task) {
+                const user = AuthSession.getCurrentUser() || DEFAULT_PROFILES.volunteer;
+                task.status = 'Volunteer Assigned';
+                task.assignedVolunteer = {
+                    name: user.name || 'Karan Verma',
+                    phone: user.phone || '+91 98765 43211',
+                    rating: user.rating || 4.9,
+                    avatar: user.avatar || '🦸‍♂️'
+                };
+                task.etaMinutes = 12;
+                AppStore.saveTasks(tasks);
+
+                localStorage.setItem('reach_accepted_task_id', taskId);
+                localStorage.setItem('reach_active_volunteer_mission', JSON.stringify(task));
+
+                if ('BroadcastChannel' in window) {
+                    const bc = new BroadcastChannel('reach_sync');
+                    bc.postMessage({ type: 'TASK_ACCEPTED', taskId: taskId, volunteer: user.name });
+                }
+
+                alert(`Task ${taskId} Accepted! Heading to mission tracking.`);
+                window.location.href = `confirmation.html?id=${taskId}`;
+            }
+        }
+
+        // Render Space Owner Bookings
+        function renderOwnerBookings() {
+            const container = document.getElementById('ownerBookingsList');
+            const bookings = AppStore.getBookings();
+
+            let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+            bookings.forEach(b => {
+                const isPending = b.status === 'Pending Owner Approval';
+                html += `
+                    <div class="clean-item-row">
+                        <div>
+                            <strong style="color: #0369A1; font-size: 1.05rem;">🏛️ ${b.spaceName}</strong>
+                            <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
+                                Purpose: ${b.purpose} • Requester: <strong>${b.requester}</strong> • 📅 ${b.date}
+                            </div>
+                        </div>
+                        <div style="display:flex; gap: 8px; align-items: center;">
+                            ${isPending ? `
+                                <button onclick="decideBooking('${b.id}', 'Approved')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">
+                                    ✓ Approve
+                                </button>
+                                <button onclick="decideBooking('${b.id}', 'Not Approved')" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; color: #DC2626; border-color: #FCA5A5;">
+                                    ✗ Decline
+                                </button>
+                            ` : `
+                                <span class="badge ${b.status.includes('Approved') && !b.status.includes('Not') ? 'badge-success' : 'badge-danger'}">${b.status}</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        function decideBooking(id, status) {
+            const bookings = AppStore.getBookings();
+            const b = bookings.find(x => x.id === id);
+            if (b) {
+                b.status = status;
+                AppStore.saveBookings(bookings);
+                renderOwnerBookings();
+
+                if ('BroadcastChannel' in window) {
+                    const bc = new BroadcastChannel('reach_sync');
+                    bc.postMessage({ type: 'BOOKING_UPDATED', id: id, status: status });
+                }
+
+                alert(`Booking updated to: "${status}".`);
+            }
+        }
+
+        // Render Organizer Activities
+        function renderOrganizerActivities() {
+            const container = document.getElementById('orgActivitiesList');
+            const acts = AppStore.getActivities();
+            let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
+            acts.forEach(a => {
+                html += `
+                    <div class="clean-item-row">
+                        <div>
+                            <strong style="color: #7C3AED; font-size: 1.05rem;">🎯 ${a.title}</strong>
+                            <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
+                                📅 ${a.date} • Venue: ${a.spaceName} • Volunteers: ${a.volunteersRegistered} / ${a.volunteersNeeded}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge badge-success">${a.status}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Listen for live updates
+        if ('BroadcastChannel' in window) {
+            const bc = new BroadcastChannel('reach_sync');
+            bc.onmessage = () => {
+                loadDashboard();
+            };
+        }
+        window.addEventListener('storage', () => {
+            loadDashboard();
+        });
+
+        document.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Activities & Requests - Community Micro-Volunteering & Empty Space</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-light);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border: none;
+            background: transparent;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .activity-item-card {
+            background: #FFFFFF;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')">A-</button>
+                <button onclick="changeFontSize('normal')">A</button>
+                <button onclick="changeFontSize('large')">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 2rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="explore.html?type=spaces">Community Spaces</a>
+            <a href="my-activity.html" class="active">My Activity</a>
+            <a href="help.html">Help & FAQ</a>
+        </nav>
+    </header>
+
+    <main class="page-container">
+
+        <!-- Return / Breadcrumbs -->
+        <a href="dashboard.html" class="btn-back">
+            ← Return to Dashboard
+        </a>
+
+        <!-- Header -->
+        <div style="margin-bottom: 24px;">
+            <div class="neighborhood-badge">
+                <span>📋</span>
+                <span>User Activity & Request Records</span>
+            </div>
+            <h1 style="color: var(--primary-dark); font-size: 1.85rem; margin: 8px 0 4px 0;">
+                My Activity & Community Services Tracker
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1rem;">
+                Track all your everyday volunteer help requests, community space reservations, and completed task history.
+            </p>
+        </div>
+
+        <!-- Auth Gate Barrier (Shown when unauthenticated) -->
+        <div id="activityAuthGate" style="display: none; background: #FFFBEB; border: 2px solid #FCD34D; border-radius: 12px; padding: 28px; text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🔒</div>
+            <h2 style="color: #92400E; font-size: 1.45rem; margin-bottom: 8px;">
+                Sign In Required to View Personal Activity
+            </h2>
+            <p style="color: #78350F; font-size: 0.98rem; max-width: 580px; margin: 0 auto 20px auto; line-height: 1.5;">
+                To view your active errand help requests, live volunteer tracking, and digital space access passes, please sign in or register.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px;">
+                <a href="index.html#signInBox" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                    🔑 Sign In with Phone OTP
+                </a>
+                <a href="register.html" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                    📝 Create New Account
+                </a>
+            </div>
+            <div style="padding-top: 14px; border-top: 1px dashed #FDE68A;">
+                <span style="font-size: 0.88rem; color: #92400E; font-weight: 600; display: block; margin-bottom: 8px;">Evaluation Quick Unlock:</span>
+                <button type="button" class="btn" onclick="AuthSession.quickLogin('member', 'my-activity.html')" style="background: #FEF3C7; color: #92400E; border: 1.5px solid #F59E0B; font-size: 0.88rem; padding: 6px 16px; font-weight: 700;">
+                    ⚡ Quick Sign In as Resident (Ramesh Patel)
+                </button>
+            </div>
+        </div>
+
+        <div id="activityMainContent">
+        <!-- 3 Tabs: Help Tasks, Space Bookings, History -->
+        <div class="tabs-nav">
+            <button id="tabBtnTasks" class="tab-btn active" onclick="switchActivityTab('tasks')">
+                🛒 Errand Help Requests (<span id="countMyTasks">0</span>)
+            </button>
+            <button id="tabBtnBookings" class="tab-btn" onclick="switchActivityTab('bookings')">
+                🏛️ Community Space Bookings (<span id="countMyBookings">0</span>)
+            </button>
+            <button id="tabBtnHistory" class="tab-btn" onclick="switchActivityTab('history')">
+                📜 Completed History & Feedback
+            </button>
+        </div>
+
+        <!-- TAB 1: HELP REQUESTS -->
+        <div id="secActivityTasks">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem; color: var(--primary);">Active Volunteer Help Requests</h2>
+                <a href="help.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.88rem;">+ Request New Help</a>
+            </div>
+            <div id="myTasksContainer">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+
+        <!-- TAB 2: SPACE BOOKINGS -->
+        <div id="secActivityBookings" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem; color: #0369A1;">Community Space Reservations</h2>
+                <a href="spaces.html" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.88rem; background: #0284C7;">+ Find a Space</a>
+            </div>
+            <div id="myBookingsContainer">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+
+        <!-- TAB 3: HISTORY -->
+        <div id="secActivityHistory" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.25rem; color: #166534;">Completed Tasks & Senior Ratings</h2>
+            </div>
+            <div id="myHistoryContainer">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+        </div><!-- /#activityMainContent -->
+
+    </main>
+
+    <!-- Project Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js?v=2"></script>
+    <script>
+        function checkActivityAuth() {
+            const isLoggedIn = AuthSession.isLoggedIn();
+            const gate = document.getElementById('activityAuthGate');
+            const content = document.getElementById('activityMainContent');
+
+            if (!isLoggedIn) {
+                if (gate) gate.style.display = 'block';
+                if (content) {
+                    content.style.opacity = '0.35';
+                    content.style.pointerEvents = 'none';
+                }
+                return false;
+            } else {
+                if (gate) gate.style.display = 'none';
+                if (content) {
+                    content.style.opacity = '1';
+                    content.style.pointerEvents = 'auto';
+                }
+                return true;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkActivityAuth()) {
+                loadActivityData();
+            }
+        });
+
+        function switchActivityTab(tab) {
+            ['tasks', 'bookings', 'history'].forEach(t => {
+                const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+                const sec = document.getElementById('secActivity' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn) btn.classList.toggle('active', t === tab);
+                if (sec) sec.style.display = (t === tab) ? 'block' : 'none';
+            });
+        }
+
+        function loadActivityData() {
+            const user = AuthSession.getCurrentUser();
+            const allTasks = AppStore.getTasks();
+            const allBookings = AppStore.getBookings();
+
+            // Filter tasks requested by this user or general
+            const activeTasks = allTasks.filter(t => t.status !== 'Task Completed' && t.status !== 'Final State');
+            const completedTasks = allTasks.filter(t => t.status === 'Task Completed' || t.status === 'Final State' || t.rating);
+
+            document.getElementById('countMyTasks').textContent = activeTasks.length;
+            document.getElementById('countMyBookings').textContent = allBookings.length;
+
+            // Render Active Tasks
+            const tasksContainer = document.getElementById('myTasksContainer');
+            if (activeTasks.length === 0) {
+                tasksContainer.innerHTML = `
+                    <div style="text-align: center; padding: 32px; background: #FFF; border-radius: 8px; border: 1px solid var(--border);">
+                        <p style="color: var(--text-muted); margin-bottom: 12px;">You do not have any active help requests right now.</p>
+                        <a href="help.html" class="btn btn-primary">+ Request Volunteer Help</a>
+                    </div>
+                `;
+            } else {
+                let html = '';
+                activeTasks.forEach(t => {
+                    html += `
+                        <div class="activity-item-card">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <strong style="color: var(--primary); font-size: 1.15rem;">🛒 ${t.category}: ${t.title}</strong>
+                                    <span class="badge ${t.status === 'Waiting for Volunteer' ? 'badge-pending' : 'badge-success'}">${t.status}</span>
+                                </div>
+                                <p style="margin: 0; font-size: 0.92rem; color: var(--text-main);">${t.notes || 'Everyday neighborhood errand assistance'}</p>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                                    📍 ${t.location} • ⏰ ${t.time} • 🔐 Handover PIN: <strong>${t.safetyPin || '4829'}</strong>
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <a href="confirmation.html?id=${t.id}" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem;">
+                                    Open Live Tracker 🛵
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+                tasksContainer.innerHTML = html;
+            }
+
+            // Render Bookings
+            const bookingsContainer = document.getElementById('myBookingsContainer');
+            if (allBookings.length === 0) {
+                bookingsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 32px; background: #FFF; border-radius: 8px; border: 1px solid var(--border);">
+                        <p style="color: var(--text-muted); margin-bottom: 12px;">No space reservations found.</p>
+                        <a href="spaces.html" class="btn btn-primary" style="background: #0284C7;">Browse Venues</a>
+                    </div>
+                `;
+            } else {
+                let html = '';
+                allBookings.forEach(b => {
+                    const isConfirmed = b.status === 'Confirmed' || b.status === 'Approved';
+                    html += `
+                        <div class="activity-item-card">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <strong style="color: #0369A1; font-size: 1.15rem;">🏛️ ${b.spaceName}</strong>
+                                    <span class="badge ${isConfirmed ? 'badge-success' : 'badge-pending'}">${b.status}</span>
+                                </div>
+                                <p style="margin: 0; font-size: 0.92rem; color: var(--text-main);">Purpose: <strong>${b.purpose}</strong> (${b.expectedGuests} Attendees)</p>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                                    📅 ${b.date} • ⏰ ${b.time} ${b.qrPassId ? `• 🎫 Pass ID: <strong>#${b.qrPassId}</strong>` : ''}
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <a href="confirmation.html?id=${b.id}" class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.9rem; border-color: #0284C7; color: #0369A1;">
+                                    View Digital Pass 📱
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                });
+                bookingsContainer.innerHTML = html;
+            }
+
+            // Render History
+            const historyContainer = document.getElementById('myHistoryContainer');
+            if (completedTasks.length === 0) {
+                historyContainer.innerHTML = `<p style="text-align: center; color: var(--text-muted);">No completed tasks yet.</p>`;
+            } else {
+                let html = '';
+                completedTasks.forEach(t => {
+                    html += `
+                        <div class="activity-item-card" style="border-left: 4px solid #10B981;">
+                            <div>
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <strong style="color: #166534; font-size: 1.15rem;">✅ ${t.category}: ${t.title}</strong>
+                                    <span class="badge badge-success">Task Completed</span>
+                                </div>
+                                <p style="margin: 0; font-size: 0.92rem; color: var(--text-main);">${t.notes || ''}</p>
+                                <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                                    Completed by: <strong>${t.assignedVolunteer ? (t.assignedVolunteer.name || t.assignedVolunteer) : 'Karan Verma'}</strong> • ⭐ Rating: <strong>${t.rating || 5}/5 Stars</strong>
+                                </div>
+                                ${t.feedback ? `<div style="font-size: 0.85rem; color: #166534; margin-top: 4px; font-style: italic;">“${t.feedback}”</div>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+                historyContainer.innerHTML = html;
+            }
+        }
+    </script>
+</body>
+
+</html>

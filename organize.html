@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Organizer Hub - Community Micro-Volunteering & Empty Space</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-light);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border: none;
+            background: transparent;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #7C3AED;
+            border-bottom-color: #7C3AED;
+        }
+
+        .dual-status-card {
+            background: #FFFFFF;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .service-selection-toggle {
+            background: #F8FAFC;
+            border: 2px dashed #CBD5E1;
+            border-radius: var(--radius-sm);
+            padding: 18px;
+            margin-bottom: 20px;
+        }
+
+        .service-choice-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px;
+            background: #FFFFFF;
+            border: 1.5px solid var(--border-light);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 10px;
+        }
+
+        .service-choice-row:hover {
+            border-color: #A78BFA;
+            background: #FAF5FF;
+        }
+
+        .dual-columns-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 14px;
+            padding-top: 14px;
+            border-top: 1px solid var(--border-light);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')">A-</button>
+                <button onclick="changeFontSize('normal')">A</button>
+                <button onclick="changeFontSize('large')">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 2rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html?role=organizer">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="spaces.html">Community Spaces</a>
+            <a href="organize.html" class="active">Organize Event</a>
+            <a href="help.html">Help & FAQ</a>
+        </nav>
+    </header>
+
+    <main class="page-container">
+
+        <!-- Return / Breadcrumbs -->
+        <a href="dashboard.html?role=organizer" class="btn-back">
+            ← Return to Dashboard
+        </a>
+
+        <!-- Header Banner -->
+        <div style="margin-bottom: 24px;">
+            <div class="neighborhood-badge">
+                <span>🤝</span>
+                <span>Platform Integration: Volunteering + Space Sharing</span>
+            </div>
+            <h1 style="color: #6B21A8; font-size: 1.85rem; margin: 8px 0 4px 0;">
+                Event Organizer Hub — CareForward Welfare NGO
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1rem;">
+                Schedule community wellness camps, senior workshops, or tutoring drives by seamlessly connecting volunteer teams and community venues.
+            </p>
+        </div>
+
+        <!-- Auth Gate Barrier (Shown when unauthenticated) -->
+        <div id="orgAuthGate" style="display: none; background: #FFFBEB; border: 2px solid #FCD34D; border-radius: 12px; padding: 28px; text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🔒</div>
+            <h2 style="color: #92400E; font-size: 1.45rem; margin-bottom: 8px;">
+                Event Organizer Sign In Required
+            </h2>
+            <p style="color: #78350F; font-size: 0.98rem; max-width: 580px; margin: 0 auto 20px auto; line-height: 1.5;">
+                To create dual-service community programs, recruit volunteer groups, and reserve venues, you must be signed into a verified Organizer or NGO account.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px;">
+                <a href="index.html#signInBox" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                    🔑 Sign In with Phone OTP
+                </a>
+                <a href="register.html?role=organizer" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                    📝 Register as Organizer
+                </a>
+            </div>
+            <div style="padding-top: 14px; border-top: 1px dashed #FDE68A;">
+                <span style="font-size: 0.88rem; color: #92400E; font-weight: 600; display: block; margin-bottom: 8px;">Evaluation Quick Unlock:</span>
+                <button type="button" class="btn" onclick="AuthSession.quickLogin('organizer', 'organize.html')" style="background: #FEF3C7; color: #92400E; border: 1.5px solid #F59E0B; font-size: 0.88rem; padding: 6px 16px; font-weight: 700;">
+                    ⚡ Quick Sign In as Organizer (Pooja Nair)
+                </button>
+            </div>
+        </div>
+
+        <div id="orgMainPortal">
+        <!-- Navigation Tabs -->
+        <div class="tabs-nav">
+            <button id="tabBtnCreate" class="tab-btn active" onclick="switchOrgTab('create')">
+                🎯 Create New Activity
+            </button>
+            <button id="tabBtnActivities" class="tab-btn" onclick="switchOrgTab('myactivities')">
+                📋 My Activities & Dual Tracker (<span id="countOrgActs">2</span>)
+            </button>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 1: CREATE ACTIVITY (INTEGRATION WORKFLOW)                  -->
+        <!-- ============================================================== -->
+        <div id="sectionOrgCreate">
+            <div class="card" style="max-width: 760px; padding: 30px; margin: 0 auto;">
+                
+                <h2 style="color: #6B21A8; font-size: 1.5rem; margin-bottom: 6px;">
+                    Schedule a Community Activity
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 22px;">
+                    Enter your initiative details, then choose whether you need volunteers, a community space, or both.
+                </p>
+
+                <form onsubmit="handleCreateActivitySubmit(event)">
+
+                    <!-- Activity Details -->
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Activity / Workshop Title:</label>
+                        <input type="text" id="actTitle" class="form-control" placeholder="e.g. Free Senior Citizen Eye & Health Screening Camp" value="Free Senior Citizen Eye & Health Screening Camp" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label">Planned Date & Time:</label>
+                            <input type="text" id="actDateTime" class="form-control" value="Sunday, 1 Nov 2026 (10:00 AM - 1:00 PM)" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Expected Participants / Seniors:</label>
+                            <input type="number" id="actTurnout" class="form-control" value="50" min="5" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label">Description of Activity:</label>
+                        <textarea id="actDescription" class="form-control" rows="2" required>Volunteer doctors and nurses conducting free diabetes check, vision testing, and blood pressure screening for elders.</textarea>
+                    </div>
+
+                    <!-- STEP 4: Choose Services Needed (Volunteers, Space, or Both) -->
+                    <div class="service-selection-toggle">
+                        <label class="form-label" style="font-size: 1.05rem; color: #4C1D95; margin-bottom: 10px;">
+                            Which Platform Services Do You Require?
+                        </label>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 14px;">
+                            Select volunteers only, a space only, or both services together for a full community drive.
+                        </p>
+
+                        <!-- Choice 1: Volunteers -->
+                        <label class="service-choice-row">
+                            <input type="checkbox" id="chkNeedVolunteers" onchange="toggleVolField(this.checked)" checked style="width: 20px; height: 20px;">
+                            <span style="font-size: 1.6rem;">🦸‍♂️</span>
+                            <div style="flex: 1;">
+                                <strong style="display: block; font-size: 1rem; color: #166534;">Request Volunteer Team</strong>
+                                <small style="color: var(--text-muted);">Enlist verified local volunteers for registration desks, guiding elders, and distribution.</small>
+                            </div>
+                        </label>
+
+                        <div id="volDetailsSub" style="background: #FFFFFF; border: 1.5px solid #86EFAC; border-radius: 8px; padding: 14px; margin: 10px 0 14px 34px;">
+                            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 12px;">
+                                <div>
+                                    <label class="form-label" style="font-size: 0.85rem;">Number of Volunteers:</label>
+                                    <input type="number" id="actVolCount" class="form-control" value="6" min="1" max="50">
+                                </div>
+                                <div>
+                                    <label class="form-label" style="font-size: 0.85rem;">Roles / Tasks for Volunteers:</label>
+                                    <input type="text" id="actVolRoles" class="form-control" value="Senior reception, Queue guidance, Form filling">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Choice 2: Community Space -->
+                        <label class="service-choice-row">
+                            <input type="checkbox" id="chkNeedSpace" onchange="toggleSpaceField(this.checked)" checked style="width: 20px; height: 20px;">
+                            <span style="font-size: 1.6rem;">🏛️</span>
+                            <div style="flex: 1;">
+                                <strong style="display: block; font-size: 1rem; color: #075985;">Reserve a Community Space</strong>
+                                <small style="color: var(--text-muted);">Request a hall, society clubhouse, or terrace suitable for this gathering.</small>
+                            </div>
+                        </label>
+
+                        <div id="spaceDetailsSub" style="background: #FFFFFF; border: 1.5px solid #93C5FD; border-radius: 8px; padding: 14px; margin: 10px 0 6px 34px;">
+                            <div class="form-group">
+                                <label class="form-label" style="font-size: 0.85rem;">Preferred Community Venue:</label>
+                                <select id="actSpaceChoice" class="form-control">
+                                    <option value="St. Joseph Community Activity Hall">St. Joseph Community Activity Hall (Parish Welfare Center, Cap: 80)</option>
+                                    <option value="Shanti Niketan Society Clubhouse">Shanti Niketan Society Clubhouse & Library (Cap: 35)</option>
+                                    <option value="Community Learning & Skill Center">Community Learning & Skill Center (Cap: 45)</option>
+                                    <option value="Public Park / Outdoor Grounds">Public Park / Outdoor Pavilion (No booking fee)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem; background: #7C3AED; border-color: #6D28D9;">
+                        Submit Required Requests & Launch Activity 🚀
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: MY ACTIVITIES & DUAL-STATUS TRACKER                     -->
+        <!-- ============================================================== -->
+        <div id="sectionOrgActivities" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h2 style="font-size: 1.35rem; color: #6B21A8;">
+                    Campaigns & Dual-Service Status Overview
+                </h2>
+                <button onclick="switchOrgTab('create')" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem; background: #7C3AED;">
+                    + New Community Activity
+                </button>
+            </div>
+
+            <div id="orgActivitiesListContainer">
+                <!-- Injected via JavaScript -->
+            </div>
+        </div>
+        </div><!-- /#orgMainPortal -->
+
+    </main>
+
+    <!-- Project Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js?v=2"></script>
+    <script>
+        function checkOrgAuth() {
+            const isLoggedIn = AuthSession.isLoggedIn();
+            const gate = document.getElementById('orgAuthGate');
+            const portal = document.getElementById('orgMainPortal');
+
+            if (!isLoggedIn) {
+                if (gate) gate.style.display = 'block';
+                if (portal) {
+                    portal.style.opacity = '0.35';
+                    portal.style.pointerEvents = 'none';
+                }
+                return false;
+            } else {
+                if (gate) gate.style.display = 'none';
+                if (portal) {
+                    portal.style.opacity = '1';
+                    portal.style.pointerEvents = 'auto';
+                }
+                return true;
+            }
+        }
+
+        // Real-Time Cross-Window Synchronization Channel
+        const reachChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('reach_sync') : null;
+        if (reachChannel) {
+            reachChannel.onmessage = () => renderActivities();
+        }
+        window.addEventListener('storage', () => renderActivities());
+        setInterval(renderActivities, 1000);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkOrgAuth();
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab') || 'create';
+            switchOrgTab(tab);
+            renderActivities();
+        });
+
+        function switchOrgTab(tab) {
+            const isCreate = tab === 'create';
+            document.getElementById('tabBtnCreate').classList.toggle('active', isCreate);
+            document.getElementById('tabBtnActivities').classList.toggle('active', !isCreate);
+            document.getElementById('sectionOrgCreate').style.display = isCreate ? 'block' : 'none';
+            document.getElementById('sectionOrgActivities').style.display = !isCreate ? 'block' : 'none';
+        }
+
+        function toggleVolField(checked) {
+            document.getElementById('volDetailsSub').style.display = checked ? 'block' : 'none';
+        }
+
+        function toggleSpaceField(checked) {
+            document.getElementById('spaceDetailsSub').style.display = checked ? 'block' : 'none';
+        }
+
+        function renderActivities() {
+            const container = document.getElementById('orgActivitiesListContainer');
+            const acts = AppStore.getActivities();
+            document.getElementById('countOrgActs').textContent = acts.length;
+
+            if (acts.length === 0) {
+                container.innerHTML = `<p style="text-align: center; color: var(--text-muted);">No activities created yet.</p>`;
+                return;
+            }
+
+            let html = '';
+            acts.forEach(a => {
+                html += `
+                    <div class="dual-status-card">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px; margin-bottom: 10px;">
+                            <div>
+                                <h3 style="color: #6B21A8; font-size: 1.3rem; margin: 0 0 4px 0;">🎯 ${a.title}</h3>
+                                <p style="margin: 0; font-size: 0.92rem; color: var(--text-muted);">
+                                    📅 ${a.date} • Organizer: <strong>${a.organizer}</strong>
+                                </p>
+                            </div>
+                            <span class="badge badge-success" style="font-size: 0.9rem; padding: 6px 14px;">
+                                ${a.overallStatus || 'Active'}
+                            </span>
+                        </div>
+                        <p style="font-size: 0.92rem; color: var(--text-main); margin-bottom: 14px;">${a.description}</p>
+
+                        <!-- DUAL-SERVICE TRACKING -->
+                        <div class="dual-columns-grid">
+                            
+                            <!-- Track 1: Volunteer Matching -->
+                            <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: 8px; padding: 14px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <span style="font-size: 1.3rem;">🦸‍♂️</span>
+                                    <strong style="color: #166534; font-size: 0.95rem;">Volunteer Mobilization</strong>
+                                </div>
+                                ${a.needsVolunteers ? `
+                                    <p style="margin: 0; font-size: 0.88rem; color: #15803D;">
+                                        Status: <strong>${a.volunteerStatus}</strong>
+                                    </p>
+                                    <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+                                        Enlisted: <strong>${a.volunteersAssigned || a.volunteersRegistered || 0} / ${a.volunteersNeeded} Volunteers</strong>
+                                    </div>
+                                ` : `
+                                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">No volunteers requested for this event.</p>
+                                `}
+                            </div>
+
+                            <!-- Track 2: Community Space Booking -->
+                            <div style="background: #EFF6FF; border: 1.5px solid #93C5FD; border-radius: 8px; padding: 14px;">
+                                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                    <span style="font-size: 1.3rem;">🏛️</span>
+                                    <strong style="color: #1E40AF; font-size: 0.95rem;">Venue Reservation</strong>
+                                </div>
+                                ${a.needsSpace ? `
+                                    <p style="margin: 0; font-size: 0.88rem; color: #1D4ED8;">
+                                        Venue: <strong>${a.spaceName}</strong>
+                                    </p>
+                                    <div style="font-size: 0.82rem; color: #15803D; margin-top: 4px;">
+                                        Status: <strong>${a.spaceStatus || 'Confirmed'}</strong> ${a.qrPassId ? `(#${a.qrPassId})` : ''}
+                                    </div>
+                                ` : `
+                                    <p style="margin: 0; font-size: 0.85rem; color: var(--text-muted);">${a.spaceName || 'Outdoor public venue / No room booking required'}</p>
+                                `}
+                            </div>
+
+                        </div>
+
+                        <!-- Action controls -->
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 16px;">
+                            <button onclick="simulateConductActivity('${a.id}')" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.88rem; background: #7C3AED; border-color: #6D28D9;">
+                                Conduct Activity & Log Completion ✓
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function handleCreateActivitySubmit(e) {
+            e.preventDefault();
+
+            // STRICT AUTH CHECK
+            if (!AuthSession.isLoggedIn()) {
+                AuthSession.showAuthModal({
+                    title: 'Sign In Required to Create Activity',
+                    message: 'You must be signed into an Organizer account to submit community activities.',
+                    role: 'organizer',
+                    redirectUrl: 'organize.html'
+                });
+                return;
+            }
+
+            const title = document.getElementById('actTitle').value;
+            const dateTime = document.getElementById('actDateTime').value;
+            const turnout = document.getElementById('actTurnout').value;
+            const description = document.getElementById('actDescription').value;
+
+            const needsVol = document.getElementById('chkNeedVolunteers').checked;
+            const volCount = parseInt(document.getElementById('actVolCount').value) || 5;
+            const volRoles = document.getElementById('actVolRoles').value;
+
+            const needsSpace = document.getElementById('chkNeedSpace').checked;
+            const spaceChoice = document.getElementById('actSpaceChoice').value;
+
+            if (!needsVol && !needsSpace) {
+                alert('Please select at least one service (Volunteers, Space, or Both).');
+                return;
+            }
+
+            const acts = AppStore.getActivities();
+            const newActId = 'ACT-' + Math.floor(400 + Math.random() * 500);
+
+            const newAct = {
+                id: newActId,
+                title,
+                organizer: 'Pooja Nair (CareForward NGO)',
+                phone: '+91 98765 43213',
+                date: dateTime,
+                description,
+                turnout,
+                needsVolunteers: needsVol,
+                volunteersNeeded: volCount,
+                volunteersAssigned: 0,
+                volunteerStatus: needsVol ? `Broadcasted to nearby volunteers (0/${volCount})` : 'Not Required',
+                needsSpace: needsSpace,
+                spaceName: spaceChoice,
+                spaceStatus: needsSpace ? 'Pending Owner Approval' : 'Not Required',
+                qrPassId: needsSpace ? 'PASS-' + newActId : null,
+                overallStatus: 'Arrangements in Progress'
+            };
+
+            acts.unshift(newAct);
+            AppStore.saveActivities(acts);
+
+            // Also post into Volunteering Tasks feed if volunteers were requested
+            if (needsVol) {
+                const tasks = AppStore.getTasks();
+                tasks.unshift({
+                    id: 'TSK-ACT-' + newActId,
+                    category: 'Community Welfare Event',
+                    title: `Event Volunteers for: ${title}`,
+                    requester: 'CareForward NGO (Pooja Nair)',
+                    requesterPhone: '+91 98765 43213',
+                    location: spaceChoice + ', Sector 4',
+                    time: dateTime,
+                    urgency: 'Organized Event',
+                    skillsNeeded: volRoles,
+                    status: 'Waiting for Volunteer',
+                    assignedVolunteer: null,
+                    notes: `${volCount} volunteers needed for ${volRoles}.`
+                });
+                AppStore.saveTasks(tasks);
+            }
+
+            // Also post into Space Bookings if space was requested
+            if (needsSpace && !spaceChoice.includes('Outdoor')) {
+                const bookings = AppStore.getBookings();
+                bookings.unshift({
+                    id: 'BKG-ACT-' + newActId,
+                    spaceId: 'SPC-501',
+                    spaceName: spaceChoice,
+                    requester: 'CareForward NGO (Pooja Nair)',
+                    requesterPhone: '+91 98765 43213',
+                    purpose: title,
+                    date: dateTime.split('(')[0].trim(),
+                    time: dateTime.includes('(') ? dateTime.split('(')[1].replace(')', '') : '10:00 AM',
+                    expectedGuests: turnout,
+                    status: 'Pending Owner Approval',
+                    qrPassId: 'PASS-' + newActId
+                });
+                AppStore.saveBookings(bookings);
+            }
+
+            alert(`Activity "${title}" launched successfully!\nRequests dispatched for ${needsVol ? 'Volunteers ' : ''}${needsVol && needsSpace ? 'and ' : ''}${needsSpace ? 'Space Reservation' : ''}.`);
+            switchOrgTab('myactivities');
+            renderActivities();
+        }
+
+        function simulateConductActivity(id) {
+            const acts = AppStore.getActivities();
+            const a = acts.find(x => x.id === id);
+            if (a) {
+                a.overallStatus = 'Completed & Feedback Collected';
+                a.volunteerStatus = 'Completed (Full Attendance)';
+                a.spaceStatus = 'Completed (QR Checkout Verified)';
+                AppStore.saveActivities(acts);
+                renderActivities();
+                alert(`Activity ${id} successfully conducted! Volunteer hours logged and venue checkout recorded.`);
+            }
+        }
+    </script>
+</body>
+
+</html>

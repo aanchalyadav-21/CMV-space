@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Request Volunteer Help - Community Micro-Volunteering & Empty Space</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+            margin: 16px 0 24px 0;
+        }
+
+        .category-card {
+            background: #FFFFFF;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            user-select: none;
+        }
+
+        .category-card:hover {
+            border-color: #93C5FD;
+            background: #F8FAFC;
+            transform: translateY(-2px);
+        }
+
+        .category-card.selected {
+            border-color: var(--primary);
+            background: #EFF6FF;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+        }
+
+        .category-icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+        }
+
+        .category-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            color: var(--primary-dark);
+            margin-bottom: 4px;
+        }
+
+        .category-desc {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .audio-help-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')">A-</button>
+                <button onclick="changeFontSize('normal')">A</button>
+                <button onclick="changeFontSize('large')">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 2rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="spaces.html">Community Spaces</a>
+            <a href="help.html" class="active">Help & FAQ</a>
+        </nav>
+    </header>
+
+    <main class="page-container" style="max-width: 760px;">
+
+        <!-- Return / Breadcrumbs -->
+        <a href="dashboard.html?role=member" class="btn-back">
+            ← Return to Dashboard
+        </a>
+
+        <!-- Flow Stepper Progress Bar -->
+        <div class="steps-progress">
+            <div class="step-item active">
+                <span class="step-circle">1</span>
+                <span>Enter Task Details</span>
+            </div>
+            <div class="step-item">
+                <span class="step-circle">2</span>
+                <span>Review Request</span>
+            </div>
+            <div class="step-item">
+                <span class="step-circle">3</span>
+                <span>Live Tracking & Status</span>
+            </div>
+        </div>
+
+        <!-- Audio Help Bar for Senior Accessibility -->
+        <div class="audio-help-bar">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.3rem;">🔊</span>
+                <span style="font-size: 0.92rem; color: var(--primary-dark);">
+                    Need spoken audio assistance with this form?
+                </span>
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="speakFormInstructions()" style="padding: 4px 12px; font-size: 0.84rem;">
+                Listen Instructions 🗣️
+            </button>
+        </div>
+
+        <!-- Card Container -->
+        <div class="card" style="padding: 30px;">
+
+            <!-- Auth Gate Barrier (Shown when unauthenticated) -->
+            <div id="authGateNotice" style="display: none; background: #FFFBEB; border: 2px solid #FCD34D; border-radius: 12px; padding: 28px; text-align: center; margin-bottom: 24px;">
+                <div style="font-size: 3rem; margin-bottom: 10px;">🔒</div>
+                <h2 style="color: #92400E; font-size: 1.45rem; margin-bottom: 8px;">
+                    Sign In Required to Request Assistance
+                </h2>
+                <p style="color: #78350F; font-size: 0.98rem; max-width: 580px; margin: 0 auto 20px auto; line-height: 1.5;">
+                    To protect community trust and senior safety, volunteer assistance requests can only be placed from a verified resident account. Please sign in or register to submit your request.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px;">
+                    <a href="index.html#signInBox" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                        🔑 Sign In with Phone OTP
+                    </a>
+                    <a href="register.html?role=member" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                        📝 Create Resident Account
+                    </a>
+                </div>
+                <div style="padding-top: 14px; border-top: 1px dashed #FDE68A;">
+                    <span style="font-size: 0.88rem; color: #92400E; font-weight: 600; display: block; margin-bottom: 8px;">Evaluation Quick Unlock:</span>
+                    <button type="button" class="btn" onclick="AuthSession.quickLogin('member', 'help.html')" style="background: #FEF3C7; color: #92400E; border: 1.5px solid #F59E0B; font-size: 0.88rem; padding: 6px 16px; font-weight: 700;">
+                        ⚡ Quick Sign In as Resident (Ramesh Patel)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Form Wrapper (Hidden if unauthenticated) -->
+            <div id="helpFormWrapper">
+                <div style="margin-bottom: 22px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        <h1 style="color: var(--primary-dark); font-size: 1.85rem; margin-bottom: 6px;">
+                            Request Volunteer Assistance
+                        </h1>
+                        <span id="userStatusTag" class="badge badge-success" style="font-size: 0.85rem; padding: 6px 12px;">
+                            ✓ Verified Resident Account
+                        </span>
+                    </div>
+                    <p style="color: var(--text-muted); font-size: 1rem;">
+                        Step 1 of 3: Choose a service category and tell us what you need help with.
+                    </p>
+                </div>
+
+                <form id="helpRequestForm" onsubmit="handleProceedToReview(event)">
+
+                <!-- 1. Task Category Selection -->
+                <div class="form-group">
+                    <label class="form-label" style="font-size: 1.05rem;">
+                        1. Select Everyday Task Category:
+                    </label>
+
+                    <div class="category-grid">
+                        <div class="category-card selected" onclick="pickCategory('Medicine Pickup', 'Prescription BP & Diabetes Medicine')" id="cat-med">
+                            <div class="category-icon">💊</div>
+                            <div class="category-title">Medicine Pickup</div>
+                            <div class="category-desc">Prescription collection from chemist & delivery</div>
+                        </div>
+
+                        <div class="category-card" onclick="pickCategory('Groceries', 'Fresh Vegetables & 2L Milk Delivery')" id="cat-groc">
+                            <div class="category-icon">🛒</div>
+                            <div class="category-title">Grocery Aid</div>
+                            <div class="category-desc">Fresh market produce, milk & daily essentials</div>
+                        </div>
+
+                        <div class="category-card" onclick="pickCategory('Tutoring', 'Class 8 Math/Science Homework Tutoring')" id="cat-tutor">
+                            <div class="category-icon">📚</div>
+                            <div class="category-title">Student Tutoring</div>
+                            <div class="category-desc">School coaching & subject guidance</div>
+                        </div>
+
+                        <div class="category-card" onclick="pickCategory('Digital Guidance', 'Smartphone & Pension App Guidance')" id="cat-tech">
+                            <div class="category-icon">📱</div>
+                            <div class="category-title">Digital / App Help</div>
+                            <div class="category-desc">Digital life certificate & phone assistance</div>
+                        </div>
+
+                        <div class="category-card" onclick="pickCategory('Clinic Companion', 'Companion Walk to Clinic & Park')" id="cat-walk">
+                            <div class="category-icon">🩺</div>
+                            <div class="category-title">Clinic Escort</div>
+                            <div class="category-desc">Doctor visits, routine checks & morning walks</div>
+                        </div>
+
+                        <div class="category-card" onclick="pickCategory('Other Everyday Help', 'General Household / Errand Help')" id="cat-other">
+                            <div class="category-icon">🤝</div>
+                            <div class="category-title">Other Errand</div>
+                            <div class="category-desc">Utility bill deposit or parcel drop</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Task Details Form -->
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label">Task Title / Brief Summary:</label>
+                    <input type="text" id="taskTitle" class="form-control" value="Prescription BP & Diabetes Medicine" placeholder="e.g. Need urgent medicines picked up from Apex Chemist" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label class="form-label">Location / Residential Address:</label>
+                    <input type="text" id="taskLocation" class="form-control" value="Flat 402, Shanti Niketan CHS, Sector 4" placeholder="Where should the volunteer visit?" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+                    <div class="form-group">
+                        <label class="form-label">Preferred Date & Time:</label>
+                        <input type="text" id="taskTime" class="form-control" value="Today, 11:30 AM" placeholder="e.g. Today at 4 PM" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Urgency Level:</label>
+                        <select id="taskUrgency" class="form-control">
+                            <option value="Today (Urgent)">⚡ Today (Urgent / Immediate)</option>
+                            <option value="Today (Flexible)">🕒 Today (Flexible Timing)</option>
+                            <option value="Tomorrow">📅 Tomorrow</option>
+                            <option value="Within 2 Days">🗓️ Within 2 Days</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label">Special Instructions & Required Skills (if any):</label>
+                    <textarea id="taskNotes" class="form-control" rows="3" placeholder="e.g. Please bring small change, or resident has difficulty climbing stairs.">Prescription slip will be given at Apex chemist counter. Payment already made via UPI. Please verify seal before handover.</textarea>
+                </div>
+
+                <!-- Forward Navigation CTA Button -->
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem;">
+                    Review Request Details →
+                </button>
+
+            </form>
+            </div><!-- /#helpFormWrapper -->
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js?v=2"></script>
+    <script>
+        let selectedCategory = 'Medicine Pickup';
+
+        function checkAuthStatus() {
+            const isLoggedIn = AuthSession.isLoggedIn();
+            const gateNotice = document.getElementById('authGateNotice');
+            const formWrapper = document.getElementById('helpFormWrapper');
+            const userTag = document.getElementById('userStatusTag');
+
+            if (!isLoggedIn) {
+                // NOT logged in: Show auth gate and lock form!
+                gateNotice.style.display = 'block';
+                formWrapper.style.opacity = '0.4';
+                formWrapper.style.pointerEvents = 'none';
+                if (userTag) userTag.style.display = 'none';
+            } else {
+                // Logged in: Unlock form and show user identity
+                gateNotice.style.display = 'none';
+                formWrapper.style.opacity = '1';
+                formWrapper.style.pointerEvents = 'auto';
+                if (userTag) {
+                    const u = AuthSession.getCurrentUser();
+                    userTag.style.display = 'inline-block';
+                    userTag.textContent = `✓ Signed in as ${u ? u.name : 'Resident'}`;
+                }
+            }
+        }
+
+        function pickCategory(cat, sampleTitle) {
+            selectedCategory = cat;
+            const ids = {
+                'Medicine Pickup': 'cat-med',
+                'Groceries': 'cat-groc',
+                'Tutoring': 'cat-tutor',
+                'Digital Guidance': 'cat-tech',
+                'Clinic Companion': 'cat-walk',
+                'Other Everyday Help': 'cat-other'
+            };
+
+            Object.entries(ids).forEach(([k, id]) => {
+                const el = document.getElementById(id);
+                if (el) {
+                    if (k === cat) el.classList.add('selected');
+                    else el.classList.remove('selected');
+                }
+            });
+
+            if (sampleTitle) {
+                document.getElementById('taskTitle').value = sampleTitle;
+            }
+        }
+
+        function speakFormInstructions() {
+            if ('speechSynthesis' in window) {
+                const text = "Please select the help category you need. Enter your address, preferred time, and any instructions for the neighborhood volunteer. Then click review request details.";
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1.0;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Audio narration is not supported on this browser.');
+            }
+        }
+
+        function handleProceedToReview(e) {
+            e.preventDefault();
+
+            // STRICT AUTH CHECK: Guest users cannot submit!
+            if (!AuthSession.isLoggedIn()) {
+                AuthSession.showAuthModal({
+                    title: 'Sign In Required to Submit Help Request',
+                    message: 'You cannot submit a volunteer request without signing in. Please sign in or create an account to proceed.',
+                    role: 'member',
+                    redirectUrl: 'help.html'
+                });
+                return false;
+            }
+
+            const user = AuthSession.getCurrentUser();
+
+            const pendingRequest = {
+                category: selectedCategory,
+                title: document.getElementById('taskTitle').value,
+                location: document.getElementById('taskLocation').value,
+                time: document.getElementById('taskTime').value,
+                urgency: document.getElementById('taskUrgency').value,
+                notes: document.getElementById('taskNotes').value,
+                requester: user ? user.name : 'Resident',
+                requesterPhone: user ? user.phone : '+91 98765 43210'
+            };
+
+            localStorage.setItem('reach_pending_request', JSON.stringify(pendingRequest));
+            window.location.href = 'review.html';
+        }
+
+        // Restore existing draft if user came back via "Edit Details"
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuthStatus();
+
+            const saved = localStorage.getItem('reach_pending_request');
+            if (saved) {
+                try {
+                    const data = JSON.parse(saved);
+                    pickCategory(data.category, data.title);
+                    if (data.location) document.getElementById('taskLocation').value = data.location;
+                    if (data.time) document.getElementById('taskTime').value = data.time;
+                    if (data.urgency) document.getElementById('taskUrgency').value = data.urgency;
+                    if (data.notes) document.getElementById('taskNotes').value = data.notes;
+                } catch (e) {}
+            }
+        });
+    </script>
+</body>
+
+</html>

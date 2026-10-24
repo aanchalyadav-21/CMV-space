@@ -1,158 +1,691 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reach Community - Screen 1: Home</title>
-    <!-- Shared Styles with cache-buster v=3 -->
-    <link rel="stylesheet" href="css/base.css?v=3">
-    <!-- Member 1 Styles -->
-    <link rel="stylesheet" href="css/screen1.css?v=3">
+    <title>Community Micro-Volunteering & Empty Space</title>
+    <!-- Shared Unified Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .auth-container-card {
+            background: #FFFFFF;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            box-shadow: var(--shadow-md);
+            margin: 28px auto;
+            max-width: 640px;
+        }
+
+        .auth-tab-nav {
+            display: flex;
+            background: #F1F5F9;
+            padding: 6px;
+            border-radius: var(--radius-md);
+            margin-bottom: 24px;
+            gap: 6px;
+        }
+
+        .auth-tab-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .auth-tab-btn.active {
+            background: #FFFFFF;
+            color: var(--primary-dark);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-light);
+        }
+
+        .role-pill-select {
+            background: #FFFFFF;
+            border: 2px solid #E2E8F0;
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            font-family: inherit;
+            color: var(--text-main);
+            width: 100%;
+        }
+
+        .role-pill-select:hover {
+            border-color: #93C5FD;
+            background: #F8FAFC;
+        }
+
+        .role-pill-select.active {
+            border-color: var(--primary);
+            background: #EFF6FF;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+        }
+
+        .service-comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin: 36px 0;
+        }
+
+        .service-box {
+            background: #FFFFFF;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 26px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .service-badge {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            width: fit-content;
+        }
+
+        .service-badge-primary {
+            background: #EFF6FF;
+            color: var(--primary);
+            border: 1px solid #BFDBFE;
+        }
+
+        .service-badge-secondary {
+            background: #ECFDF5;
+            color: #059669;
+            border: 1px solid #A7F3D0;
+        }
+
+        .service-badge-integration {
+            background: #FAF5FF;
+            color: #7E22CE;
+            border: 1px solid #E9D5FF;
+        }
+
+        .lang-select-box {
+            background: #1E293B;
+            border: 1px solid #334155;
+            color: #FFFFFF;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
 
-    <!-- Accessibility, Helpline & SOS Bar -->
+    <!-- Top Helpline, SOS Bar & Accessibility -->
     <div class="top-bar">
         <div class="top-bar-left">
             <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
-            <!-- Bright Red SOS Button with inline fallback for 100% visibility -->
-            <button class="btn-sos" onclick="openSosModal()" style="background-color: #DC2626 !important; color: #FFFFFF !important; border: 2px solid #FFFFFF !important; padding: 6px 18px !important; border-radius: 9999px !important; font-weight: 800 !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; gap: 6px !important;" title="Emergency Help">
-                🚨 EMERGENCY SOS
-            </button>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
         </div>
-        <div class="font-controls">
-            <span>Font Size:</span>
-            <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
-            <button onclick="changeFontSize('normal')" title="Standard text">A</button>
-            <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+        <div class="top-bar-right">
+            <!-- Language Selection -->
+            <div style="display: flex; align-items: center; gap: 6px;">
+                <span style="font-size: 0.85rem; color: #94A3B8;">🌐 Language:</span>
+                <select id="langSelect" class="lang-select-box" onchange="setLanguage(this.value)">
+                    <option value="en">English</option>
+                    <option value="hi">हिंदी (Hindi)</option>
+                    <option value="mr">मराठी (Marathi)</option>
+                </select>
+            </div>
+
+            <!-- Font Size Controls -->
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+                <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+                <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+            </div>
         </div>
     </div>
 
-    <!-- Header Navigation with Dedicated "File Complaint" Tab -->
+    <!-- Main Header -->
     <header class="main-header">
         <a href="index.html" class="logo">
-            <span style="font-size: 1.8rem;">🤝</span>
-            <span><strong>Reach</strong> Community</span>
+            <span style="font-size: 2rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
         </a>
         <nav class="main-nav">
-            <a href="index.html" class="active">Home</a>
-            <a href="categories.html">Services</a>
-            <a href="request-help.html">Request Help</a>
-            <a href="confirmation.html">Track Status</a>
-            <a href="complaints.html" style="color: #DC2626; font-weight: 700;">File Complaint</a>
+            <a href="index.html" class="active">🏠 Home</a>
+            <a href="explore.html?type=tasks">🛒 Browse Tasks</a>
+            <a href="explore.html?type=spaces">🏛️ Community Spaces</a>
+            <a href="#servicesOverview">📋 Services</a>
+            <a href="#signInBox" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.88rem;">🔑 Sign In</a>
+            <a href="#signInBox" onclick="switchAuthTab('register')" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.88rem;">📝 Create Account</a>
+            <div id="navUserSection"></div>
         </nav>
     </header>
 
     <!-- Main Content Container -->
     <main class="page-container">
-        
-        <!-- Journey Progress Indicator -->
-        <div class="flow-progress">
-            <div class="flow-step active">
-                <span class="step-num">1</span>
-                <span>Home / Welcome</span>
-            </div>
-            <div class="flow-step">
-                <span class="step-num">2</span>
-                <span>Select Service</span>
-            </div>
-            <div class="flow-step">
-                <span class="step-num">3</span>
-                <span>Fill Request</span>
-            </div>
-            <div class="flow-step">
-                <span class="step-num">4</span>
-                <span>Review Details</span>
-            </div>
-            <div class="flow-step">
-                <span class="step-num">5</span>
-                <span>Confirmed Status</span>
-            </div>
-        </div>
 
-        <!-- MEMBER 1 CONTENT (Screen 1: Landing / Entry Screen) -->
-        <section class="hero-section">
-            <h1 class="hero-title">Neighbourhood Help & Community Spaces Made Simple</h1>
-            <p class="hero-subtitle">
-                A community-driven platform connecting local residents and senior citizens with trusted volunteers for micro-tasks and shared activity spaces.
-            </p>
-            
-            <!-- Single, Unified Forward CTA Button -->
-            <div class="hero-actions">
-                <a href="categories.html" class="btn btn-primary btn-large" id="btn-request-help">
-                    Explore Community Services & Spaces →
-                </a>
+        <!-- Hero Section -->
+        <section class="hero-banner" style="text-align: center; margin-bottom: 30px;">
+            <div class="neighborhood-badge">
+                <span>📍</span>
+                <span>Neighborhood Care Network</span>
             </div>
+            <h1 style="color: var(--primary-dark); font-size: 2.3rem; margin: 12px 0 8px 0; font-weight: 800;">
+                Connecting Neighbors, <span class="gradient-text">Helping Communities</span>
+            </h1>
+            <p class="platform-tagline" style="font-size: 1.15rem; color: var(--text-muted); max-width: 680px; margin: 0 auto;">
+                Connecting People, Helping Communities. Micro-volunteering for senior errand aid and shared community halls under one verified network.
+            </p>
         </section>
 
-        <!-- Feature Highlights -->
-        <section class="feature-cards">
-            <div class="feature-card">
-                <div class="icon">🛒</div>
-                <h3>Micro-Volunteering</h3>
-                <p>Quick help with groceries, medicine pickup, digital forms, and daily companionship.</p>
+        <!-- Entry Form: Sign In & Registration Tabs Box -->
+        <div id="signInBox" class="auth-container-card">
+
+            <!-- Tab Switcher -->
+            <div class="auth-tab-nav">
+                <button type="button" class="auth-tab-btn active" id="tabBtnSignIn" onclick="switchAuthTab('signin')">
+                    🔑 Sign In
+                </button>
+                <button type="button" class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">
+                    📝 Create New Account
+                </button>
             </div>
-            <div class="feature-card">
-                <div class="icon">🏛️</div>
-                <h3>Shared Spaces</h3>
-                <p>Discover neighborhood halls, society rooms, and activity spaces for workshops.</p>
+
+            <!-- ============================================================== -->
+            <!-- TAB 1: SIGN IN (EXISTING USER)                                  -->
+            <!-- ============================================================== -->
+            <div id="authContentSignIn">
+                <h3 style="color: var(--primary-dark); margin-bottom: 6px; font-size: 1.25rem;">
+                    Sign In to Your Dashboard
+                </h3>
+                <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 20px;">
+                    Select your account role and verify with mobile phone OTP code.
+                </p>
+
+                <form onsubmit="handleSignInSubmit(event)">
+
+                    <!-- Step 1: Account Role Selection -->
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">1. Choose Your Account Role:</label>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <button type="button" class="role-pill-select active" onclick="selectSignInRole('member')" id="pill-member">
+                                <span style="font-size: 1.5rem;">👵</span>
+                                <div>
+                                    <strong style="display: block; font-size: 0.95rem;">Resident / Senior</strong>
+                                    <small style="color: var(--text-muted); font-size: 0.78rem;">Request everyday assistance</small>
+                                </div>
+                            </button>
+                            <button type="button" class="role-pill-select" onclick="selectSignInRole('volunteer')" id="pill-volunteer">
+                                <span style="font-size: 1.5rem;">🦸‍♂️</span>
+                                <div>
+                                    <strong style="display: block; font-size: 0.95rem;">Volunteer</strong>
+                                    <small style="color: var(--text-muted); font-size: 0.78rem;">Complete tasks & share ETA</small>
+                                </div>
+                            </button>
+                            <button type="button" class="role-pill-select" onclick="selectSignInRole('owner')" id="pill-owner">
+                                <span style="font-size: 1.5rem;">🏛️</span>
+                                <div>
+                                    <strong style="display: block; font-size: 0.95rem;">Space Owner</strong>
+                                    <small style="color: var(--text-muted); font-size: 0.78rem;">List & approve venues</small>
+                                </div>
+                            </button>
+                            <button type="button" class="role-pill-select" onclick="selectSignInRole('organizer')" id="pill-organizer">
+                                <span style="font-size: 1.5rem;">🤝</span>
+                                <div>
+                                    <strong style="display: block; font-size: 0.95rem;">Event Organizer</strong>
+                                    <small style="color: var(--text-muted); font-size: 0.78rem;">Workshops & welfare drives</small>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Mobile Number -->
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">2. Mobile Phone Number:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="tel" id="signInPhone" class="form-control" value="+91 98765 43210" placeholder="+91 98765 43210" required>
+                            <button type="button" id="btnSendOtp" class="btn btn-secondary" onclick="triggerOtpCode()" style="white-space: nowrap; font-weight: 700;">
+                                Send OTP 📲
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: OTP Code Box (Revealed after clicking Send OTP) -->
+                    <div id="otpInputRow" style="display: none; background: #F0FDF4; border: 1.5px solid #86EFAC; padding: 16px; border-radius: var(--radius-sm); margin-bottom: 18px;">
+                        <label class="form-label" style="color: #166534; margin-bottom: 6px;">
+                            3. Enter 6-Digit SMS Verification Code:
+                        </label>
+                        <input type="text" id="signInOtp" class="form-control" maxlength="6" placeholder="Enter 6-digit OTP (e.g. 123456)" style="font-size: 1.25rem; font-weight: bold; letter-spacing: 4px; text-align: center; border-color: #86EFAC;">
+                        <small style="color: #15803D; display: block; margin-top: 6px; font-size: 0.84rem;">
+                            ✓ Verification code sent via SMS. For prototype evaluation, enter <strong>123456</strong> or any 6 digits.
+                        </small>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.05rem;">
+                        Verify & Access Role Dashboard →
+                    </button>
+                </form>
+
+                <!-- Dedicated registration link -->
+                <div style="text-align: center; margin-top: 16px; font-size: 0.92rem; color: var(--text-muted);">
+                    New to our Community? 
+                    <a href="register.html" style="color: var(--primary); font-weight: 700; text-decoration: underline;">
+                        Create a free resident or volunteer account
+                    </a>
+                </div>
             </div>
-            <div class="feature-card">
-                <div class="icon">🛡️</div>
-                <h3>Senior Safety & SOS</h3>
-                <p>Instant SOS emergency alerts and strict community grievance oversight for peace of mind.</p>
+
+            <!-- ============================================================== -->
+            <!-- TAB 2: CREATE ACCOUNT (SHORT INITIAL REGISTRATION)              -->
+            <!-- ============================================================== -->
+            <div id="authContentRegister" style="display: none;">
+                <h3 style="color: var(--primary-dark); margin-bottom: 6px; font-size: 1.25rem;">
+                    Join Community Platform
+                </h3>
+                <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 20px;">
+                    Fill out the short profile form to register your account.
+                </p>
+
+                <form onsubmit="handleRegistrationSubmit(event)">
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Full Name:</label>
+                        <input type="text" id="regFullName" class="form-control" placeholder="e.g. Ramesh Patel" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Mobile Number:</label>
+                        <input type="tel" id="regMobile" class="form-control" placeholder="+91 98200 12345" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label">Area / Locality:</label>
+                            <input type="text" id="regArea" class="form-control" value="Sector 4" placeholder="e.g. Sector 4, Shanti Niketan" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Language:</label>
+                            <select id="regLanguage" class="form-control">
+                                <option value="en">English</option>
+                                <option value="hi">हिंदी (Hindi)</option>
+                                <option value="mr">मराठी (Marathi)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">I Want to Join As (Account Role):</label>
+                        <select id="regAccountRole" class="form-control" onchange="adjustRegisterFields(this.value)">
+                            <option value="member">👵 Community Member / Resident (Request everyday errand help)</option>
+                            <option value="volunteer">🦸 Community Volunteer (Find and complete tasks)</option>
+                            <option value="owner">🏛️ Space Owner (List society halls and manage bookings)</option>
+                            <option value="organizer">🤝 NGO / Event Organizer (Coordinate welfare activities)</option>
+                        </select>
+                    </div>
+
+                    <!-- Aadhaar Identity Verification Section -->
+                    <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                            <span style="font-size: 1.4rem;">🆔</span>
+                            <div>
+                                <strong style="color: #0F172A; font-size: 0.95rem;">Identity Verification (Aadhaar Card)</strong>
+                                <p style="margin: 0; font-size: 0.8rem; color: #64748B;">
+                                    Ensures safety of elders, volunteer verification, and community security.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <label class="form-label" style="font-size: 0.88rem;">12-Digit Aadhaar Card Number:</label>
+                            <input type="text" id="regAadhaarNumber" class="form-control" placeholder="e.g. 5421 8892 4103" maxlength="16" oninput="formatAadhaarNumber(this)" value="5421 8892 4103" required style="letter-spacing: 2px; font-weight: 600;">
+                        </div>
+
+                        <div style="margin-bottom: 6px;">
+                            <label class="form-label" style="font-size: 0.88rem;">Upload Aadhaar Document Front (Photo/PDF):</label>
+                            <div onclick="document.getElementById('fileAadhaarIndex').click()" style="border: 1.5px dashed #94A3B8; background: #FFFFFF; border-radius: 6px; padding: 10px; text-align: center; cursor: pointer;">
+                                <input type="file" id="fileAadhaarIndex" style="display: none;" accept="image/*,.pdf" onchange="document.getElementById('lblDocNameIndex').textContent = this.files[0] ? this.files[0].name : 'aadhaar_card_doc.pdf'">
+                                <span style="font-size: 1.2rem;">📄</span>
+                                <span id="lblDocNameIndex" style="font-size: 0.86rem; color: #1E40AF; font-weight: 600; margin-left: 6px;">
+                                    aadhaar_card_doc.pdf (Pre-verified for demo)
+                                </span>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.78rem; color: #047857; margin-top: 6px;">
+                            🔒 Privacy Safeguard: Masked as XXXX-XXXX-4103 strictly for platform verification.
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Role-Specific Fields -->
+                    <div id="volunteerExtraFields" style="display: none; background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 14px;">
+                        <label class="form-label" style="font-size: 0.9rem;">Volunteer Skills & Availability:</label>
+                        <input type="text" id="regSkills" class="form-control" placeholder="e.g. Medicine pickup, Elderly care, Tutoring" style="margin-bottom: 8px;">
+                        <input type="text" id="regAvailability" class="form-control" placeholder="e.g. Weekday mornings, Weekend evenings">
+                    </div>
+
+                    <div id="ownerExtraFields" style="display: none; background: #F8FAFC; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 14px; margin-bottom: 14px;">
+                        <label class="form-label" style="font-size: 0.9rem;">Initial Venue Information:</label>
+                        <input type="text" id="regVenueName" class="form-control" placeholder="e.g. Shanti Niketan Society Clubhouse" style="margin-bottom: 8px;">
+                        <input type="number" id="regVenueCapacity" class="form-control" placeholder="Approximate Capacity (e.g. 50)">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.05rem;">
+                        Complete Registration & Start →
+                    </button>
+                </form>
+            </div>
+
+
+
+            <!-- Restricted Admin Link -->
+            <div style="margin-top: 16px; text-align: center;">
+                <a href="admin.html" style="font-size: 0.86rem; color: #64748B; text-decoration: underline; display: inline-flex; align-items: center; gap: 6px;">
+                    <span>🔒</span>
+                    <span>Restricted Admin & Supervisor Portal (Demo Login)</span>
+                </a>
+            </div>
+
+        </div>
+
+        <!-- Section: Overview of Core Platform Services -->
+        <section id="servicesOverview" style="margin-top: 48px;">
+            <div class="section-heading" style="text-align: center; margin-bottom: 24px;">
+                <h2 style="color: var(--primary-dark); font-size: 1.75rem;">Platform Services Architecture</h2>
+                <p style="color: var(--text-muted); font-size: 1.05rem;">
+                    Connecting micro-volunteering and space-sharing into one seamless community network.
+                </p>
+            </div>
+
+            <div class="service-comparison-grid">
+                
+                <!-- Service 1: Community Volunteering (Main Service) -->
+                <div class="service-box" style="border-top: 4px solid var(--primary);">
+                    <div>
+                        <span class="service-badge service-badge-primary">Main Service 1</span>
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🛒</div>
+                        <h3 style="color: var(--primary-dark); font-size: 1.3rem; margin-bottom: 8px;">
+                            Community Micro-Volunteering
+                        </h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 14px;">
+                            Everyday assistance for seniors and residents: prescription medicine pickup, grocery runs, student tutoring, and clinic companion walks.
+                        </p>
+                        <ul style="font-size: 0.9rem; color: var(--text-main); padding-left: 20px; line-height: 1.8;">
+                            <li>Verified local volunteers</li>
+                            <li>Live tracking & ETA updates</li>
+                            <li>4-digit senior safety PIN confirmation</li>
+                        </ul>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border-light); font-size: 0.85rem; color: var(--primary);">
+                        ✓ Sign in as <strong>Resident</strong> to request help.
+                    </div>
+                </div>
+
+                <!-- Service 2: Community Space Sharing (Second Service) -->
+                <div class="service-box" style="border-top: 4px solid #10B981;">
+                    <div>
+                        <span class="service-badge service-badge-secondary">Second Service 2</span>
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🏛️</div>
+                        <h3 style="color: #065F46; font-size: 1.3rem; margin-bottom: 8px;">
+                            Community Space Sharing
+                        </h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 14px;">
+                            Discover and reserve community halls, society clubhouses, and learning rooms for wellness workshops, meetings, and classes.
+                        </p>
+                        <ul style="font-size: 0.9rem; color: var(--text-main); padding-left: 20px; line-height: 1.8;">
+                            <li>Space provider approval workflow</li>
+                            <li>Digital QR check-in & check-out pass</li>
+                            <li>Clear amenity & capacity details</li>
+                        </ul>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border-light); font-size: 0.85rem; color: #059669;">
+                        ✓ Public directory viewable by all.
+                    </div>
+                </div>
+
+                <!-- Integration: Event Organizer & Admin Oversight -->
+                <div class="service-box" style="border-top: 4px solid #8B5CF6;">
+                    <div>
+                        <span class="service-badge service-badge-integration">Platform Integration</span>
+                        <div style="font-size: 2.2rem; margin-bottom: 8px;">🤝</div>
+                        <h3 style="color: #6B21A8; font-size: 1.3rem; margin-bottom: 8px;">
+                            Activity Integration & Oversight
+                        </h3>
+                        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin-bottom: 14px;">
+                            Event organizers combine both services (e.g. book a hall AND enlist student volunteers for a health camp), overseen by the System Admin.
+                        </p>
+                        <ul style="font-size: 0.9rem; color: var(--text-main); padding-left: 20px; line-height: 1.8;">
+                            <li>Dual-status tracking for events</li>
+                            <li>Admin identity & venue verification</li>
+                            <li>Grievance panel & dispute resolution</li>
+                        </ul>
+                    </div>
+                    <div style="margin-top: 20px; padding-top: 12px; border-top: 1px solid var(--border-light); font-size: 0.85rem; color: #7E22CE;">
+                        ✓ Oversees both workflows cleanly.
+                    </div>
+                </div>
+
             </div>
         </section>
 
     </main>
 
-    <!-- Shared Footer with Link to Dedicated Complaints Page -->
+    <!-- Project Footer -->
     <footer class="main-footer">
-        <p><strong>Reach Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
-        <p style="margin-top: 8px; font-size: 0.95rem;">
-            <a href="complaints.html" style="color: #FCA5A5; text-decoration: underline;">
-                ⚠️ Report an Issue / File Volunteer Complaint
-            </a>
-            &nbsp;•&nbsp;
-            <a href="javascript:void(0)" onclick="openSosModal()" style="color: #FCA5A5; text-decoration: underline;">
-                🚨 Emergency Assistance Desk
-            </a>
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
         </p>
     </footer>
 
-    <!-- SOS Emergency Modal -->
-    <div id="sosModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content modal-sos">
-            <div class="modal-header">
-                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
-                    🚨 Senior Emergency Panic Response
-                </h2>
-                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
-            </div>
-            <p style="font-size: 1.05rem; margin-bottom: 20px; color: var(--text-primary);">
-                Do you need urgent medical or security assistance? Help is available 24/7.
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
-                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left; justify-content: flex-start;">
-                    🚑 Call Medical Ambulance (108)
-                </a>
-                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; justify-content: flex-start;">
-                    👮 Call DBIT Society Security Guard (022-2500-1111)
-                </a>
-                <a href="tel:9876500000" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
-                    👨‍👩‍👧 Alert Registered Emergency Family Contact
-                </a>
-            </div>
-            <div style="background-color: #FEE2E2; border: 1px solid #FCA5A5; padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #991B1B;">
-                GPS Location Alert: Flat 402, Shanti Niketan has been flagged for prioritized neighborhood patrol.
-            </div>
-            <div style="text-align: right; margin-top: 20px;">
-                <button class="btn btn-secondary" onclick="closeSosModal()">Close Emergency Alert</button>
-            </div>
-        </div>
-    </div>
+    <!-- Shared Unified Master Engine -->
+    <script src="script.js"></script>
+    <script>
+        let selectedSignInRole = 'member';
+        const roleDefaultPhones = {
+            member: '+91 98765 43210',
+            volunteer: '+91 98765 43211',
+            owner: '+91 98765 43212',
+            organizer: '+91 98765 43213'
+        };
 
-    <!-- Shared Script with cache-buster v=3 -->
-    <script src="js/main.js?v=3"></script>
+        function switchAuthTab(tab) {
+            const btnIn = document.getElementById('tabBtnSignIn');
+            const btnReg = document.getElementById('tabBtnRegister');
+            const contentIn = document.getElementById('authContentSignIn');
+            const contentReg = document.getElementById('authContentRegister');
+
+            if (tab === 'signin') {
+                btnIn.classList.add('active');
+                btnReg.classList.remove('active');
+                contentIn.style.display = 'block';
+                contentReg.style.display = 'none';
+            } else {
+                btnIn.classList.remove('active');
+                btnReg.classList.add('active');
+                contentIn.style.display = 'none';
+                contentReg.style.display = 'block';
+            }
+        }
+
+        function selectSignInRole(role) {
+            selectedSignInRole = role;
+            ['member', 'volunteer', 'owner', 'organizer'].forEach(r => {
+                const el = document.getElementById('pill-' + r);
+                if (el) {
+                    if (r === role) el.classList.add('active');
+                    else el.classList.remove('active');
+                }
+            });
+            const phoneInput = document.getElementById('signInPhone');
+            if (phoneInput) {
+                phoneInput.value = roleDefaultPhones[role] || '+91 98765 43210';
+            }
+        }
+
+        function triggerOtpCode() {
+            const phone = document.getElementById('signInPhone').value;
+            if (!phone || phone.trim().length < 8) {
+                alert('Please enter a valid mobile number.');
+                return;
+            }
+            document.getElementById('otpInputRow').style.display = 'block';
+            document.getElementById('btnSendOtp').textContent = 'Resend OTP 🔄';
+            document.getElementById('signInOtp').value = '';
+            document.getElementById('signInOtp').focus();
+            alert(`SMS Verification Code sent to ${phone}.\n(Demo test code: enter 123456 or any 6 digits)`);
+        }
+
+        function handleSignInSubmit(e) {
+            e.preventDefault();
+            const phone = document.getElementById('signInPhone').value;
+            const otpRow = document.getElementById('otpInputRow');
+
+            if (otpRow.style.display === 'none') {
+                triggerOtpCode();
+                return;
+            }
+
+            const otp = document.getElementById('signInOtp').value;
+            if (!otp || otp.trim().length < 4) {
+                alert('Please enter the 6-digit verification code (e.g. 123456).');
+                document.getElementById('signInOtp').focus();
+                return;
+            }
+
+            AuthSession.login(selectedSignInRole, phone);
+            window.location.href = 'dashboard.html?role=' + selectedSignInRole;
+        }
+
+        function adjustRegisterFields(role) {
+            const volDiv = document.getElementById('volunteerExtraFields');
+            const ownDiv = document.getElementById('ownerExtraFields');
+            if (volDiv) volDiv.style.display = (role === 'volunteer') ? 'block' : 'none';
+            if (ownDiv) ownDiv.style.display = (role === 'owner') ? 'block' : 'none';
+        }
+
+        function handleRegistrationSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('regFullName').value;
+            const phone = document.getElementById('regMobile').value;
+            const area = document.getElementById('regArea').value;
+            const language = document.getElementById('regLanguage').value;
+            const role = document.getElementById('regAccountRole').value;
+
+            const aadhaarNumber = document.getElementById('regAadhaarNumber')?.value || '5421 8892 4103';
+
+            const userData = {
+                name,
+                phone,
+                area,
+                language,
+                role,
+                idType: 'Aadhaar Card',
+                aadhaarNumber: aadhaarNumber
+            };
+
+            if (role === 'volunteer') {
+                userData.skills = (document.getElementById('regSkills')?.value || 'General Helper').split(',');
+                userData.availability = document.getElementById('regAvailability')?.value || 'Weekends';
+            } else if (role === 'owner') {
+                userData.venueName = document.getElementById('regVenueName')?.value || 'Community Hall';
+                userData.venueCapacity = document.getElementById('regVenueCapacity')?.value || 40;
+            }
+
+            AuthSession.register(userData);
+            alert(`Account registered successfully with Aadhaar Verification for ${name} as ${role.toUpperCase()}!\nRouting to your personalized dashboard.`);
+            window.location.href = 'dashboard.html?role=' + role;
+        }
+
+        function formatAadhaarNumber(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length > 12) val = val.slice(0, 12);
+            const parts = [];
+            for (let i = 0; i < val.length; i += 4) {
+                parts.push(val.slice(i, i + 4));
+            }
+            input.value = parts.join(' ');
+        }
+
+        function quickDemoSignIn(role) {
+            selectSignInRole(role);
+            const phone = roleDefaultPhones[role] || '+91 98765 43210';
+            AuthSession.login(role, phone);
+            window.location.href = 'dashboard.html?role=' + role;
+        }
+
+        function renderHomeSessionState() {
+            const existingBox = document.getElementById('signedInWelcomeBox');
+            if (existingBox) existingBox.remove();
+
+            if (AuthSession.isLoggedIn()) {
+                const user = AuthSession.getCurrentUser();
+                const role = AuthSession.getCurrentRole();
+                if (user) {
+                    const hero = document.querySelector('.hero-banner');
+                    if (hero) {
+                        const welcomeDiv = document.createElement('div');
+                        welcomeDiv.id = 'signedInWelcomeBox';
+                        welcomeDiv.style.cssText = 'background: #EFF6FF; border: 1.5px solid #93C5FD; border-radius: 10px; padding: 12px 20px; max-width: 680px; margin: 18px auto 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;';
+                        welcomeDiv.innerHTML = `
+                            <div style="text-align: left;">
+                                <span style="font-size: 1.1rem;">👋</span>
+                                <span style="color: var(--primary-dark); font-weight: 700; font-size: 0.95rem;">Signed in as ${user.name}</span>
+                                <span class="badge badge-success" style="font-size: 0.78rem; margin-left: 6px;">${user.roleTitle || role}</span>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="dashboard.html?role=${role}" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.85rem; text-decoration: none;">Go to Dashboard →</a>
+                                <button onclick="AuthSession.logout()" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; color: #DC2626; cursor: pointer;">Sign Out</button>
+                            </div>
+                        `;
+                        hero.appendChild(welcomeDiv);
+                    }
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHomeSessionState();
+
+            // Auto-open Register tab if navigated via #register or ?tab=register
+            const urlParams = new URLSearchParams(window.location.search);
+            if (window.location.hash === '#register' || urlParams.get('tab') === 'register') {
+                switchAuthTab('register');
+            }
+
+            // Cross-tab sync for logout
+            if ('BroadcastChannel' in window) {
+                const bc = new BroadcastChannel('reach_sync');
+                bc.onmessage = (e) => {
+                    if (e.data && e.data.type === 'USER_LOGOUT') {
+                        renderHomeSessionState();
+                        if (typeof renderDynamicNavigation === 'function') renderDynamicNavigation();
+                    }
+                };
+            }
+        });
+    </script>
 </body>
+
 </html>

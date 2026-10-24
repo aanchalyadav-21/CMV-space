@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volunteer Field Operations - Community Micro-Volunteering & Empty Space</title>
+    <!-- Base Styles and Portals Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/portals.css">
+</head>
+<body>
+
+    <!-- Accessibility, Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Volunteer Coordinator Desk: <strong>022-2504-2000</strong> (Ext 402)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')">A-</button>
+            <button onclick="changeFontSize('normal')">A</button>
+            <button onclick="changeFontSize('large')">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html?role=volunteer">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="volunteer.html" class="active">Volunteer Hub</a>
+            <a href="admin.html">System Admin</a>
+            <a href="index.html" onclick="event.preventDefault(); AuthSession.logout();" style="cursor: pointer;">Sign Out 🚪</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+
+        <!-- Return / Breadcrumbs -->
+        <a href="dashboard.html?role=volunteer" class="btn-back" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px; font-weight: 600; color: #1E3A8A; text-decoration: none; margin-bottom: 18px;">
+            ← Return to Dashboard
+        </a>
+
+        <!-- Auth Gate Barrier (Shown when unauthenticated) -->
+        <div id="volAuthGate" style="display: none; background: #FFFBEB; border: 2px solid #FCD34D; border-radius: 12px; padding: 28px; text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🔒</div>
+            <h2 style="color: #92400E; font-size: 1.45rem; margin-bottom: 8px;">
+                Volunteer Sign In Required
+            </h2>
+            <p style="color: #78350F; font-size: 0.98rem; max-width: 580px; margin: 0 auto 20px auto; line-height: 1.5;">
+                To accept nearby senior citizen errands, broadcast live delivery ETA, and enter verified safety PINs, you must be signed into an active Volunteer account.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px;">
+                <a href="index.html#signInBox" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                    🔑 Sign In with Phone OTP
+                </a>
+                <a href="register.html?role=volunteer" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                    📝 Register as Volunteer
+                </a>
+            </div>
+            <div style="padding-top: 14px; border-top: 1px dashed #FDE68A;">
+                <span style="font-size: 0.88rem; color: #92400E; font-weight: 600; display: block; margin-bottom: 8px;">Evaluation Quick Unlock:</span>
+                <button type="button" class="btn" onclick="AuthSession.quickLogin('volunteer', 'volunteer.html')" style="background: #FEF3C7; color: #92400E; border: 1.5px solid #F59E0B; font-size: 0.88rem; padding: 6px 16px; font-weight: 700;">
+                    ⚡ Quick Sign In as Volunteer (Karan Verma)
+                </button>
+            </div>
+        </div>
+
+        <div id="volMainPortal">
+        <!-- Volunteer Header Banner -->
+        <div class="portal-header-banner" style="background: linear-gradient(135deg, #064E3B 0%, #059669 100%);">
+            <div class="portal-title-row">
+                <div>
+                    <h1>
+                        <span>🦸‍♂️</span>
+                        <span>Volunteer Field Hub & Missions</span>
+                        <span class="portal-role-tag" style="background: #047857; color: #ECFDF5;">VOLUNTEER DESK</span>
+                    </h1>
+                    <p class="portal-meta" style="color: #A7F3D0;">
+                        Welcome back, <strong>Karan Verma</strong> • Verified Community Volunteer ID: <strong>#VOL-2026-45</strong>
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.2); padding: 8px 16px; border-radius: 30px;">
+                    <span style="font-size: 0.9rem; color: #FFFFFF; font-weight: 600;">Status:</span>
+                    <button id="btnToggleAvail" onclick="toggleAvailability()" class="btn" style="background: #10B981; color: white; padding: 6px 14px; font-size: 0.85rem; border-radius: 20px;">
+                        🟢 Online & Ready
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="icon-box" style="background: #DCFCE7; color: #166534;">✅</div>
+                <div class="metric-val">42</div>
+                <div class="metric-label">Completed Missions</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-box" style="background: #FEF3C7; color: #B45309;">⭐</div>
+                <div class="metric-val">4.9 / 5.0</div>
+                <div class="metric-label">Senior Citizen Rating</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-box" style="background: #DBEAFE; color: #1E40AF;">⏱️</div>
+                <div class="metric-val">64 Hrs</div>
+                <div class="metric-label">Community Service Hours</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-box" style="background: #F3E8FF; color: #7E22CE;">🛡️</div>
+                <div class="metric-val">100%</div>
+                <div class="metric-label">Verified Volunteer Badge</div>
+            </div>
+        </div>
+
+        <!-- Portal Tabs Navigation -->
+        <div class="portal-tabs">
+            <button class="portal-tab-btn active" onclick="showTab('available')">
+                📡 Nearby Available Tasks <span class="tab-badge-count" id="badgeAvailCount">2</span>
+            </button>
+            <button class="portal-tab-btn" onclick="showTab('active')">
+                🚀 Active Mission & GPS Tracker <span class="tab-badge-count" id="badgeActiveCount">1</span>
+            </button>
+            <button class="portal-tab-btn" onclick="showTab('history')">
+                📜 Completed Tasks & Reviews
+            </button>
+        </div>
+
+        <!-- TAB 1: AVAILABLE TASKS FEED -->
+        <div id="tab-available">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 10px;">
+                <h2 style="font-size: 1.35rem; color: var(--primary-color);">
+                    📢 Local Micro-Volunteering Broadcast Feed (Within 2.5 km)
+                </h2>
+                <span style="font-size: 0.9rem; color: var(--text-secondary);">Showing real-time neighborhood broadcasts nearby</span>
+            </div>
+
+            <div id="availableTasksContainer">
+                <!-- Dynamically populated from ReachData -->
+            </div>
+        </div>
+
+        <!-- TAB 2: ACTIVE MISSION & GPS TRACKER -->
+        <div id="tab-active" style="display: none;">
+            <div class="card" style="border-color: #10B981; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.8rem;">🛵</span>
+                        <div>
+                            <h2 style="font-size: 1.35rem; margin: 0; color: var(--text-primary);" id="activeMissionTitle">
+                                Grocery & Medicine Pickup for Ramesh Patel
+                            </h2>
+                            <span style="font-size: 0.9rem; color: var(--text-secondary);" id="activeMissionId">#RCH-2026-8941</span>
+                        </div>
+                    </div>
+                    <span class="badge" id="missionStateBadge" style="background: #DCFCE7; color: #166534; font-size: 0.95rem; padding: 6px 14px;">
+                        Live Location Active (En Route)
+                    </span>
+                </div>
+
+                <!-- UML State Diagram Step Bar -->
+                <div class="state-flow">
+                    <div class="state-node completed" id="sn1">
+                        <div class="state-circle">✓</div>
+                        <span>Request Created</span>
+                    </div>
+                    <div class="state-connector completed" id="sc1"></div>
+
+                    <div class="state-node completed" id="sn2">
+                        <div class="state-circle">✓</div>
+                        <span>Volunteer Assigned</span>
+                    </div>
+                    <div class="state-connector completed" id="sc2"></div>
+
+                    <div class="state-node active" id="sn3">
+                        <div class="state-circle">3</div>
+                        <span>Live Location Active</span>
+                    </div>
+                    <div class="state-connector" id="sc3"></div>
+
+                    <div class="state-node" id="sn4">
+                        <div class="state-circle">4</div>
+                        <span>Arrived at Location</span>
+                    </div>
+                    <div class="state-connector" id="sc4"></div>
+
+                    <div class="state-node" id="sn5">
+                        <div class="state-circle">5</div>
+                        <span>Task in Progress</span>
+                    </div>
+                    <div class="state-connector" id="sc5"></div>
+
+                    <div class="state-node" id="sn6">
+                        <div class="state-circle">6</div>
+                        <span>Task Completed</span>
+                    </div>
+                </div>
+
+                <!-- Simulated Live GPS Map View -->
+                <div class="live-map-box">
+                    <div class="map-canvas-sim"></div>
+                    <!-- Streets -->
+                    <div class="map-street" style="top: 130px; left: 0; width: 100%; height: 16px;"></div>
+                    <div class="map-street" style="top: 0; left: 240px; width: 16px; height: 100%;"></div>
+                    <div class="map-street" style="top: 0; left: 520px; width: 16px; height: 100%;"></div>
+
+                    <!-- Volunteer Marker -->
+                    <div class="map-pin volunteer-pin" id="simVolMarker" title="Your Live Location">
+                        🛵
+                    </div>
+
+                    <!-- Resident / Senior Citizen Destination Marker -->
+                    <div class="map-pin resident-pin" title="Destination: Ramesh Patel">
+                        🏠
+                    </div>
+
+                    <div class="map-eta-overlay">
+                        <span>📍 GPS Simulation:</span>
+                        <strong id="simEtaText">380 meters away • ~4 mins ETA</strong>
+                    </div>
+                </div>
+
+                <!-- Senior Details & Address -->
+                <div class="task-meta-grid">
+                    <div>
+                        <strong>Senior Citizen:</strong><br>
+                        <span id="actSeniorName">Ramesh Patel (Age 68)</span>
+                    </div>
+                    <div>
+                        <strong>Contact Phone:</strong><br>
+                        <span id="actSeniorPhone">+91 98765 43210</span>
+                    </div>
+                    <div>
+                        <strong>Destination Address:</strong><br>
+                        <span id="actSeniorAddress">Flat 402, Shanti Niketan, Sector 4</span>
+                    </div>
+                    <div>
+                        <strong>Medicine / Item:</strong><br>
+                        <span id="actSeniorNotes">Amlodipine 5mg Prescribed Tablets (Apex Chemist)</span>
+                    </div>
+                </div>
+
+                <!-- Interactive Lifecycle Action Buttons (Following State Diagram) -->
+                <div class="task-actions" style="margin-top: 20px;">
+                    <button class="btn btn-primary" id="btnSimArrive" onclick="advanceWorkflow('arrived')">
+                        🚶 I Have Arrived at Senior's Home
+                    </button>
+                    <button class="btn btn-secondary" id="btnSimStart" onclick="advanceWorkflow('in_progress')" style="display: none; background: #3B82F6; color: white;">
+                        ▶️ Start Task Assistance
+                    </button>
+                    <button class="btn btn-primary" id="btnSimComplete" onclick="openCompletionModal()" style="display: none; background: #16A34A;">
+                        ✅ Complete Task (Enter OTP)
+                    </button>
+                    <a href="tel:9876543210" class="btn btn-secondary">
+                        📞 Call Senior Citizen
+                    </a>
+                    <button class="btn btn-secondary" onclick="openDisputeModal()" style="color: #DC2626; border-color: #FCA5A5;">
+                        ⚠️ Report Dispute / Safety Issue
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: TASK HISTORY -->
+        <div id="tab-history" style="display: none;">
+            <div class="card" style="padding: 24px;">
+                <h2 style="font-size: 1.35rem; color: var(--primary-color); margin-bottom: 16px;">
+                    📜 Past Volunteering Engagements & Feedback
+                </h2>
+                <div id="taskHistoryList">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+        </div>
+        </div><!-- /#volMainPortal -->
+
+    </main>
+
+    <!-- Task Completion OTP Modal -->
+    <div id="completionModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2 style="color: var(--primary-color);">✅ Confirm Task Completion</h2>
+                <button class="modal-close-btn" onclick="closeCompletionModal()">&times;</button>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px;">
+                To safeguard seniors, please ask Ramesh Patel for their 4-digit verification completion PIN.
+            </p>
+            <div style="background: #F8FAFC; border: 1px solid var(--border-color); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                <small style="color: var(--text-secondary);">Senior's SMS PIN for this task is: <strong>4829</strong></small>
+            </div>
+            <form onsubmit="handleFinishTask(event)">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Enter 4-Digit Verification PIN:</label>
+                    <input type="text" id="enteredPin" maxlength="4" class="form-control" value="4829" required style="width: 100%; padding: 12px; font-size: 1.4rem; letter-spacing: 6px; text-align: center; border: 2px solid var(--primary-color); border-radius: 8px; font-weight: bold;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Volunteer Completion Notes:</label>
+                    <textarea id="volNotes" class="form-control" rows="2" placeholder="Picked up prescription from Apex Chemist and delivered safely." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeCompletionModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Submit & Finish Mission ✓</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dispute / Escalation Modal (State diagram dispute path) -->
+    <div id="disputeModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h2 style="color: #DC2626;">⚠️ Escalate Safety Issue / Dispute</h2>
+                <button class="modal-close-btn" onclick="closeDisputeModal()">&times;</button>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px;">
+                Filing an issue immediately alerts our community grievance committee to investigate and provide assistance.
+            </p>
+            <form onsubmit="handleDisputeSubmit(event)">
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 4px;">Reason for Escalation:</label>
+                    <select class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                        <option value="unreachable">Senior resident unreachable / door locked</option>
+                        <option value="medicine_unavailable">Prescribed medicine out of stock</option>
+                        <option value="safety">Safety or medical emergency concern</option>
+                        <option value="other">Other operational roadblock</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 4px;">Incident Details:</label>
+                    <textarea class="form-control" rows="3" required placeholder="Describe what happened..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeDisputeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="background: #DC2626; border-color: #DC2626;">Escalate to Support Team ✓</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SOS Emergency Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left;">
+                    👮 Call Society Security Guard (022-2500-1111)
+                </a>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Scripts -->
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        let currentWorkflowStage = 'location_active';
+
+        function showTab(tabId, btnElement) {
+            document.querySelectorAll('.portal-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#tab-available, #tab-active, #tab-history').forEach(el => el.style.display = 'none');
+            
+            const targetContent = document.getElementById('tab-' + tabId);
+            if (targetContent) targetContent.style.display = 'block';
+
+            let targetBtn = btnElement;
+            if (!targetBtn && window.event && window.event.currentTarget) {
+                targetBtn = window.event.currentTarget;
+            }
+            if (!targetBtn) {
+                const idx = tabId === 'available' ? 0 : tabId === 'active' ? 1 : 2;
+                targetBtn = document.querySelectorAll('.portal-tab-btn')[idx];
+            }
+            if (targetBtn && targetBtn.classList) {
+                targetBtn.classList.add('active');
+            }
+        }
+
+        function toggleAvailability() {
+            const btn = document.getElementById('btnToggleAvail');
+            if (btn.textContent.includes('Online')) {
+                btn.textContent = '⏸️ Paused (Offline)';
+                btn.style.background = '#64748B';
+            } else {
+                btn.textContent = '🟢 Online & Ready';
+                btn.style.background = '#10B981';
+            }
+        }
+
+        function loadVolunteerData() {
+            const requests = ReachData.getRequests();
+            const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            
+            // Available Tasks (excluding dismissed/passed tasks)
+            const waiting = requests.filter(r => r.status === 'waiting_volunteer' && !dismissed.includes(r.id));
+            document.getElementById('badgeAvailCount').textContent = waiting.length;
+
+            const container = document.getElementById('availableTasksContainer');
+            if (waiting.length === 0) {
+                container.innerHTML = `
+                    <div class="card" style="text-align: center; padding: 40px;">
+                        <span style="font-size: 2.5rem;">🎉</span>
+                        <h3 style="color: var(--text-primary); margin: 10px 0;">All Neighborhood Tasks Covered!</h3>
+                        <p style="color: var(--text-secondary);">No pending requests nearby right now. You will receive an instant notification when a resident needs help.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = waiting.map(req => `
+                    <div class="task-card priority-high">
+                        <div class="task-card-header">
+                            <div>
+                                <span class="task-title">
+                                    <span>${req.icon || '🛒'}</span>
+                                    <span>${req.category}</span>
+                                </span>
+                                <span style="font-size: 0.85rem; color: var(--text-secondary);">ID: <strong>${req.id}</strong> • Broadcasted ${req.createdAt}</span>
+                            </div>
+                            <span class="badge badge-pending">🟡 Pending Volunteer</span>
+                        </div>
+                        <p style="color: var(--text-primary); margin: 6px 0 10px 0; font-size: 1.05rem;">
+                            <strong>Task Notes:</strong> "${req.notes}"
+                        </p>
+                        <div class="task-meta-grid">
+                            <div><strong>Resident:</strong> ${req.userName}</div>
+                            <div><strong>Urgency:</strong> <span style="color: #DC2626; font-weight: bold;">${req.urgency}</span></div>
+                            <div><strong>Preferred Time:</strong> ${req.time}</div>
+                            <div><strong>Location:</strong> ${req.address}</div>
+                        </div>
+                        <div class="task-actions">
+                            <button class="btn btn-primary" onclick="acceptTask('${req.id}')" style="background: #16A34A; border-color: #16A34A;">
+                                ✓ Accept This Task & Start Tracking
+                            </button>
+                            <button class="btn btn-secondary" onclick="rejectTask('${req.id}')">
+                                ✕ Pass / Skip
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            // Task History
+            const history = requests.filter(r => r.status === 'completed');
+            const historyContainer = document.getElementById('taskHistoryList');
+            historyContainer.innerHTML = history.map(item => `
+                <div style="border-bottom: 1px solid var(--border-color); padding: 14px 0;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <strong style="color: var(--primary-color); font-size: 1.05rem;">${item.icon || '🛒'} ${item.category}</strong>
+                        <span class="badge badge-success">✓ Completed</span>
+                    </div>
+                    <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Assisted <strong>${item.userName}</strong> • ${item.createdAt}
+                    </div>
+                    ${item.rating ? `
+                        <div style="margin-top: 6px; background: #FEF3C7; color: #92400E; padding: 6px 12px; border-radius: 6px; font-size: 0.9rem; display: inline-block;">
+                            ⭐ <strong>${item.rating}/5 Rating:</strong> "${item.feedback || 'Great and timely assistance.'}"
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+
+            // Also keep active mission tab synchronized with current mission stage
+            syncActiveMissionUI();
+        }
+
+        function syncActiveMissionUI() {
+            const missionStr = localStorage.getItem('reach_active_volunteer_mission');
+            const acceptedId = localStorage.getItem('reach_accepted_task_id');
+            const lastStr = localStorage.getItem('reach_last_confirmed');
+            
+            let status = 'location_active';
+            if (missionStr) {
+                try {
+                    const m = JSON.parse(missionStr);
+                    if (m && m.status) status = m.status;
+                } catch(e) {}
+            } else if (lastStr) {
+                try {
+                    const l = JSON.parse(lastStr);
+                    if (l && l.status) {
+                        const s = l.status.toLowerCase();
+                        if (s.includes('completed')) status = 'completed';
+                        else if (s.includes('progress')) status = 'in_progress';
+                        else if (s.includes('arrived')) status = 'volunteer_arrived';
+                        else if (s.includes('active') || s.includes('en route') || s.includes('assigned')) status = 'location_active';
+                    }
+                } catch(e) {}
+            }
+
+            const marker = document.getElementById('simVolMarker');
+            const etaText = document.getElementById('simEtaText');
+            const badge = document.getElementById('missionStateBadge');
+            const btnArrive = document.getElementById('btnSimArrive');
+            const btnStart = document.getElementById('btnSimStart');
+            const btnComplete = document.getElementById('btnSimComplete');
+            const badgeCount = document.getElementById('badgeActiveCount');
+
+            if (badgeCount) {
+                badgeCount.textContent = (acceptedId || missionStr) && status !== 'completed' ? '1' : '0';
+            }
+
+            if (status === 'volunteer_arrived' || status === 'arrived') {
+                if (marker) { marker.style.top = '145px'; marker.style.left = '480px'; }
+                if (etaText) etaText.textContent = "Volunteer has arrived at senior resident's residence!";
+                if (badge) {
+                    badge.textContent = '🟢 Arrived at Location';
+                    badge.style.background = '#DBEAFE';
+                    badge.style.color = '#1E40AF';
+                }
+                document.getElementById('sn4')?.classList.add('active', 'completed');
+                document.getElementById('sc3')?.classList.add('completed');
+                if (btnArrive) btnArrive.style.display = 'none';
+                if (btnStart) btnStart.style.display = 'inline-flex';
+                if (btnComplete) btnComplete.style.display = 'none';
+            } else if (status === 'in_progress') {
+                if (marker) { marker.style.top = '145px'; marker.style.left = '480px'; }
+                if (etaText) etaText.textContent = "Task in progress. Assisting senior resident.";
+                if (badge) {
+                    badge.textContent = '⚡ Task in Progress';
+                    badge.style.background = '#FEF3C7';
+                    badge.style.color = '#B45309';
+                }
+                document.getElementById('sn4')?.classList.add('completed');
+                document.getElementById('sc3')?.classList.add('completed');
+                document.getElementById('sn5')?.classList.add('active', 'completed');
+                document.getElementById('sc4')?.classList.add('completed');
+                if (btnArrive) btnArrive.style.display = 'none';
+                if (btnStart) btnStart.style.display = 'none';
+                if (btnComplete) btnComplete.style.display = 'inline-flex';
+            } else if (status === 'completed') {
+                if (marker) { marker.style.top = '145px'; marker.style.left = '480px'; }
+                if (etaText) etaText.textContent = "Mission Completed! Location tracking off.";
+                if (badge) {
+                    badge.textContent = '✅ Task Completed';
+                    badge.style.background = '#DCFCE7';
+                    badge.style.color = '#166534';
+                }
+                document.getElementById('sn4')?.classList.add('completed');
+                document.getElementById('sc3')?.classList.add('completed');
+                document.getElementById('sn5')?.classList.add('completed');
+                document.getElementById('sc4')?.classList.add('completed');
+                document.getElementById('sn6')?.classList.add('active', 'completed');
+                document.getElementById('sc5')?.classList.add('completed');
+                if (btnArrive) btnArrive.style.display = 'none';
+                if (btnStart) btnStart.style.display = 'none';
+                if (btnComplete) btnComplete.style.display = 'none';
+            } else if (acceptedId || status === 'location_active') {
+                if (marker) { marker.style.top = '120px'; marker.style.left = '160px'; }
+                if (etaText) etaText.textContent = "380 meters away • ~4 mins ETA";
+                if (badge) {
+                    badge.textContent = 'Live Location Active (En Route)';
+                    badge.style.background = '#DCFCE7';
+                    badge.style.color = '#166534';
+                }
+                document.getElementById('sn4')?.classList.remove('active', 'completed');
+                document.getElementById('sc3')?.classList.remove('completed');
+                document.getElementById('sn5')?.classList.remove('active', 'completed');
+                document.getElementById('sc4')?.classList.remove('completed');
+                document.getElementById('sn6')?.classList.remove('active', 'completed');
+                document.getElementById('sc5')?.classList.remove('completed');
+                if (btnArrive) btnArrive.style.display = 'inline-flex';
+                if (btnStart) btnStart.style.display = 'none';
+                if (btnComplete) btnComplete.style.display = 'none';
+            }
+        }
+
+        // Real-Time Cross-Window Synchronization Channel
+        const reachChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('reach_sync') : null;
+        if (reachChannel) {
+            reachChannel.onmessage = (msg) => {
+                loadVolunteerData();
+            };
+        }
+
+        // Live storage event listener (fires when community member creates or updates request)
+        window.addEventListener('storage', (e) => {
+            loadVolunteerData();
+        });
+
+        // Fast periodic poll fallback (every 900ms) to ensure continuous synchronization
+        setInterval(loadVolunteerData, 900);
+
+        function broadcastSync(action, payload) {
+            localStorage.setItem('reach_sync_ping', Date.now().toString());
+            if (reachChannel) {
+                try { reachChannel.postMessage({ action, payload, time: Date.now() }); } catch (e) {}
+            }
+        }
+
+        function acceptTask(id) {
+            const volunteerObj = {
+                name: 'Karan Verma',
+                phone: '+91 98765 43211',
+                rating: 4.9,
+                avatar: '🦸‍♂️'
+            };
+
+            // 1. Update ReachData (reach_requests_db)
+            if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                ReachData.updateRequestStatus(id, 'location_active', {
+                    assignedVolunteer: volunteerObj
+                });
+            }
+
+            // 2. Update AppStore (reach_tasks)
+            if (window.AppStore && typeof AppStore.getTasks === 'function') {
+                const tasks = AppStore.getTasks();
+                let t = tasks.find(x => x.id === id);
+                if (!t) {
+                    const lastStr = localStorage.getItem('reach_last_confirmed');
+                    if (lastStr) {
+                        try {
+                            const lastItem = JSON.parse(lastStr);
+                            if (lastItem && lastItem.id) t = tasks.find(x => x.id === lastItem.id);
+                        } catch (e) {}
+                    }
+                }
+                if (!t) {
+                    t = tasks.find(x => x.id === 'TSK-101' || x.id === 'RCH-2026-8941' || x.status === 'Waiting for Volunteer');
+                }
+                if (t) {
+                    t.status = 'Live Location Active';
+                    t.assignedVolunteer = volunteerObj;
+                    AppStore.saveTasks(tasks);
+                }
+            }
+
+            // 3. Update reach_last_confirmed so confirmation page reflects immediately
+            const lastStr = localStorage.getItem('reach_last_confirmed');
+            if (lastStr) {
+                try {
+                    const item = JSON.parse(lastStr);
+                    item.status = 'Live Location Active';
+                    item.assignedVolunteer = 'Karan Verma';
+                    item.assignedVolunteerPhone = '+91 98765 43211';
+                    localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                } catch (e) {}
+            } else {
+                localStorage.setItem('reach_last_confirmed', JSON.stringify({
+                    id: id,
+                    type: 'help',
+                    title: 'Everyday Errand Assistance',
+                    status: 'Live Location Active',
+                    assignedVolunteer: 'Karan Verma',
+                    assignedVolunteerPhone: '+91 98765 43211'
+                }));
+            }
+
+            // 4. Set persistent active mission keys
+            localStorage.setItem('reach_accepted_task_id', id);
+            localStorage.setItem('reach_active_volunteer_mission', JSON.stringify({
+                taskId: id,
+                status: 'location_active',
+                volunteerName: 'Karan Verma',
+                volunteerPhone: '+91 98765 43211',
+                timestamp: Date.now()
+            }));
+
+            // Update Active tab header with current mission ID
+            const actIdEl = document.getElementById('activeMissionId');
+            if (actIdEl) actIdEl.textContent = '#' + id;
+
+            // Broadcast real-time change to resident confirmation page
+            broadcastSync('accept_task', { id });
+
+            alert(`Task ${id} Accepted! You are now assigned as the volunteer helper. Resident tracker is updated in real time.`);
+            loadVolunteerData();
+            showTab('active');
+        }
+
+        function rejectTask(id) {
+            if (confirm(`Are you sure you want to pass on task ${id}? It will be returned to the neighborhood available pool.`)) {
+                let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+                if (!dismissed.includes(id)) {
+                    dismissed.push(id);
+                    localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
+                }
+                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                    ReachData.updateRequestStatus(id, 'waiting_volunteer');
+                }
+                // Clear active mission if it was this task
+                if (localStorage.getItem('reach_accepted_task_id') === id) {
+                    localStorage.removeItem('reach_accepted_task_id');
+                    localStorage.removeItem('reach_active_volunteer_mission');
+                    const lastStr = localStorage.getItem('reach_last_confirmed');
+                    if (lastStr) {
+                        try {
+                            const item = JSON.parse(lastStr);
+                            item.status = 'Waiting for Volunteer';
+                            item.assignedVolunteer = null;
+                            localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                        } catch (e) {}
+                    }
+                }
+                broadcastSync('reject_task', { id });
+                alert(`Task ${id} has been passed and returned to the neighborhood pool.`);
+                loadVolunteerData();
+            }
+        }
+
+        // State Diagram Lifecycle Progressions
+        function advanceWorkflow(stage) {
+            currentWorkflowStage = stage;
+            const marker = document.getElementById('simVolMarker');
+            const etaText = document.getElementById('simEtaText');
+            const badge = document.getElementById('missionStateBadge');
+
+            const currentActiveId = localStorage.getItem('reach_accepted_task_id') || 
+                                  (document.getElementById('activeMissionId')?.textContent || '').replace('#', '').trim() || 
+                                  'TSK-101';
+
+            if (stage === 'arrived') {
+                // Move volunteer marker right next to resident house
+                marker.style.top = '145px';
+                marker.style.left = '480px';
+                etaText.textContent = 'Volunteer has arrived at senior resident\'s residence!';
+                badge.textContent = '🟢 Arrived at Location';
+                badge.style.background = '#DBEAFE';
+                badge.style.color = '#1E40AF';
+
+                document.getElementById('sn4').classList.add('active', 'completed');
+                document.getElementById('sc3').classList.add('completed');
+                document.getElementById('btnSimArrive').style.display = 'none';
+                document.getElementById('btnSimStart').style.display = 'inline-flex';
+                
+                // Update ReachData
+                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                    ReachData.updateRequestStatus(currentActiveId, 'volunteer_arrived');
+                    ReachData.updateRequestStatus('RCH-2026-8941', 'volunteer_arrived');
+                }
+
+                // Update AppStore
+                if (window.AppStore && typeof AppStore.getTasks === 'function') {
+                    const tasks = AppStore.getTasks();
+                    const t = tasks.find(x => x.id === currentActiveId || x.id === 'TSK-101');
+                    if (t) { t.status = 'Volunteer Arrived'; AppStore.saveTasks(tasks); }
+                }
+
+                // Update active mission storage for cross-window sync
+                localStorage.setItem('reach_active_volunteer_mission', JSON.stringify({
+                    taskId: currentActiveId,
+                    status: 'volunteer_arrived',
+                    volunteerName: 'Karan Verma',
+                    volunteerPhone: '+91 98765 43211',
+                    timestamp: Date.now()
+                }));
+
+                const lastStr = localStorage.getItem('reach_last_confirmed');
+                if (lastStr) {
+                    try {
+                        const item = JSON.parse(lastStr);
+                        item.status = 'Volunteer Arrived';
+                        localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                    } catch (e) {}
+                }
+
+                broadcastSync('stage_arrived', { currentActiveId });
+            } else if (stage === 'in_progress') {
+                badge.textContent = '⚡ Task in Progress';
+                badge.style.background = '#FEF3C7';
+                badge.style.color = '#B45309';
+
+                document.getElementById('sn5').classList.add('active', 'completed');
+                document.getElementById('sc4').classList.add('completed');
+                document.getElementById('btnSimStart').style.display = 'none';
+                document.getElementById('btnSimComplete').style.display = 'inline-flex';
+
+                // Update ReachData
+                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                    ReachData.updateRequestStatus(currentActiveId, 'in_progress');
+                    ReachData.updateRequestStatus('RCH-2026-8941', 'in_progress');
+                }
+
+                // Update AppStore
+                if (window.AppStore && typeof AppStore.getTasks === 'function') {
+                    const tasks = AppStore.getTasks();
+                    const t = tasks.find(x => x.id === currentActiveId || x.id === 'TSK-101');
+                    if (t) { t.status = 'Task In Progress'; AppStore.saveTasks(tasks); }
+                }
+
+                // Update active mission storage for cross-window sync
+                localStorage.setItem('reach_active_volunteer_mission', JSON.stringify({
+                    taskId: currentActiveId,
+                    status: 'in_progress',
+                    volunteerName: 'Karan Verma',
+                    volunteerPhone: '+91 98765 43211',
+                    timestamp: Date.now()
+                }));
+
+                const lastStr = localStorage.getItem('reach_last_confirmed');
+                if (lastStr) {
+                    try {
+                        const item = JSON.parse(lastStr);
+                        item.status = 'Task In Progress';
+                        localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                    } catch (e) {}
+                }
+
+                broadcastSync('stage_in_progress', { currentActiveId });
+            }
+        }
+
+        function openCompletionModal() {
+            document.getElementById('completionModal').style.display = 'flex';
+        }
+
+        function closeCompletionModal() {
+            document.getElementById('completionModal').style.display = 'none';
+        }
+
+        function handleFinishTask(e) {
+            e.preventDefault();
+            const pin = document.getElementById('enteredPin').value.trim();
+            if (pin !== '4829' && !/^\d{4}$/.test(pin)) {
+                alert('Please enter a valid 4-digit PIN provided by the senior citizen.');
+                return;
+            }
+
+            const currentActiveId = localStorage.getItem('reach_accepted_task_id') || 
+                                  (document.getElementById('activeMissionId')?.textContent || '').replace('#', '').trim() || 
+                                  'TSK-101';
+            const notes = document.getElementById('volNotes')?.value || 'Delivered prescribed medicines safely.';
+            
+            // Mark task completed in ReachData
+            if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                ReachData.updateRequestStatus(currentActiveId, 'completed', {
+                    rating: 5,
+                    feedback: 'Delivered prescribed medicines swiftly and checked on my blood pressure meter. Excellent volunteer!'
+                });
+                ReachData.updateRequestStatus('RCH-2026-8941', 'completed');
+            }
+            // Mark task completed in AppStore
+            if (window.AppStore && typeof AppStore.getTasks === 'function') {
+                const tasks = AppStore.getTasks();
+                const t = tasks.find(x => x.id === currentActiveId || x.id === 'TSK-101');
+                if (t) {
+                    t.status = 'Task Completed';
+                    t.rating = 5;
+                    t.feedback = 'Delivered prescribed medicines swiftly and checked on my blood pressure meter. Excellent volunteer!';
+                    AppStore.saveTasks(tasks);
+                }
+            }
+
+            // Update active mission storage for cross-window sync
+            localStorage.setItem('reach_active_volunteer_mission', JSON.stringify({
+                taskId: currentActiveId,
+                status: 'completed',
+                volunteerName: 'Karan Verma',
+                timestamp: Date.now()
+            }));
+
+            const lastStr = localStorage.getItem('reach_last_confirmed');
+            if (lastStr) {
+                try {
+                    const item = JSON.parse(lastStr);
+                    item.status = 'Task Completed';
+                    localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                } catch (e) {}
+            }
+
+            closeCompletionModal();
+            document.getElementById('sn6').classList.add('active', 'completed');
+            document.getElementById('sc5').classList.add('completed');
+            
+            // Update active mission state and hide badge
+            const badge = document.getElementById('missionStateBadge');
+            if (badge) {
+                badge.textContent = '✅ Mission Completed (Safety PIN Verified)';
+                badge.style.background = '#DCFCE7';
+                badge.style.color = '#166534';
+            }
+            const activeBadge = document.getElementById('badgeActiveCount');
+            if (activeBadge) activeBadge.textContent = '0';
+
+            // Mark completed in localStorage for volunteer session
+            localStorage.setItem('reach_vol_active_mission_done', 'true');
+
+            // Update completed missions count metric
+            const metricVals = document.querySelectorAll('.metric-val');
+            if (metricVals && metricVals[0]) {
+                const currentCount = parseInt(metricVals[0].textContent) || 42;
+                metricVals[0].textContent = currentCount + 1;
+            }
+
+            broadcastSync('task_completed', { currentActiveId, pin });
+
+            alert('Mission Completed Successfully! Verified with Senior Citizen PIN (' + pin + '). 1.5 Community Service Hours logged.');
+            loadVolunteerData();
+            showTab('history');
+        }
+
+        function openDisputeModal() {
+            document.getElementById('disputeModal').style.display = 'flex';
+        }
+
+        function closeDisputeModal() {
+            document.getElementById('disputeModal').style.display = 'none';
+        }
+
+        function handleDisputeSubmit(e) {
+            e.preventDefault();
+            ReachData.updateRequestStatus('RCH-2026-8941', 'complaint_escalated');
+            ReachData.addComplaint({
+                relatedRef: 'RCH-2026-8941',
+                category: 'safety',
+                description: 'Operational obstacle encountered during field task dispatch.',
+                reporterPhone: '+91 98765 43211',
+                reporterName: 'Karan Verma (Volunteer)'
+            });
+            closeDisputeModal();
+            alert('Issue Escalated to Community Grievance Committee. Support team is investigating.');
+        }
+
+        function checkVolAuth() {
+            const isLoggedIn = AuthSession.isLoggedIn();
+            const gate = document.getElementById('volAuthGate');
+            const portal = document.getElementById('volMainPortal');
+
+            if (!isLoggedIn) {
+                if (gate) gate.style.display = 'block';
+                if (portal) {
+                    portal.style.opacity = '0.35';
+                    portal.style.pointerEvents = 'none';
+                }
+                return false;
+            } else {
+                if (gate) gate.style.display = 'none';
+                if (portal) {
+                    portal.style.opacity = '1';
+                    portal.style.pointerEvents = 'auto';
+                }
+                return true;
+            }
+        }
+    </script>
+
+    <!-- Project Footer -->
+    <footer class="main-footer" style="margin-top: 48px; background: #0F172A; color: #FFFFFF; padding: 24px 20px; text-align: center; border-top: 1px solid #1E293B;">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            checkVolAuth();
+            loadVolunteerData();
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab');
+            if (tab === 'mytasks') {
+                showTab('active');
+            } else if (tab === 'browse') {
+                showTab('available');
+            }
+        });
+    </script>
+</body>
+</html>

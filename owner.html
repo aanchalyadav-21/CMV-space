@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Space Provider Hub - Community Micro-Volunteering & Empty Space</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .tabs-nav {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid var(--border-light);
+            margin-bottom: 24px;
+        }
+
+        .tab-btn {
+            padding: 12px 20px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            border: none;
+            background: transparent;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #0369A1;
+            border-bottom-color: #0369A1;
+        }
+
+        .booking-req-card {
+            background: #FFFFFF;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 20px;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')">A-</button>
+                <button onclick="changeFontSize('normal')">A</button>
+                <button onclick="changeFontSize('large')">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 2rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html?role=owner">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="spaces.html">Community Spaces</a>
+            <a href="owner.html" class="active">Space Desk</a>
+            <a href="help.html">Help & FAQ</a>
+        </nav>
+    </header>
+
+    <main class="page-container">
+
+        <!-- Return / Breadcrumbs -->
+        <a href="dashboard.html?role=owner" class="btn-back">
+            ← Return to Dashboard
+        </a>
+
+        <!-- Header Banner -->
+        <div style="margin-bottom: 24px;">
+            <div class="neighborhood-badge">
+                <span>🏛️</span>
+                <span>Space Provider Management Desk</span>
+            </div>
+            <h1 style="color: #0369A1; font-size: 1.85rem; margin: 8px 0 4px 0;">
+                Marian Community Welfare Trust — Venues Portal
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1rem;">
+                Manage shared society spaces, approve booking requests, and verify digital QR visitor passes.
+            </p>
+        </div>
+
+        <!-- Auth Gate Barrier (Shown when unauthenticated or wrong role) -->
+        <div id="ownerAuthGate" style="display: none; background: #FFFBEB; border: 2px solid #FCD34D; border-radius: 12px; padding: 28px; text-align: center; margin-bottom: 24px;">
+            <div style="font-size: 3rem; margin-bottom: 10px;">🔒</div>
+            <h2 style="color: #92400E; font-size: 1.45rem; margin-bottom: 8px;">
+                Space Provider Sign In Required
+            </h2>
+            <p style="color: #78350F; font-size: 0.98rem; max-width: 580px; margin: 0 auto 20px auto; line-height: 1.5;">
+                To list community halls, approve reservation requests, and manage access tokens, you must be signed into a verified Space Provider account.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-bottom: 18px;">
+                <a href="index.html#signInBox" class="btn btn-primary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                    🔑 Sign In with Phone OTP
+                </a>
+                <a href="register.html?role=owner" class="btn btn-secondary" style="padding: 12px 24px; font-size: 1rem; text-decoration: none;">
+                    📝 Register as Space Provider
+                </a>
+            </div>
+            <div style="padding-top: 14px; border-top: 1px dashed #FDE68A;">
+                <span style="font-size: 0.88rem; color: #92400E; font-weight: 600; display: block; margin-bottom: 8px;">Evaluation Quick Unlock:</span>
+                <button type="button" class="btn" onclick="AuthSession.quickLogin('owner', 'owner.html')" style="background: #FEF3C7; color: #92400E; border: 1.5px solid #F59E0B; font-size: 0.88rem; padding: 6px 16px; font-weight: 700;">
+                    ⚡ Quick Sign In as Space Owner (Marian Trust)
+                </button>
+            </div>
+        </div>
+
+        <div id="ownerMainPortal">
+        <!-- 3 Primary Tabs for Space Owner -->
+        <div class="tabs-nav">
+            <button id="tabBtnBookings" class="tab-btn active" onclick="switchOwnerTab('bookings')">
+                📩 Booking Requests (<span id="countPendingBookings">1</span>)
+            </button>
+            <button id="tabBtnSpaces" class="tab-btn" onclick="switchOwnerTab('spaces')">
+                🏛️ My Spaces (<span id="countMySpaces">2</span>)
+            </button>
+            <button id="tabBtnAdd" class="tab-btn" onclick="switchOwnerTab('add')">
+                ➕ Add a Space
+            </button>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 1: BOOKING REQUESTS (APPROVE OR REJECT)                    -->
+        <!-- ============================================================== -->
+        <div id="sectionOwnerBookings">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.3rem; color: #0369A1;">
+                    Incoming Reservation Requests
+                </h2>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">
+                    Approve to generate official entry QR pass
+                </span>
+            </div>
+
+            <div id="bookingRequestsList">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 2: MY SPACES LISTING                                       -->
+        <!-- ============================================================== -->
+        <div id="sectionOwnerSpaces" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h2 style="font-size: 1.3rem; color: #0369A1;">
+                    Active Venue Listings Managed
+                </h2>
+                <button onclick="switchOwnerTab('add')" class="btn btn-primary" style="padding: 8px 16px; font-size: 0.9rem; background: #0284C7;">
+                    + List Another Venue
+                </button>
+            </div>
+
+            <div id="mySpacesList" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- TAB 3: ADD A SPACE FORM                                        -->
+        <!-- ============================================================== -->
+        <div id="sectionOwnerAdd" style="display: none;">
+            <div class="card" style="max-width: 720px; padding: 28px; margin: 0 auto;">
+                <h2 style="color: #0369A1; font-size: 1.5rem; margin-bottom: 6px;">
+                    List a New Community Space
+                </h2>
+                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">
+                    Enter details for your society hall, library room, or terrace. Listings undergo swift Admin Safety review before public publication.
+                </p>
+
+                <form onsubmit="handleAddNewSpace(event)">
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Venue / Hall Name:</label>
+                        <input type="text" id="newSpaceName" class="form-control" placeholder="e.g. St. Joseph Parish Multi-Purpose Room" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Location / Full Address:</label>
+                        <input type="text" id="newSpaceLocation" class="form-control" placeholder="e.g. 1st Floor, Parish Welfare Center, City Center" required>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label class="form-label">Maximum Guest Capacity:</label>
+                            <input type="number" id="newSpaceCapacity" class="form-control" placeholder="e.g. 60" min="5" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Pricing / Donation Policy:</label>
+                            <input type="text" id="newSpacePricing" class="form-control" placeholder="e.g. Free for Welfare / ₹200 hr" value="Free for Community / ₹200 hr External" required>
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Facilities & Amenities (comma-separated):</label>
+                        <input type="text" id="newSpaceFacilities" class="form-control" placeholder="e.g. Air Conditioning, High Speed Wi-Fi, Projector, Sound System, Restrooms" value="Air Conditioning, High Speed Wi-Fi, Projector, Wheelchair Ramp" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Available Time Slots / Days:</label>
+                        <input type="text" id="newSpaceAvailability" class="form-control" placeholder="e.g. Mon - Sat (9:00 AM - 8:30 PM)" value="Mon - Sat (9:00 AM - 8:30 PM)" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label">House Rules & Notes:</label>
+                        <textarea id="newSpaceRules" class="form-control" rows="2" placeholder="e.g. No loud noise past 8:30 PM. Please leave premises clean.">No loud noise past 8:30 PM. Please leave premises clean.</textarea>
+                    </div>
+
+                    <div style="background: #F0FDF4; border: 1px solid #86EFAC; padding: 12px; border-radius: 6px; font-size: 0.88rem; color: #166534; margin-bottom: 20px;">
+                        🛡️ <strong>Safety Check:</strong> As per community platform protocol, new venue submissions enter <em>Pending Admin Review</em> before appearing on public search.
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                        <button type="button" class="btn btn-secondary" onclick="switchOwnerTab('spaces')">Cancel</button>
+                        <button type="submit" class="btn btn-primary" style="background: #0284C7; border-color: #0369A1; padding: 12px 24px;">
+                            Submit Venue for Review ✓
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        </div><!-- /#ownerMainPortal -->
+
+    </main>
+
+    <!-- Project Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js?v=2"></script>
+    <script>
+        function checkOwnerAuth() {
+            const isLoggedIn = AuthSession.isLoggedIn();
+            const gate = document.getElementById('ownerAuthGate');
+            const portal = document.getElementById('ownerMainPortal');
+
+            if (!isLoggedIn) {
+                if (gate) gate.style.display = 'block';
+                if (portal) {
+                    portal.style.opacity = '0.35';
+                    portal.style.pointerEvents = 'none';
+                }
+                return false;
+            } else {
+                if (gate) gate.style.display = 'none';
+                if (portal) {
+                    portal.style.opacity = '1';
+                    portal.style.pointerEvents = 'auto';
+                }
+                return true;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkOwnerAuth();
+            const params = new URLSearchParams(window.location.search);
+            const tab = params.get('tab') || 'bookings';
+            switchOwnerTab(tab);
+            loadOwnerData();
+        });
+
+        function switchOwnerTab(tab) {
+            ['bookings', 'spaces', 'add'].forEach(t => {
+                const btn = document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1));
+                const sec = document.getElementById('sectionOwner' + t.charAt(0).toUpperCase() + t.slice(1));
+                if (btn) btn.classList.toggle('active', t === tab);
+                if (sec) sec.style.display = (t === tab) ? 'block' : 'none';
+            });
+        }
+
+        function loadOwnerData() {
+            const bookings = AppStore.getBookings();
+            const spaces = AppStore.getSpaces();
+
+            // Bookings List
+            const bookContainer = document.getElementById('bookingRequestsList');
+            let pendingCount = 0;
+            let bHtml = '';
+
+            bookings.forEach(b => {
+                const isPending = b.status === 'Pending Owner Approval';
+                if (isPending) pendingCount++;
+
+                bHtml += `
+                    <div class="booking-req-card">
+                        <div>
+                            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 4px;">
+                                <strong style="color: #0369A1; font-size: 1.15rem;">🏛️ ${b.spaceName}</strong>
+                                <span class="badge ${b.status === 'Confirmed' || b.status === 'Approved' ? 'badge-success' : (b.status.includes('Reject') ? 'badge-danger' : 'badge-pending')}">
+                                    ${b.status}
+                                </span>
+                            </div>
+                            <p style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-main);">
+                                Purpose: ${b.purpose} (${b.expectedGuests} Guests)
+                            </p>
+                            <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 4px;">
+                                👤 Requester: <strong>${b.requester}</strong> (${b.requesterPhone}) • 📅 ${b.date} • ⏰ ${b.time}
+                            </div>
+                            ${b.qrPassId ? `<div style="font-size: 0.8rem; color: #0284C7; margin-top: 4px;">🎫 Access Pass: <strong>#${b.qrPassId}</strong></div>` : ''}
+                        </div>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            ${isPending ? `
+                                <button onclick="decideOwnerBooking('${b.id}', 'Confirmed')" class="btn btn-primary" style="background: #10B981; border-color: #059669; padding: 8px 16px; font-size: 0.9rem;">
+                                    ✓ Approve (Generate QR)
+                                </button>
+                                <button onclick="decideOwnerBooking('${b.id}', 'Rejected')" class="btn btn-secondary" style="color: #DC2626; border-color: #FCA5A5; padding: 8px 16px; font-size: 0.9rem;">
+                                    ✗ Reject Request
+                                </button>
+                            ` : `
+                                <span style="font-size: 0.88rem; color: var(--text-muted);">Decision Recorded</span>
+                            `}
+                        </div>
+                    </div>
+                `;
+            });
+
+            bookContainer.innerHTML = bHtml;
+            document.getElementById('countPendingBookings').textContent = pendingCount;
+
+            // Spaces List
+            const spaceContainer = document.getElementById('mySpacesList');
+            let sHtml = '';
+            spaces.forEach(s => {
+                sHtml += `
+                    <div class="card" style="border: 2px solid var(--border-light); padding: 20px;">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
+                            <h3 style="color: #0369A1; font-size: 1.2rem; margin: 0;">${s.name}</h3>
+                            <span class="badge ${s.status === 'Approved' ? 'badge-success' : 'badge-pending'}">${s.status}</span>
+                        </div>
+                        <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">📍 ${s.location}</p>
+                        <p style="font-size: 0.88rem; margin-bottom: 6px;">👥 Capacity: <strong>${s.capacity} People</strong></p>
+                        <p style="font-size: 0.88rem; margin-bottom: 8px;">💰 Pricing: <strong>${s.pricing || 'Free'}</strong></p>
+                        <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 10px;">
+                            ${(s.facilities || []).map(f => `<span class="badge" style="background:#F1F5F9; color:#334155; font-size:0.75rem;">${f}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+            spaceContainer.innerHTML = sHtml;
+            document.getElementById('countMySpaces').textContent = spaces.length;
+        }
+
+        // Real-Time Cross-Window Synchronization Channel
+        const reachChannel = ('BroadcastChannel' in window) ? new BroadcastChannel('reach_sync') : null;
+        if (reachChannel) {
+            reachChannel.onmessage = () => loadOwnerData();
+        }
+        window.addEventListener('storage', () => loadOwnerData());
+        setInterval(loadOwnerData, 1000);
+
+        function decideOwnerBooking(bookingId, decision) {
+            const bookings = AppStore.getBookings();
+            const b = bookings.find(x => x.id === bookingId);
+            if (b) {
+                b.status = decision;
+                if (decision === 'Confirmed') {
+                    b.qrPassId = 'PASS-' + b.id;
+                    b.qrStatus = 'Ready for Check-in';
+                }
+                AppStore.saveBookings(bookings);
+
+                // Also synchronize organizer activity
+                const acts = AppStore.getActivities();
+                const act = acts.find(a => bookingId.includes(a.id) || (a.title && b.purpose && a.title.includes(b.purpose)));
+                if (act) {
+                    act.spaceStatus = (decision === 'Confirmed') ? 'Confirmed & QR Pass Issued' : 'Rejected';
+                    if (decision === 'Confirmed') act.qrPassId = b.qrPassId;
+                    AppStore.saveActivities(acts);
+                }
+
+                // Broadcast sync to organizer window
+                localStorage.setItem('reach_sync_ping', Date.now().toString());
+                if (reachChannel) {
+                    try { reachChannel.postMessage({ action: 'booking_decision', bookingId, decision, time: Date.now() }); } catch (e) {}
+                }
+
+                loadOwnerData();
+                alert(`Booking ${bookingId} has been marked as ${decision.toUpperCase()}.\n${decision === 'Confirmed' ? 'Official entry QR pass generated for the requester.' : 'Requester informed to search alternative venue.'}`);
+            }
+        }
+
+        function handleAddNewSpace(e) {
+            e.preventDefault();
+            const name = document.getElementById('newSpaceName').value;
+            const location = document.getElementById('newSpaceLocation').value;
+            const capacity = parseInt(document.getElementById('newSpaceCapacity').value) || 50;
+            const pricing = document.getElementById('newSpacePricing').value;
+            const facilities = document.getElementById('newSpaceFacilities').value.split(',').map(f => f.trim());
+            const availability = document.getElementById('newSpaceAvailability').value;
+            const rules = document.getElementById('newSpaceRules').value;
+
+            const spaces = AppStore.getSpaces();
+            const newSpace = {
+                id: 'SPC-' + Math.floor(600 + Math.random() * 300),
+                name,
+                owner: 'Marian Community Welfare Trust',
+                ownerPhone: '+91 98765 43212',
+                location,
+                capacity,
+                pricing,
+                facilities,
+                availability,
+                rules,
+                status: 'Pending Admin Review',
+                rating: 5.0
+            };
+
+            spaces.unshift(newSpace);
+            AppStore.saveSpaces(spaces);
+
+            // Also add verification entry for Admin dashboard
+            const verifs = AppStore.getVerifications();
+            verifs.unshift({
+                id: 'VER-SPC-' + newSpace.id,
+                type: 'Space Listing',
+                name: newSpace.name,
+                doc: 'Venue Safety & NOC Submitted',
+                status: 'Pending',
+                phone: '+91 98765 43212',
+                submittedAt: 'Just now'
+            });
+            AppStore.saveVerifications(verifs);
+
+            alert(`Space "${name}" submitted successfully!\nStatus: Pending Admin Safety Review.`);
+            switchOwnerTab('spaces');
+            loadOwnerData();
+        }
+    </script>
+</body>
+
+</html>

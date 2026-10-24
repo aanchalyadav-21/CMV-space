@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Request - Community Micro-Volunteering & Empty Space</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+                <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+                <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="explore.html?type=spaces">Community Spaces</a>
+            <div id="navUserSection"></div>
+        </nav>
+    </header>
+
+    <main class="page-container" style="max-width: 720px;">
+
+        <!-- Steps Progress Bar -->
+        <div class="steps-progress">
+            <div class="step-item active">
+                <span class="step-circle">1</span>
+                <span>Enter Details</span>
+            </div>
+            <div class="step-item">
+                <span class="step-circle">2</span>
+                <span>Review Details</span>
+            </div>
+            <div class="step-item">
+                <span class="step-circle">3</span>
+                <span>Confirmation</span>
+            </div>
+        </div>
+
+        <div class="card">
+
+            <div style="margin-bottom: 24px;">
+                <h1 id="pageHeading" style="color: var(--primary); font-size: 1.75rem; margin-bottom: 6px;">
+                    Request Volunteer Assistance
+                </h1>
+                <p id="pageSubheading" style="color: var(--text-muted); font-size: 1rem;">
+                    Please provide the details below so a verified neighborhood volunteer can assist you.
+                </p>
+            </div>
+
+            <form id="unifiedRequestForm" onsubmit="handleFormSubmit(event)">
+
+                <!-- Request Type Selector -->
+                <div class="form-group">
+                    <label class="form-label">Request Type:</label>
+                    <select id="requestTypeSelect" class="form-control" onchange="adjustFormFields(this.value)">
+                        <option value="help">🛒 Volunteer Help (Medicine, Groceries, Tutoring, Walks)</option>
+                        <option value="space_booking">🏛️ Community Space Booking Request</option>
+                        <option value="activity">🎯 Event Organizer Activity (Volunteers + Space)</option>
+                        <option value="space">➕ List a New Community Venue (Space Owner)</option>
+                    </select>
+                </div>
+
+                <!-- HELP REQUEST FIELDS -->
+                <div id="fieldsHelp">
+                    <div class="form-group">
+                        <label class="form-label">Task Category:</label>
+                        <select id="helpCategory" class="form-control">
+                            <option value="Medicine Pickup">💊 Prescription Medicine Pickup</option>
+                            <option value="Groceries">🛒 Groceries & Essentials</option>
+                            <option value="Tutoring">📚 Student Coaching / Tutoring</option>
+                            <option value="Digital Guidance">📱 Smartphone & Pension App Help</option>
+                            <option value="Clinic Companion">🩺 Clinic Companion & Park Walks</option>
+                            <option value="Other">🤝 Other Daily Assistance</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Task Title / Brief Description:</label>
+                        <input type="text" id="helpTitle" class="form-control"
+                            placeholder="e.g. Need BP tablet strip from chemist" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Specific Notes & Instructions:</label>
+                        <textarea id="helpNotes" class="form-control" rows="3"
+                            placeholder="Provide any details (e.g. Chemist name, UPI payment details, floor number)..."></textarea>
+                    </div>
+                </div>
+
+                <!-- SPACE BOOKING FIELDS -->
+                <div id="fieldsSpaceBooking" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Select Community Venue:</label>
+                        <select id="bookingSpaceSelect" class="form-control">
+                            <option value="SPC-501">St. Joseph Community Activity Hall (Capacity: 80, AC, Audio)
+                            </option>
+                            <option value="SPC-502">Shanti Niketan Society Clubhouse & Library (Capacity: 35)</option>
+                            <option value="SPC-503">Community Learning & Skill Center (Capacity: 45, Computers)
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Purpose of Community Activity:</label>
+                        <input type="text" id="bookingPurpose" class="form-control"
+                            placeholder="e.g. Senior Yoga Session, Book Club, Medical Checkup">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Expected Number of Attendees:</label>
+                        <input type="number" id="bookingGuests" class="form-control" placeholder="e.g. 25" min="1"
+                            max="150">
+                    </div>
+                </div>
+
+                <!-- ORGANIZER ACTIVITY FIELDS -->
+                <div id="fieldsActivity"
+                    style="display: none; background: #EFF6FF; border: 2px dashed #93C5FD; padding: 18px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3 style="color: var(--primary); font-size: 1.15rem; margin-bottom: 12px;">🎯 Integrated Community
+                        Initiative</h3>
+
+                    <div class="form-group">
+                        <label class="form-label">Campaign / Activity Name:</label>
+                        <input type="text" id="activityTitle" class="form-control"
+                            placeholder="e.g. Dengue Awareness & Cleanliness Drive">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Support Needed:</label>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="chkNeedsVolunteers" checked>
+                                <span>I need Community Volunteers (Count: <input type="number" id="activityVolCount"
+                                        value="10" min="1" max="50" style="width: 60px; padding: 4px;">)</span>
+                            </label>
+                            <label style="display: flex; align-items: center; gap: 8px;">
+                                <input type="checkbox" id="chkNeedsSpace" checked>
+                                <span>I need to Reserve a Community Hall</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SPACE OWNER LISTING FIELDS -->
+                <div id="fieldsSpaceListing" style="display: none;">
+                    <div class="form-group">
+                        <label class="form-label">Venue / Room Name:</label>
+                        <input type="text" id="spaceName" class="form-control"
+                            placeholder="e.g. Greenfield CHS Community Hall">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Max Seating Capacity:</label>
+                        <input type="number" id="spaceCapacity" class="form-control" placeholder="e.g. 50">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Facilities Available (comma separated):</label>
+                        <input type="text" id="spaceFacilities" class="form-control"
+                            placeholder="e.g. AC, Chairs, Projector, Wheelchair Ramp">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Hall Rules & Usage Guidelines:</label>
+                        <textarea id="spaceRules" class="form-control" rows="2"
+                            placeholder="e.g. No loud music after 8 PM, please switch off AC on exit."></textarea>
+                    </div>
+                </div>
+
+                <!-- COMMON FIELDS: Location, Date & Time, Contact Details -->
+                <div style="border-top: 2px solid var(--border-light); padding-top: 20px; margin-top: 20px;">
+
+                    <div class="form-group">
+                        <label class="form-label">Requester Full Name:</label>
+                        <input type="text" id="commonName" class="form-control" required placeholder="Enter full name">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Contact Mobile Number:</label>
+                        <input type="tel" id="commonPhone" class="form-control" required
+                            placeholder="e.g. +91 98765 43210">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Location / Society Address:</label>
+                        <input type="text" id="commonLocation" class="form-control" required
+                            placeholder="Flat no., Society name, Landmark">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+                        <div class="form-group">
+                            <label class="form-label">Preferred Date:</label>
+                            <input type="text" id="commonDate" class="form-control" value="Today, 22 Oct 2026">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Time Slot:</label>
+                            <select id="commonTime" class="form-control">
+                                <option value="Morning (9:00 AM - 12:00 PM)">Morning (9 AM - 12 PM)</option>
+                                <option value="Afternoon (2:00 PM - 5:00 PM)">Afternoon (2 PM - 5 PM)</option>
+                                <option value="Evening (5:00 PM - 8:00 PM)">Evening (5 PM - 8 PM)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px;">
+                    <a href="dashboard.html" class="btn btn-secondary">← Back to Dashboard</a>
+                    <button type="submit" class="btn btn-primary btn-large">
+                        Continue to Review Details →
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+    <!-- SOS Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: var(--danger);">🚨 Emergency Panic Response</h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <p>Do you need urgent medical or security assistance?</p>
+            <div style="display:flex; flex-direction:column; gap:10px; margin: 18px 0;">
+                <a href="tel:108" class="btn btn-danger">🚑 Call Medical Ambulance (108)</a>
+                <a href="tel:02225001111" class="btn btn-secondary">👮 Call Society Security Guard (022-2500-1111)</a>
+            </div>
+            <button class="btn btn-secondary" onclick="closeSosModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script>
+        function adjustFormFields(type) {
+            const h = document.getElementById('fieldsHelp');
+            const sb = document.getElementById('fieldsSpaceBooking');
+            const act = document.getElementById('fieldsActivity');
+            const sl = document.getElementById('fieldsSpaceListing');
+            const heading = document.getElementById('pageHeading');
+            const subheading = document.getElementById('pageSubheading');
+
+            h.style.display = 'none';
+            sb.style.display = 'none';
+            act.style.display = 'none';
+            sl.style.display = 'none';
+
+            if (type === 'space_booking') {
+                sb.style.display = 'block';
+                heading.textContent = 'Reserve a Community Space or Hall';
+                subheading.textContent = 'Request booking for a verified neighborhood hall or classroom.';
+            } else if (type === 'activity') {
+                act.style.display = 'block';
+                heading.textContent = 'Organize a Community Initiative';
+                subheading.textContent = 'Combine volunteer recruitment with shared venue reservation.';
+            } else if (type === 'space') {
+                sl.style.display = 'block';
+                heading.textContent = 'List a New Community Venue';
+                subheading.textContent = 'Register a clubhouse, classroom or hall for neighborhood sharing.';
+            } else {
+                h.style.display = 'block';
+                heading.textContent = 'Request Volunteer Assistance';
+                subheading.textContent = 'Provide details so a verified neighborhood volunteer can assist you.';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const reqType = urlParams.get('type') || 'help';
+            const sel = document.getElementById('requestTypeSelect');
+            sel.value = reqType;
+            adjustFormFields(reqType);
+
+            // Pre-fill user profile if logged in
+            const user = AuthSession.getCurrentUser();
+            if (user) {
+                document.getElementById('commonName').value = user.name;
+                document.getElementById('commonPhone').value = user.phone;
+                if (user.address) document.getElementById('commonLocation').value = user.address;
+            }
+        });
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('requestTypeSelect').value;
+
+            const draft = {
+                type: type,
+                requesterName: document.getElementById('commonName').value,
+                requesterPhone: document.getElementById('commonPhone').value,
+                location: document.getElementById('commonLocation').value,
+                date: document.getElementById('commonDate').value,
+                time: document.getElementById('commonTime').value,
+                createdAt: new Date().toLocaleDateString('en-GB')
+            };
+
+            if (type === 'help') {
+                draft.category = document.getElementById('helpCategory').value;
+                draft.title = document.getElementById('helpTitle').value;
+                draft.notes = document.getElementById('helpNotes').value || 'Standard assistance';
+            } else if (type === 'space_booking') {
+                draft.spaceId = document.getElementById('bookingSpaceSelect').value;
+                const spcObj = AppStore.getSpaces().find(s => s.id === draft.spaceId) || { name: 'Community Hall' };
+                draft.spaceName = spcObj.name;
+                draft.purpose = document.getElementById('bookingPurpose').value || 'Community Activity';
+                draft.expectedGuests = document.getElementById('bookingGuests').value || '20';
+            } else if (type === 'activity') {
+                draft.title = document.getElementById('activityTitle').value || 'Community Welfare Camp';
+                draft.needsVolunteers = document.getElementById('chkNeedsVolunteers').checked;
+                draft.volunteersNeeded = document.getElementById('activityVolCount').value;
+                draft.needsSpace = document.getElementById('chkNeedsSpace').checked;
+                draft.spaceName = 'St. Joseph Community Activity Hall';
+            } else if (type === 'space') {
+                draft.venueName = document.getElementById('spaceName').value;
+                draft.capacity = document.getElementById('spaceCapacity').value;
+                draft.facilities = document.getElementById('spaceFacilities').value;
+                draft.rules = document.getElementById('spaceRules').value;
+            }
+
+            // Save to localStorage draft
+            localStorage.setItem('reach_active_draft', JSON.stringify(draft));
+            window.location.href = 'review.html';
+        }
+    </script>
+</body>
+
+</html>

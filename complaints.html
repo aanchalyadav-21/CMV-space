@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reach Community - File a Complaint / Grievance</title>
+    <title>File a Complaint / Grievance - Community Micro-Volunteering & Empty Space</title>
     <!-- Shared Styles with cache-buster v=2 -->
     <link rel="stylesheet" href="css/base.css?v=2">
+    <!-- Portals Styles -->
+    <link rel="stylesheet" href="css/portals.css">
 </head>
 <body>
 
@@ -29,14 +31,14 @@
     <header class="main-header">
         <a href="index.html" class="logo">
             <span style="font-size: 1.8rem;">🤝</span>
-            <span><strong>Reach</strong> Community</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
         </a>
         <nav class="main-nav">
             <a href="index.html">Home</a>
-            <a href="categories.html">Services</a>
-            <a href="request-help.html">Request Help</a>
-            <a href="confirmation.html">Track Status</a>
-            <a href="complaints.html" class="active" style="color: #DC2626; font-weight: 700;">File Complaint</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="explore.html?type=spaces">Community Spaces</a>
+            <a href="help.html">Help & FAQ</a>
         </nav>
     </header>
 
@@ -52,7 +54,7 @@
             </div>
             
             <p style="color: var(--text-secondary); margin-bottom: 24px; font-size: 1.05rem;">
-                Your safety and trust are our top priority. If a volunteer did not show up, behaved inappropriately, or if a community space was unclean/locked, please submit details below. All complaints are investigated by the DBIT Student Committee within 24 hours.
+                Your safety and trust are our top priority. If a volunteer did not show up, behaved inappropriately, or if a community space was unclean/locked, please submit details below. All complaints are investigated by the Community Safety Committee within 24 hours.
             </p>
 
             <div id="complaintSuccessMsg" style="display: none; background-color: #DCFCE7; border: 2px solid #86EFAC; color: #166534; padding: 18px; border-radius: 10px; margin-bottom: 24px; font-size: 1.1rem;">
@@ -105,7 +107,7 @@
 
     <!-- Shared Footer -->
     <footer class="main-footer">
-        <p><strong>Reach Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
+        <p><strong>Community Micro-Volunteering & Empty Space</strong> • Neighborhood Care & Senior Support Network</p>
         <p style="margin-top: 8px; font-size: 0.95rem;">
             <a href="complaints.html" style="color: #FCA5A5; text-decoration: underline;">
                 ⚠️ Report an Issue / File Volunteer Complaint
@@ -134,7 +136,7 @@
                     🚑 Call Medical Ambulance (108)
                 </a>
                 <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; justify-content: flex-start;">
-                    👮 Call DBIT Society Security Guard (022-2500-1111)
+                    👮 Call Local Society Security Guard (022-2500-1111)
                 </a>
                 <a href="tel:9876500000" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
                     👨‍👩‍👧 Alert Registered Emergency Family Contact
@@ -149,14 +151,42 @@
         </div>
     </div>
 
-    <!-- Shared Script with cache-buster v=2 -->
+    <!-- Shared Scripts -->
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
     <script src="js/main.js?v=2"></script>
     <script>
         function handlePageComplaintSubmit(e) {
             e.preventDefault();
-            document.getElementById('complaintPageForm').style.display = 'none';
+            const form = document.getElementById('complaintPageForm');
+            const ref = form.querySelector('input[type="text"]').value || '#RCH-2026-8941';
+            const cat = form.querySelector('select').value;
+            const desc = form.querySelector('textarea').value;
+            const phone = form.querySelector('input[type="tel"]').value;
+
+            if (window.ReachData) {
+                ReachData.addComplaint({
+                    relatedRef: ref,
+                    category: cat,
+                    description: desc,
+                    reporterPhone: phone,
+                    reporterName: 'Resident / Senior Citizen'
+                });
+            }
+
+            form.style.display = 'none';
             document.getElementById('complaintSuccessMsg').style.display = 'block';
         }
+
+        // Auto-fill reference from URL if provided (?ref=...)
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const refParam = urlParams.get('ref');
+            if (refParam) {
+                const refInput = document.querySelector('#complaintPageForm input[type="text"]');
+                if (refInput) refInput.value = '#' + refParam.replace('#', '');
+            }
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account & Profile Setup - Community Micro-Volunteering & Empty Space</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .register-container {
+            max-width: 680px;
+            margin: 24px auto 48px auto;
+        }
+
+        .role-radio-card {
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            background: #FFFFFF;
+        }
+
+        .role-radio-card:hover {
+            border-color: #93C5FD;
+            background: #F8FAFC;
+        }
+
+        .role-radio-card.selected {
+            border-color: var(--primary);
+            background: #EFF6FF;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+
+        .verification-badge-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            background: #F0FDF4;
+            border: 1.5px solid #86EFAC;
+            margin: 18px 0;
+            font-size: 0.92rem;
+            color: #166534;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')">A-</button>
+                <button onclick="changeFontSize('normal')">A</button>
+                <button onclick="changeFontSize('large')">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 2rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">🏠 Home</a>
+            <a href="spaces.html">🏛️ Community Spaces</a>
+            <a href="index.html#signInBox" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.88rem;">🔑 Sign In</a>
+            <a href="register.html" class="active btn btn-primary" style="padding: 6px 14px; font-size: 0.88rem;">📝 Create Account</a>
+        </nav>
+    </header>
+
+    <main class="page-container">
+
+        <div class="register-container">
+
+            <!-- Visible Return Navigation -->
+            <a href="index.html" class="btn-back">
+                ← Return to Welcome Page
+            </a>
+
+            <div class="card" style="padding: 32px;">
+
+                <div style="margin-bottom: 24px; text-align: center;">
+                    <h1 style="color: var(--primary-dark); font-size: 1.85rem; margin-bottom: 6px;">
+                        Create Your Community Account
+                    </h1>
+                    <p style="color: var(--text-muted); font-size: 1rem;">
+                        Join the verified neighborhood network to request help, volunteer, or share venues.
+                    </p>
+                </div>
+
+                <form id="fullRegistrationForm" onsubmit="handleRegisterSubmit(event)">
+
+                    <!-- 1. Account Role Selection -->
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label class="form-label" style="font-size: 1.05rem;">
+                            1. Select Your Account Role:
+                        </label>
+
+                        <div class="role-radio-card selected" onclick="pickRole('member')" id="roleCard-member">
+                            <span style="font-size: 1.8rem;">👵</span>
+                            <div style="flex: 1;">
+                                <strong style="display: block; font-size: 1rem; color: var(--primary-dark);">Community Member / Senior Resident</strong>
+                                <small style="color: var(--text-muted); font-size: 0.85rem;">Request daily errand assistance, groceries, medicines, and reserve community spaces.</small>
+                            </div>
+                            <span style="font-size: 1.2rem; color: var(--primary);">●</span>
+                        </div>
+
+                        <div class="role-radio-card" onclick="pickRole('volunteer')" id="roleCard-volunteer">
+                            <span style="font-size: 1.8rem;">🦸‍♂️</span>
+                            <div style="flex: 1;">
+                                <strong style="display: block; font-size: 1rem; color: #166534;">Community Volunteer</strong>
+                                <small style="color: var(--text-muted); font-size: 0.85rem;">Browse nearby requests, complete local errands, and support neighborhood seniors.</small>
+                            </div>
+                            <span style="font-size: 1.2rem; color: var(--border);">○</span>
+                        </div>
+
+                        <div class="role-radio-card" onclick="pickRole('owner')" id="roleCard-owner">
+                            <span style="font-size: 1.8rem;">🏛️</span>
+                            <div style="flex: 1;">
+                                <strong style="display: block; font-size: 1rem; color: #075985;">Community Space Owner</strong>
+                                <small style="color: var(--text-muted); font-size: 0.85rem;">List society clubhouses, halls, or rooms and approve booking reservations.</small>
+                            </div>
+                            <span style="font-size: 1.2rem; color: var(--border);">○</span>
+                        </div>
+
+                        <div class="role-radio-card" onclick="pickRole('organizer')" id="roleCard-organizer">
+                            <span style="font-size: 1.8rem;">🤝</span>
+                            <div style="flex: 1;">
+                                <strong style="display: block; font-size: 1rem; color: #6B21A8;">NGO / Welfare Society / Event Organizer</strong>
+                                <small style="color: var(--text-muted); font-size: 0.85rem;">Organize community workshops and coordinate both volunteers and venues.</small>
+                            </div>
+                            <span style="font-size: 1.2rem; color: var(--border);">○</span>
+                        </div>
+                    </div>
+
+                    <!-- 2. Personal Information Fields -->
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">Full Name:</label>
+                        <input type="text" id="regName" class="form-control" placeholder="e.g. Ramesh Patel" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">Mobile Number (with OTP Verification):</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="tel" id="regPhone" class="form-control" placeholder="+91 98765 43210" required>
+                            <button type="button" id="btnSendRegOtp" onclick="sendRegOtp()" class="btn btn-secondary" style="white-space: nowrap; font-weight: 700;">
+                                Send OTP 📲
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Simulated OTP Input Section -->
+                    <div id="regOtpBox" style="display: none; background: #F0FDF4; border: 1.5px solid #86EFAC; border-radius: var(--radius-sm); padding: 14px; margin-bottom: 16px;">
+                        <label class="form-label" style="color: #166534; margin-bottom: 6px;">
+                            Enter 6-Digit SMS Verification Code:
+                        </label>
+                        <input type="text" id="regOtpInput" class="form-control" placeholder="Enter 6-digit OTP (e.g. 123456)" maxlength="6" style="letter-spacing: 4px; font-weight: bold; font-size: 1.15rem; text-align: center; border-color: #86EFAC;">
+                        <small style="color: #15803D; display: block; margin-top: 6px; font-size: 0.82rem;">
+                            ✓ Test SMS dispatched. Enter 123456 or any 6 digits for evaluation.
+                        </small>
+                    </div>
+
+                    <!-- Area & Preferred Language -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label class="form-label">Area / Locality:</label>
+                            <input type="text" id="regArea" class="form-control" value="Sector 4, City Center" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Preferred Language:</label>
+                            <select id="regLanguage" class="form-control">
+                                <option value="en">English</option>
+                                <option value="hi">हिंदी (Hindi)</option>
+                                <option value="mr">मराठी (Marathi)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 3. Government Identity & Aadhaar Verification Section -->
+                    <div style="background: #F8FAFC; border: 2px solid #CBD5E1; border-radius: var(--radius-sm); padding: 20px; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
+                            <span style="font-size: 1.6rem;">🆔</span>
+                            <div>
+                                <strong style="color: #0F172A; font-size: 1.05rem;">Identity & Safety Verification (Aadhaar Card)</strong>
+                                <p style="margin: 2px 0 0 0; font-size: 0.85rem; color: #64748B;">
+                                    Required for safety of elders, volunteer background checks, and community trust.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+                            <div class="form-group">
+                                <label class="form-label">ID Document Type:</label>
+                                <select id="regIdType" class="form-control" onchange="toggleIdLabels()">
+                                    <option value="Aadhaar Card">Aadhaar Card (UIDAI Verified)</option>
+                                    <option value="College Student ID">College / University Student ID</option>
+                                    <option value="Senior Citizen ID">Senior Citizen Resident Card</option>
+                                    <option value="Voter ID Card">Voter ID Card (Election Commission)</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" id="lblIdNumber">12-Digit Aadhaar Card Number:</label>
+                                <input type="text" id="regAadhaarNumber" class="form-control" placeholder="e.g. 5421 8892 4103" maxlength="16" oninput="formatAadhaarNumber(this)" value="5421 8892 4103" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 8px;">
+                            <label class="form-label">Upload Identity Document Front (Photo / PDF):</label>
+                            <div id="dropzoneBox" onclick="document.getElementById('fileAadhaar').click()" style="border: 2px dashed #94A3B8; background: #FFFFFF; border-radius: 8px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.2s;">
+                                <input type="file" id="fileAadhaar" style="display: none;" accept="image/*,.pdf" onchange="handleFileChosen(this)">
+                                <div id="dropzoneContent">
+                                    <span style="font-size: 1.8rem;">📄</span>
+                                    <div id="fileNameLabel" style="font-size: 0.92rem; font-weight: 600; color: #1E3A8A; margin-top: 4px;">
+                                        Click to browse or upload Aadhaar Front Image / PDF
+                                    </div>
+                                    <span style="font-size: 0.8rem; color: #64748B;">Default: aadhaar_card_doc.pdf (Pre-verified for demo) • Supported: JPG, PNG, PDF (Max 5MB)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; align-items: center; gap: 6px; font-size: 0.82rem; color: #047857; margin-top: 10px;">
+                            <span>🔒</span>
+                            <span>Privacy Safeguard: Stored securely with masking (XXXX-XXXX-4103) strictly for verification.</span>
+                        </div>
+                    </div>
+
+                    <!-- 3. Dynamic Role-Specific Fields -->
+                    <!-- Volunteer Section -->
+                    <div id="sectionVolunteerFields" style="display: none; border-top: 1px dashed var(--border); padding-top: 16px; margin-bottom: 16px;">
+                        <h4 style="color: #166534; font-size: 1.05rem; margin-bottom: 10px;">
+                            🦸 Volunteer Profile & Availability Details
+                        </h4>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Skills Offered (comma-separated):</label>
+                            <input type="text" id="volSkills" class="form-control" placeholder="e.g. Elderly Care, Grocery Pickup, First Aid, Tutoring" value="Prescription Pickup, Grocery Assistance">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Availability Schedule:</label>
+                            <input type="text" id="volAvailability" class="form-control" placeholder="e.g. Weekday Evenings (5 PM - 8 PM), Weekends" value="Evenings & Weekends">
+                        </div>
+                    </div>
+
+                    <!-- Space Owner Section -->
+                    <div id="sectionOwnerFields" style="display: none; border-top: 1px dashed var(--border); padding-top: 16px; margin-bottom: 16px;">
+                        <h4 style="color: #075985; font-size: 1.05rem; margin-bottom: 10px;">
+                            🏛️ Venue Listing Information
+                        </h4>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label class="form-label">Venue / Society Name:</label>
+                            <input type="text" id="ownerVenueName" class="form-control" placeholder="e.g. Parish Welfare Activity Hall">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                            <div class="form-group">
+                                <label class="form-label">Max Capacity:</label>
+                                <input type="number" id="ownerCapacity" class="form-control" placeholder="e.g. 50">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Hourly Pricing:</label>
+                                <input type="text" id="ownerPricing" class="form-control" placeholder="e.g. Free / ₹150 hr">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Immediate Verification Status Box -->
+                    <div class="verification-badge-box" id="verificationPreviewBox">
+                        <span style="font-size: 1.6rem;">🛡️</span>
+                        <div>
+                            <strong>Verification Status: <span id="verifStatusText">Verified Community Member</span></strong>
+                            <p style="margin: 2px 0 0 0; font-size: 0.84rem; color: #166534;" id="verifStatusDesc">
+                                Resident accounts are instantly activated for fast emergency assistance.
+                            </p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.1rem;">
+                        Verify & Complete Registration ✓
+                    </button>
+                </form>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Project Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        let currentChosenRole = 'member';
+        let uploadedProofFile = 'aadhaar_card_doc.pdf';
+
+        function formatAadhaarNumber(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length > 12) val = val.substring(0, 12);
+            const parts = [];
+            for (let i = 0; i < val.length; i += 4) {
+                parts.push(val.substring(i, i + 4));
+            }
+            input.value = parts.join(' ');
+        }
+
+        function toggleIdLabels() {
+            const type = document.getElementById('regIdType').value;
+            const lbl = document.getElementById('lblIdNumber');
+            const input = document.getElementById('regAadhaarNumber');
+            if (type === 'Aadhaar Card') {
+                lbl.textContent = '12-Digit Aadhaar Card Number:';
+                input.placeholder = 'e.g. 5421 8892 4103';
+                input.maxLength = 14;
+            } else if (type === 'College Student ID') {
+                lbl.textContent = 'College / Student Roll ID Number:';
+                input.placeholder = 'e.g. STU-2026-8812';
+                input.maxLength = 20;
+            } else if (type === 'Senior Citizen ID') {
+                lbl.textContent = 'Senior Citizen Registration No:';
+                input.placeholder = 'e.g. SNR-MH-99412';
+                input.maxLength = 20;
+            } else {
+                lbl.textContent = 'Voter ID (EPIC) Number:';
+                input.placeholder = 'e.g. WBD-1984210';
+                input.maxLength = 20;
+            }
+        }
+
+        function handleFileChosen(input) {
+            if (input.files && input.files[0]) {
+                uploadedProofFile = input.files[0].name;
+                const lbl = document.getElementById('fileNameLabel');
+                if (lbl) {
+                    lbl.innerHTML = `✓ Uploaded: <strong>${uploadedProofFile}</strong> (${(input.files[0].size / 1024).toFixed(1)} KB)`;
+                    lbl.style.color = '#15803D';
+                }
+            }
+        }
+
+        function pickRole(role) {
+            currentChosenRole = role;
+            ['member', 'volunteer', 'owner', 'organizer'].forEach(r => {
+                const card = document.getElementById('roleCard-' + r);
+                if (card) {
+                    if (r === role) {
+                        card.classList.add('selected');
+                        card.querySelector('span:last-child').innerHTML = '●';
+                        card.querySelector('span:last-child').style.color = 'var(--primary)';
+                    } else {
+                        card.classList.remove('selected');
+                        card.querySelector('span:last-child').innerHTML = '○';
+                        card.querySelector('span:last-child').style.color = 'var(--border)';
+                    }
+                }
+            });
+
+            // Adjust dynamic role fields
+            const volSection = document.getElementById('sectionVolunteerFields');
+            const ownSection = document.getElementById('sectionOwnerFields');
+            const statusText = document.getElementById('verifStatusText');
+            const statusDesc = document.getElementById('verifStatusDesc');
+
+            if (role === 'volunteer') {
+                volSection.style.display = 'block';
+                ownSection.style.display = 'none';
+                statusText.textContent = 'Pending Aadhaar/KYC Verification (Safety First)';
+                statusDesc.textContent = 'Volunteers can browse tasks immediately. Government Aadhaar / College ID will be submitted for Supervisor review.';
+            } else if (role === 'owner') {
+                volSection.style.display = 'none';
+                ownSection.style.display = 'block';
+                statusText.textContent = 'Venue Verification Pending';
+                statusDesc.textContent = 'Space listing will be audited before appearing on public community search directory.';
+            } else if (role === 'organizer') {
+                volSection.style.display = 'none';
+                ownSection.style.display = 'none';
+                statusText.textContent = 'Verified Organizer';
+                statusDesc.textContent = 'Organization credentials approved for scheduling community welfare activities.';
+            } else {
+                volSection.style.display = 'none';
+                ownSection.style.display = 'none';
+                statusText.textContent = 'Verified Community Member';
+                statusDesc.textContent = 'Resident accounts are instantly activated with Aadhaar record for fast errand assistance.';
+            }
+        }
+
+        function sendRegOtp() {
+            const phone = document.getElementById('regPhone').value;
+            if (!phone || phone.trim().length < 8) {
+                alert('Please enter a valid mobile number.');
+                return;
+            }
+            document.getElementById('regOtpBox').style.display = 'block';
+            document.getElementById('btnSendRegOtp').textContent = 'Resend OTP 🔄';
+            document.getElementById('regOtpInput').value = '';
+            document.getElementById('regOtpInput').focus();
+            alert(`SMS code sent to ${phone}.\n(Demo test code: enter 123456 or any 6 digits)`);
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const phone = document.getElementById('regPhone').value;
+            const otpBox = document.getElementById('regOtpBox');
+
+            if (otpBox.style.display === 'none') {
+                sendRegOtp();
+                return;
+            }
+
+            const otp = document.getElementById('regOtpInput').value;
+            if (!otp || otp.trim().length < 4) {
+                alert('Please enter the 6-digit verification code.');
+                document.getElementById('regOtpInput').focus();
+                return;
+            }
+
+            const name = document.getElementById('regName').value;
+            const area = document.getElementById('regArea').value;
+            const language = document.getElementById('regLanguage').value;
+            const idType = document.getElementById('regIdType')?.value || 'Aadhaar Card';
+            const aadhaarNumber = (document.getElementById('regAadhaarNumber')?.value || '').trim();
+
+            const cleanAadhaar = aadhaarNumber.replace(/\s+/g, '');
+            if (idType === 'Aadhaar Card') {
+                if (cleanAadhaar.length !== 12 || !/^\d{12}$/.test(cleanAadhaar)) {
+                    alert('Please enter a valid 12-digit Aadhaar Card number (e.g. 5421 8892 4103).');
+                    document.getElementById('regAadhaarNumber')?.focus();
+                    return;
+                }
+            } else if (!cleanAadhaar || cleanAadhaar.length < 4) {
+                alert('Please enter a valid identity document number for safety verification.');
+                document.getElementById('regAadhaarNumber')?.focus();
+                return;
+            }
+
+            const userData = {
+                name,
+                phone,
+                area,
+                language,
+                role: currentChosenRole,
+                idType,
+                aadhaarNumber,
+                idProofFile: uploadedProofFile
+            };
+
+            if (currentChosenRole === 'volunteer') {
+                userData.skills = (document.getElementById('volSkills').value || '').split(',').map(s => s.trim());
+                userData.availability = document.getElementById('volAvailability').value;
+            } else if (currentChosenRole === 'owner') {
+                userData.venueName = document.getElementById('ownerVenueName').value;
+                userData.venueCapacity = document.getElementById('ownerCapacity').value;
+            }
+
+            AuthSession.register(userData);
+            alert(`Welcome, ${name}!\nYour account has been created with Aadhaar verification (${userData.aadhaarNumber}).`);
+            window.location.href = 'dashboard.html?role=' + currentChosenRole;
+        }
+    </script>
+</body>
+
+</html>

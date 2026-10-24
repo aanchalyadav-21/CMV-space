@@ -1,54 +1,45 @@
-# 🤝 Reach Community Platform
-
-> **DBIT Department of Computer Engineering — AY 26-27**  
-> **Course:** 25CE3CEP01 Community Engagement Project  
-> **Experiment No. 5:** Prototype Development Using Software Tools (Front-End Prototype)
+# 🤝 Community Micro-Volunteering & Empty Space
+### Platform Documentation & Architecture
+**Tagline:** *Connecting People, Helping Communities.*
 
 ---
 
-## 📌 Project Overview
-**Reach** is an accessible, community-driven micro-volunteering and shared space platform. It allows local residents and senior citizens to request urgent help (grocery/medicine pickup, digital tech assistance, clinic companion) and reserve shared community halls for workshops and neighborhood activities.
+## 🌟 Overview & Platform Mission
 
-### 🌟 Key Human-Centric Safety Features:
-1. **🚨 Senior Emergency SOS Panic Button:** One-touch emergency assistance modal in the top header connecting elders directly to medical ambulance (108) and society security.
-2. **⚠️ Grievance Redressal / Complaint Filing:** Accessible link in the footer allowing residents to file complaints (#CMP-2026) regarding volunteer conduct or facility maintenance.
-3. **🏛️ Dedicated Space Booking Pass:** If a user reserves a community space (e.g., St. Joseph Community Hall), Screen 5 generates an official **Community Space Booking Pass (#SPACE-2026-502)** with key-handover instructions instead of a volunteer delivery receipt.
-4. **👓 Senior Citizen Accessibility:** Top-bar font size toggle (`A-` / `A` / `A+`), high-contrast colors, and large touch targets.
+**Community Micro-Volunteering & Empty Space** is a neighborhood-driven web platform designed to foster community mutual aid and optimize local space sharing:
 
----
-
-## 👥 Team Work Division (5 Members)
-
-Each team member is assigned **one screen** and its corresponding stylesheet.
-
-| Member | Role / Screen | HTML File | CSS File | Responsibility |
-| :--- | :--- | :--- | :--- | :--- |
-| **Member 1** | **Screen 1:** Landing / Entry Screen | `index.html` | `css/screen1.css` | Hero section, welcome message, accessibility banner, CTA to Screen 2 |
-| **Member 2** | **Screen 2:** Service Category Selection | `categories.html` | `css/screen2.css` | Category cards (Groceries, Tech Help, Companion, Community Spaces) |
-| **Member 3** | **Screen 3:** Help & Space Request Form | `request-help.html` | `css/screen3.css` | Form with dynamic hall & capacity selector when Community Space is chosen |
-| **Member 4** | **Screen 4:** Summary Review Screen | `review.html` | `css/screen4.css` | Verification card, senior safety guarantee, Edit & Confirm buttons |
-| **Member 5** | **Screen 5:** Success & Tracking Screen | `confirmation.html` | `css/screen5.css` | Generates Volunteer Match Tracking ID or Community Space Booking Pass |
+1. **Community Micro-Volunteering (Primary Service):** Everyday errand and assistance requests for seniors and residents — prescription medicine pickup, grocery assistance, tutoring, tech guidance, and companion walks — fulfilled by verified neighborhood volunteers.
+2. **Community Empty Space Sharing (Secondary Service):** Discovering, scheduling, and reserving local community spaces, society clubhouses, and activity halls for educational workshops, health camps, and neighborhood gatherings.
+3. **Integrated Event Organizing:** Enables community NGOs and group organizers to organize neighborhood events that seamlessly pair an empty venue with verified volunteer support.
+4. **Safety & Supervisor Verification:** Dedicated administrative oversight for identity checks, space audit, live task monitoring, and community grievance resolution.
+5. **Privacy-First Design:** Unauthenticated visitors can explore community services, browse spaces, and learn about the platform. Creating requests or tracking tasks strictly requires secure sign-in.
 
 ---
 
-## 🚀 How to Run the Prototype Locally
+## 📁 File Structure & Core Components
 
-1. Double-click `index.html` in your file explorer to open it in Chrome, Edge, or Firefox.
-2. Click **"Request Volunteer Help Now →"** to test the 5-screen volunteer flow.
-3. OR click **"Browse Community Spaces 🏛️"** to see how the form and Screen 5 dynamically generate a **Community Space Booking Pass**!
-4. Click **"🚨 EMERGENCY SOS"** in the top blue banner to test the senior emergency modal.
-5. Click **"⚠️ Report an Issue"** in the footer to test the complaint filing system.
+| File | Purpose | Description |
+| :--- | :--- | :--- |
+| `index.html` | Welcome & Portal Gateway | Main homepage, service overview, sign-in & registration portal, accessibility controls. |
+| `register.html` | Account Registration | User onboarding with role selection (Resident, Volunteer, Space Provider, Organizer). |
+| `dashboard.html` | User Hub | Dynamic role-based dashboard for residents, volunteers, owners, and organizers. |
+| `help.html` | Request Help | Errand request creation form with category selection, urgency, and accessibility voice support. |
+| `review.html` | Review & Submit | Summary review step before final submission, preventing accidental duplicate requests. |
+| `confirmation.html` | Request Tracker | Live operational status tracking, safety PIN verification, and volunteer contact. |
+| `volunteer.html` | Volunteer Operations Hub | Dedicated volunteer desk to browse nearby errands, accept/pass tasks, and enter completion PIN. |
+| `spaces.html` | Empty Spaces Directory | Public directory to discover and request reservations for community halls and clubhouses. |
+| `owner.html` | Space Provider Portal | Facility management hub to approve booking requests and generate passes. |
+| `organize.html` | Event Organizer Desk | Platform integration module to run community activities utilizing volunteers and venues. |
+| `my-activity.html` | Activity History | Comprehensive history of errand requests, venue reservations, and completed tasks. |
+| `admin.html` | Supervisor Console | Administrative console for KYC verifications, space audits, and safety complaints. |
+| `complaints.html` | Safety Grievance Desk | Dispute reporting portal for residents and volunteers to ensure community safety. |
+| `style.css` | Unified Design System | High-contrast WCAG AA accessible design system with tailored fonts and responsive layout. |
+| `script.js` | Master Engine | Reactive storage engine (`AppStore`), session management, and multi-language support. |
 
 ---
 
-## 📝 Information for Experiment 5 Word Report
+## 🚀 Running the Web Platform
 
-- **Tool Selected:** `Basic Front-End Web Development (HTML5 / CSS3 / JavaScript)`
-- **Public View / Prototype URL:** `https://aanchalyadav-21.github.io/sahyog-community-platform/`
-- **GitHub Repository URL:** `https://github.com/aanchalyadav-21/sahyog-community-platform`
-- **Core User Journey Sequence:**
-  1. `index.html` (Landing)
-  2. `categories.html` (Service Directory)
-  3. `request-help.html` (Request & Space Booking Form)
-  4. `review.html` (Summary Verification)
-  5. `confirmation.html` (Status & Tracking Pass)
+1. Open `index.html` in any modern web browser.
+2. Sign in with any role using demo credentials or register a new community account.
+3. Enjoy an authentic, community-first mutual aid experience!

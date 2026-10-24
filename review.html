@@ -1,248 +1,340 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reach Community - Screen 4: Review Details</title>
-    <!-- Shared Styles -->
-    <link rel="stylesheet" href="css/base.css">
-    <!-- Member 4 Styles -->
-    <link rel="stylesheet" href="css/screen4.css">
+    <title>Review Request - Community Micro-Volunteering & Empty Space</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .review-card {
+            background: #FFFFFF;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 30px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .review-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-light);
+            font-size: 1rem;
+            gap: 16px;
+        }
+
+        .review-label {
+            color: var(--text-muted);
+            font-weight: 600;
+            min-width: 160px;
+        }
+
+        .review-value {
+            color: var(--text-main);
+            font-weight: 700;
+            text-align: right;
+            flex: 1;
+        }
+    </style>
 </head>
+
 <body>
 
-    <!-- Accessibility, Helpline & SOS Bar -->
+    <!-- Top Helpline & SOS Bar -->
     <div class="top-bar">
         <div class="top-bar-left">
             <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
             <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
         </div>
-        <div class="font-controls">
-            <span>Font Size:</span>
-            <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
-            <button onclick="changeFontSize('normal')" title="Standard text">A</button>
-            <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')">A-</button>
+                <button onclick="changeFontSize('normal')">A</button>
+                <button onclick="changeFontSize('large')">A+</button>
+            </div>
         </div>
     </div>
 
     <!-- Header Navigation -->
     <header class="main-header">
         <a href="index.html" class="logo">
-            <span style="font-size: 1.8rem;">🤝</span>
-            <span><strong>Reach</strong> Community</span>
+            <span style="font-size: 2rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
         </a>
         <nav class="main-nav">
             <a href="index.html">Home</a>
-            <a href="categories.html">Services</a>
-            <a href="request-help.html">Request Help</a>
-            <a href="confirmation.html" class="active">Track Status</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="spaces.html">Community Spaces</a>
+            <a href="help.html">Help & FAQ</a>
         </nav>
     </header>
 
-    <!-- Main Content Container -->
-    <main class="page-container">
-        
-        <!-- Journey Progress Indicator -->
-        <div class="flow-progress">
-            <div class="flow-step completed">
-                <span class="step-num">✓</span>
-                <span>Home</span>
+    <main class="page-container" style="max-width: 760px;">
+
+        <!-- Return / Breadcrumbs -->
+        <a href="help.html" class="btn-back">
+            ← Edit in Help Form
+        </a>
+
+        <!-- Flow Stepper Progress Bar -->
+        <div class="steps-progress">
+            <div class="step-item completed">
+                <span class="step-circle">✓</span>
+                <span>Enter Details</span>
             </div>
-            <div class="flow-step completed">
-                <span class="step-num">✓</span>
-                <span>Select Service</span>
+            <div class="step-item active">
+                <span class="step-circle">2</span>
+                <span>Review Request</span>
             </div>
-            <div class="flow-step completed">
-                <span class="step-num">✓</span>
-                <span>Fill Request</span>
-            </div>
-            <div class="flow-step active">
-                <span class="step-num">4</span>
-                <span>Review Details</span>
-            </div>
-            <div class="flow-step">
-                <span class="step-num">5</span>
-                <span>Confirmed Status</span>
+            <div class="step-item">
+                <span class="step-circle">3</span>
+                <span>Live Tracking & Status</span>
             </div>
         </div>
 
-        <!-- MEMBER 4 CONTENT (Screen 4: Verification / Review) -->
         <div class="review-card">
-            <h1 id="reviewHeading" style="color: var(--primary-color); font-size: 1.85rem; margin-bottom: 8px;">
-                Review Your Request Details
-            </h1>
-            <p style="color: var(--text-secondary); margin-bottom: 20px;">
-                Please review the information below before final submission. You can click <strong>"Edit Details"</strong> if you need to make changes.
-            </p>
 
-            <div class="review-notice" id="reviewNotice">
-                ℹ️ <strong>Senior Citizen Safety Guarantee:</strong> Volunteer assistance is 100% free of charge. Only verified neighborhood volunteers from DBIT Community Network are assigned.
+            <div style="margin-bottom: 20px;">
+                <h1 style="color: var(--primary-dark); font-size: 1.85rem; margin-bottom: 6px;">
+                    Review Your Request Summary
+                </h1>
+                <p style="color: var(--text-muted); font-size: 1rem;">
+                    Step 2 of 3: Please verify all entered details. If anything needs correction, click <strong>"Edit Details"</strong>.
+                </p>
             </div>
 
-            <div class="review-list">
-                <div class="review-item">
-                    <span class="review-label">Service Type:</span>
-                    <span class="review-value" id="revService">🛒 Grocery & Medicine Delivery</span>
-                </div>
-                
-                <!-- Dynamic Field for Space Booking -->
-                <div class="review-item" id="revSpaceHallItem" style="display: none;">
-                    <span class="review-label">Reserved Hall:</span>
-                    <span class="review-value" id="revHall" style="color: #0369A1; font-weight: bold;">St. Joseph Community Hall</span>
-                </div>
-
-                <div class="review-item" id="revSpaceEventItem" style="display: none;">
-                    <span class="review-label">Activity Purpose:</span>
-                    <span class="review-value" id="revEvent">Senior Yoga & Wellness Session</span>
-                </div>
-
-                <div class="review-item">
-                    <span class="review-label">Requester / Host:</span>
-                    <span class="review-value" id="revName">Ramesh Patel</span>
-                </div>
-                <div class="review-item">
-                    <span class="review-label">Contact Phone:</span>
-                    <span class="review-value" id="revPhone">+91 98765 43210</span>
-                </div>
-                <div class="review-item">
-                    <span class="review-label">Address / Society:</span>
-                    <span class="review-value" id="revAddress">Flat 402, Shanti Niketan, Sector 4, Kurla West</span>
-                </div>
-                <div class="review-item">
-                    <span class="review-label">Preferred Time:</span>
-                    <span class="review-value" id="revTime">Morning (9 AM - 12 PM)</span>
-                </div>
-                <div class="review-item" id="revNotesItem">
-                    <span class="review-label">Special Notes:</span>
-                    <span class="review-value" id="revNotes">Need assistance picking up prescribed blood pressure medicines from Apex Chemist.</span>
+            <!-- Auth Gate Barrier (If opened unauthenticated) -->
+            <div id="authGateNotice" style="display: none; background: #FFFBEB; border: 2px solid #FCD34D; border-radius: 12px; padding: 22px; text-align: center; margin-bottom: 22px;">
+                <div style="font-size: 2.4rem; margin-bottom: 8px;">🔒</div>
+                <h3 style="color: #92400E; font-size: 1.3rem; margin-bottom: 6px;">
+                    Sign In Required to Submit This Request
+                </h3>
+                <p style="color: #78350F; font-size: 0.95rem; margin-bottom: 16px;">
+                    You must be logged into a resident account so local volunteers can confirm your location and PIN.
+                </p>
+                <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                    <a href="index.html#signInBox" class="btn btn-primary" style="padding: 10px 20px; font-size: 0.95rem;">
+                        🔑 Sign In with Phone OTP
+                    </a>
+                    <button type="button" class="btn" onclick="AuthSession.quickLogin('member', 'review.html')" style="background: #FEF3C7; color: #92400E; border: 1.5px solid #F59E0B; font-size: 0.9rem; padding: 10px 18px; font-weight: 700;">
+                        ⚡ Quick Sign In as Resident
+                    </button>
                 </div>
             </div>
 
-            <!-- Forward & Backward Action Triggers (Exp 5 Requirement) -->
-            <div class="review-actions">
-                <a href="request-help.html" class="btn btn-secondary">
+            <div style="background: #F0FDF4; border: 1.5px solid #86EFAC; color: #166534; padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 22px; font-size: 0.95rem; display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 1.5rem;">🛡️</span>
+                <div>
+                    <strong>Community Volunteer Safety Guarantee:</strong>
+                    <div>Assistance is 100% free of charge. A verified local volunteer will be matched to your request.</div>
+                </div>
+            </div>
+
+            <!-- Dynamic Review Rows -->
+            <div id="reviewDetailsContainer">
+                <!-- Injected via JavaScript -->
+            </div>
+
+            <!-- Actions: Edit vs Confirm & Submit -->
+            <div id="reviewActionsRow" style="display: flex; justify-content: space-between; align-items: center; margin-top: 30px; gap: 14px; flex-wrap: wrap;">
+                <a href="help.html" class="btn btn-secondary" style="padding: 12px 20px; font-size: 1rem;">
                     ← Edit Details
                 </a>
-                <a href="confirmation.html" class="btn btn-primary btn-large" id="btn-confirm-submit">
+                <button id="btnSubmitRequest" onclick="commitAndConfirm()" class="btn btn-primary" style="background-color: #10B981; border-color: #059669; padding: 14px 28px; font-size: 1.1rem; font-weight: 800;">
                     Confirm & Submit Request ✓
-                </a>
+                </button>
             </div>
 
         </div>
 
     </main>
 
-    <!-- Shared Footer with Grievance & SOS Link -->
+    <!-- Project Footer -->
     <footer class="main-footer">
-        <p><strong>Reach Community Platform</strong> • Don Bosco Institute of Technology (DBIT) CEP AY 26-27</p>
-        <p style="margin-top: 8px; font-size: 0.95rem;">
-            <a href="javascript:void(0)" onclick="openComplaintModal()" style="color: #FCA5A5; text-decoration: underline;">
-                ⚠️ Report an Issue / File Volunteer Complaint
-            </a>
-            &nbsp;•&nbsp;
-            <a href="javascript:void(0)" onclick="openSosModal()" style="color: #FCA5A5; text-decoration: underline;">
-                🚨 Emergency Assistance Desk
-            </a>
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
         </p>
     </footer>
 
-    <!-- SOS Emergency Modal -->
-    <div id="sosModal" class="modal-overlay">
-        <div class="modal-content modal-sos">
-            <div class="modal-header">
-                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
-                    🚨 Senior Emergency Panic Response
-                </h2>
-                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
-            </div>
-            <p style="font-size: 1.05rem; margin-bottom: 20px; color: var(--text-primary);">
-                Do you need urgent medical or security assistance? Help is available 24/7.
-            </p>
-            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
-                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left; justify-content: flex-start;">
-                    🚑 Call Medical Ambulance (108)
-                </a>
-                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; justify-content: flex-start;">
-                    👮 Call DBIT Society Security Guard (022-2500-1111)
-                </a>
-                <a href="tel:9876500000" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
-                    👨‍👩‍👧 Alert Registered Emergency Family Contact
-                </a>
-            </div>
-            <div style="background-color: #FEE2E2; border: 1px solid #FCA5A5; padding: 12px; border-radius: 8px; font-size: 0.9rem; color: #991B1B;">
-                GPS Location Alert: Flat 402, Shanti Niketan has been flagged for prioritized neighborhood patrol.
-            </div>
-            <div style="text-align: right; margin-top: 20px;">
-                <button class="btn btn-secondary" onclick="closeSosModal()">Close Emergency Alert</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Grievance / Complaint Modal -->
-    <div id="complaintModal" class="modal-overlay">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 style="color: var(--primary-color);">📝 File a Community Complaint</h2>
-                <button class="modal-close-btn" onclick="closeComplaintModal()">&times;</button>
-            </div>
-            <div id="complaintSuccess" style="display: none; background-color: #DCFCE7; color: #166534; padding: 14px; border-radius: 8px; margin-bottom: 16px; font-weight: 600;">
-                ✓ Complaint Registered (#CMP-2026-104). The DBIT Community Grievance Committee will investigate within 24 hours.
-            </div>
-            <form onsubmit="handleComplaintSubmit(event)">
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Related Request / Reference ID (Optional):</label>
-                    <input type="text" class="form-control" placeholder="e.g. #SYG-2026-8941" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Issue Category:</label>
-                    <select class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;" required>
-                        <option value="">-- Choose Issue --</option>
-                        <option value="no-show">Volunteer did not arrive on time</option>
-                        <option value="behavior">Inappropriate behavior or conduct</option>
-                        <option value="space">Community space locked or unclean</option>
-                        <option value="other">Other neighborhood grievance</option>
-                    </select>
-                </div>
-                <div style="margin-bottom: 16px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Description of Problem:</label>
-                    <textarea class="form-control" rows="3" required placeholder="Describe what happened..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"></textarea>
-                </div>
-                <div style="margin-bottom: 20px;">
-                    <label style="display: block; font-weight: bold; margin-bottom: 6px;">Your Contact Phone:</label>
-                    <input type="tel" class="form-control" value="+91 98765 43210" required style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
-                </div>
-                <div style="display: flex; justify-content: flex-end; gap: 12px;">
-                    <button type="button" class="btn btn-secondary" onclick="closeComplaintModal()">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Submit Complaint ✓</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Shared Script -->
-    <script src="js/main.js"></script>
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js?v=2"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const data = getHelpRequest();
-            if (data) {
-                if (data.category) document.getElementById('revService').textContent = data.category;
-                if (data.name) document.getElementById('revName').textContent = data.name;
-                if (data.phone) document.getElementById('revPhone').textContent = data.phone;
-                if (data.address) document.getElementById('revAddress').textContent = data.address;
-                if (data.time) document.getElementById('revTime').textContent = data.time;
-                if (data.notes) document.getElementById('revNotes').textContent = data.notes;
+        let currentDraft = null;
 
-                // If user booked a community space
-                if (data.isSpaceBooking) {
-                    document.getElementById('reviewHeading').textContent = 'Review Your Community Space Reservation';
-                    document.getElementById('reviewNotice').innerHTML = '🏛️ <strong>Community Space Policy:</strong> Zero commercial booking fees for verified neighborhood activities. Cleanliness deposit waived.';
-                    document.getElementById('revSpaceHallItem').style.display = 'flex';
-                    document.getElementById('revSpaceEventItem').style.display = 'flex';
-                    if (data.hallName) document.getElementById('revHall').textContent = data.hallName;
-                    if (data.eventType) document.getElementById('revEvent').textContent = data.eventType;
+        document.addEventListener('DOMContentLoaded', () => {
+            const isLoggedIn = AuthSession.isLoggedIn();
+            const gateNotice = document.getElementById('authGateNotice');
+            const btnSubmit = document.getElementById('btnSubmitRequest');
+
+            if (!isLoggedIn) {
+                if (gateNotice) gateNotice.style.display = 'block';
+                if (btnSubmit) {
+                    btnSubmit.disabled = true;
+                    btnSubmit.style.opacity = '0.5';
+                    btnSubmit.style.cursor = 'not-allowed';
+                    btnSubmit.title = 'Please sign in to confirm this request';
+                }
+            } else {
+                if (gateNotice) gateNotice.style.display = 'none';
+                if (btnSubmit) {
+                    btnSubmit.disabled = false;
+                    btnSubmit.style.opacity = '1';
+                    btnSubmit.style.cursor = 'pointer';
                 }
             }
+
+            const pendingStr = localStorage.getItem('reach_pending_request') || localStorage.getItem('reach_active_draft');
+            if (pendingStr) {
+                try {
+                    currentDraft = JSON.parse(pendingStr);
+                } catch (e) {}
+            }
+
+            if (!currentDraft) {
+                const user = AuthSession.getCurrentUser();
+                currentDraft = {
+                    category: 'Medicine Pickup',
+                    title: 'Prescription BP & Diabetes Medicine',
+                    requester: user ? user.name : 'Resident',
+                    requesterPhone: user ? user.phone : '+91 98765 43210',
+                    location: 'Flat 402, Shanti Niketan CHS, Sector 4',
+                    time: 'Today, 11:30 AM',
+                    urgency: 'Today (Urgent)',
+                    notes: 'Prescription slip will be given at Apex Chemist counter. Payment already made.'
+                };
+            }
+
+            renderReviewData(currentDraft);
         });
+
+        function renderReviewData(d) {
+            const container = document.getElementById('reviewDetailsContainer');
+            let rows = `
+                <div class="review-row">
+                    <span class="review-label">Task Category:</span>
+                    <span class="review-value" style="color: var(--primary); font-size: 1.1rem;">
+                        🛒 ${d.category || 'General Help'}
+                    </span>
+                </div>
+                <div class="review-row">
+                    <span class="review-label">Task Summary:</span>
+                    <span class="review-value">${d.title || d.category}</span>
+                </div>
+                <div class="review-row">
+                    <span class="review-label">Requester Name:</span>
+                    <span class="review-value">${d.requester || d.requesterName || 'Resident Member'}</span>
+                </div>
+                <div class="review-row">
+                    <span class="review-label">Contact Phone:</span>
+                    <span class="review-value">${d.requesterPhone || '+91 98765 43210'}</span>
+                </div>
+                <div class="review-row">
+                    <span class="review-label">Location / Visit Address:</span>
+                    <span class="review-value">${d.location || 'Sector 4'}</span>
+                </div>
+                <div class="review-row">
+                    <span class="review-label">Preferred Date & Time:</span>
+                    <span class="review-value">${d.time || 'Today'} (${d.urgency || 'Normal'})</span>
+                </div>
+                <div class="review-row" style="border-bottom: none;">
+                    <span class="review-label">Special Notes / Skills:</span>
+                    <span class="review-value" style="font-weight: 500;">${d.notes || 'None specified'}</span>
+                </div>
+            `;
+            container.innerHTML = rows;
+        }
+
+        function commitAndConfirm() {
+            // STRICT AUTH CHECK: Cannot confirm without account!
+            if (!AuthSession.isLoggedIn()) {
+                AuthSession.showAuthModal({
+                    title: 'Sign In Required to Submit Help Request',
+                    message: 'You cannot submit a volunteer request without signing in. Please sign in or create an account to proceed.',
+                    role: 'member',
+                    redirectUrl: 'review.html'
+                });
+                return;
+            }
+
+            if (!currentDraft) return;
+
+            const tasks = AppStore.getTasks();
+            const newId = 'TSK-' + Math.floor(100 + Math.random() * 900);
+            const user = AuthSession.getCurrentUser();
+
+            const newTask = {
+                id: newId,
+                category: currentDraft.category || 'Medicine Pickup',
+                title: currentDraft.title || 'Everyday Errand Assistance',
+                requester: user ? user.name : (currentDraft.requester || 'Resident Member'),
+                requesterPhone: user ? user.phone : (currentDraft.requesterPhone || '+91 98765 43210'),
+                location: currentDraft.location || 'Sector 4',
+                time: currentDraft.time || 'Today, 11:30 AM',
+                urgency: currentDraft.urgency || 'Today',
+                skillsNeeded: currentDraft.skillsNeeded || currentDraft.notes || 'Helpful Neighbor',
+                status: 'Waiting for Volunteer',
+                assignedVolunteer: null,
+                safetyPin: Math.floor(1000 + Math.random() * 9000).toString(),
+                etaMinutes: null,
+                notes: currentDraft.notes || '',
+                createdAt: 'Just now',
+                rating: null,
+                feedback: null
+            };
+
+            tasks.unshift(newTask);
+            AppStore.saveTasks(tasks);
+
+            // Also register directly into ReachData (reach_requests_db)
+            if (window.ReachData && typeof ReachData.addRequest === 'function') {
+                ReachData.addRequest({
+                    id: newId,
+                    category: newTask.category,
+                    title: newTask.title,
+                    userName: newTask.requester,
+                    phone: newTask.requesterPhone,
+                    address: newTask.location,
+                    time: newTask.time,
+                    urgency: newTask.urgency,
+                    notes: newTask.notes || newTask.title,
+                    icon: (newTask.category || '').includes('Medicine') ? '💊' : ((newTask.category || '').includes('Grocer') ? '🛒' : '🤝'),
+                    status: 'waiting_volunteer',
+                    safetyPin: newTask.safetyPin
+                });
+            }
+
+            // Record as active confirmed item
+            localStorage.setItem('reach_last_confirmed', JSON.stringify({
+                id: newId,
+                type: 'help',
+                title: newTask.title,
+                status: 'Waiting for Volunteer'
+            }));
+
+            // Clear draft
+            localStorage.removeItem('reach_pending_request');
+
+            // Broadcast real-time ping so open Volunteer Hub displays this immediately
+            localStorage.setItem('reach_sync_ping', Date.now().toString());
+            if ('BroadcastChannel' in window) {
+                try {
+                    const ch = new BroadcastChannel('reach_sync');
+                    ch.postMessage({ action: 'new_request', id: newId, time: Date.now() });
+                } catch (e) {}
+            }
+
+            // Move forward to Confirmation & Live Tracker
+            window.location.href = 'confirmation.html?id=' + newId;
+        }
     </script>
 </body>
+
 </html>

@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Browse Tasks & Community Spaces - Community Micro-Volunteering & Empty Space</title>
+    <!-- Base Styles and Portals Styles for cohesive modern UI -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/portals.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Clean Modern Explorer Styles */
+        .explorer-hero {
+            background: linear-gradient(135deg, #0F2B5C 0%, #1E40AF 100%);
+            color: #FFFFFF;
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+
+        .explorer-hero-title {
+            font-size: 1.7rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0 0 6px 0;
+        }
+
+        .explorer-hero-subtitle {
+            font-size: 0.98rem;
+            color: #DBEAFE;
+            margin: 0 0 12px 0;
+            line-height: 1.45;
+        }
+
+        /* Dual View Navigation Tabs */
+        .explorer-view-tabs {
+            display: flex;
+            gap: 10px;
+            background: #F1F5F9;
+            padding: 5px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .explorer-view-tab {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .explorer-view-tab.active {
+            background: #FFFFFF;
+            color: #1E40AF;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        }
+
+        /* Filter & Search Toolbar */
+        .filter-bar-card {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .filter-row-top {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .search-box-wrap {
+            position: relative;
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .search-box-wrap input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            font-size: 0.94rem;
+            border: 1.5px solid #CBD5E1;
+            border-radius: 8px;
+            outline: none;
+        }
+
+        .search-box-wrap .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.05rem;
+            color: #64748B;
+        }
+
+        .filter-chips {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-chip {
+            padding: 5px 12px;
+            border-radius: 16px;
+            font-size: 0.84rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid #CBD5E1;
+            background: #F8FAFC;
+            color: #334155;
+            transition: all 0.15s;
+        }
+
+        .filter-chip.active {
+            background: #1E40AF;
+            color: #FFFFFF;
+            border-color: #1E40AF;
+        }
+
+        /* Clean Tasks Grid */
+        .tasks-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .task-item-card {
+            background: #FFFFFF;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .task-item-card:hover {
+            border-color: #2563EB;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+        }
+
+        .task-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 6px;
+        }
+
+        .task-cat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #EFF6FF;
+            color: #1D4ED8;
+        }
+
+        .task-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0F172A;
+            margin: 0 0 6px 0;
+            line-height: 1.35;
+        }
+
+        .task-notes-desc {
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.45;
+            margin-bottom: 12px;
+            flex: 1;
+        }
+
+        .task-action-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding-top: 12px;
+            border-top: 1px solid #F1F5F9;
+        }
+
+        /* Spaces Card */
+        .space-item-card {
+            background: #FFFFFF;
+            border: 1.5px solid #E2E8F0;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .space-card-hero {
+            height: 120px;
+            background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%);
+            color: #FFFFFF;
+            padding: 14px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .space-card-body {
+            padding: 16px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .amenity-tag {
+            background: #F0FDF4;
+            color: #166534;
+            border: 1px solid #BBF7D0;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+
+        /* Modal Details */
+        .modal-detail-row {
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .modal-detail-row strong {
+            display: block;
+            color: #64748B;
+            font-size: 0.82rem;
+            margin-bottom: 2px;
+        }
+
+        .modal-detail-row span {
+            font-size: 0.96rem;
+            color: #0F172A;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+                <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+                <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="explore.html?type=tasks" class="active">Browse Tasks</a>
+            <a href="explore.html?type=spaces">Community Spaces</a>
+            <div id="navUserSection"></div>
+        </nav>
+    </header>
+
+    <!-- Main Container -->
+    <main class="page-container">
+
+        <!-- Simple Top Bar with Back & Active User -->
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+            <a href="dashboard.html" class="btn-back" style="margin-bottom: 0; padding: 6px 12px; font-size: 0.88rem;">
+                ← Back to Dashboard
+            </a>
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem;">
+                <span style="color: var(--text-muted);">Active Profile:</span>
+                <strong id="activeUserBadge" style="color: var(--primary);">👵 Senior Resident</strong>
+                <button id="btnExplorerSignOut" onclick="AuthSession.logout();" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; margin-left: 8px; cursor: pointer;">Sign Out 🚪</button>
+            </div>
+        </div>
+
+        <!-- Explorer Simple Hero Banner -->
+        <div class="explorer-hero">
+            <div class="explorer-hero-title">
+                <span>🔍</span>
+                <span>Community Opportunities & Shared Spaces</span>
+            </div>
+            <p class="explorer-hero-subtitle">
+                Support seniors with urgent prescription pickups, daily groceries, and clinic accompaniment — or discover verified venues for neighborhood gatherings.
+            </p>
+            <div id="explorerRoleHint" style="font-size: 0.85rem; background: rgba(255, 255, 255, 0.15); padding: 5px 12px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px;">
+                <!-- Updated dynamically based on active role -->
+            </div>
+        </div>
+
+        <!-- Dual View Navigation Tabs -->
+        <div class="explorer-view-tabs">
+            <button class="explorer-view-tab active" id="tabBtnTasks" onclick="switchExplorerView('tasks')">
+                <span>🛒</span>
+                <span>Browse Tasks (<span id="tabCountTasks">4</span>)</span>
+            </button>
+            <button class="explorer-view-tab" id="tabBtnSpaces" onclick="switchExplorerView('spaces')">
+                <span>🏛️</span>
+                <span>Community Spaces (<span id="tabCountSpaces">3</span>)</span>
+            </button>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- VIEW A: BROWSE TASKS & ERRANDS                                  -->
+        <!-- =============================================================== -->
+        <div id="viewTasksSection">
+
+            <!-- Filter & Search Toolbar for Tasks -->
+            <div class="filter-bar-card">
+                <div class="filter-row-top">
+                    <div class="search-box-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="taskSearchInput" placeholder="Search tasks by medicine, grocery, street name..." oninput="filterTasks()">
+                    </div>
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <select id="taskSortSelect" class="form-control" style="width: auto; padding: 7px 12px; font-size: 0.88rem;" onchange="filterTasks()">
+                            <option value="urgent">⚡ Urgency: High to Low</option>
+                            <option value="nearest">📍 Distance: Nearest First</option>
+                            <option value="newest">🕒 Newest Requests</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Category Filter Chips -->
+                <div class="filter-chips">
+                    <span style="font-size: 0.84rem; font-weight: 700; color: #64748B;">Category:</span>
+                    <button class="filter-chip active" data-cat="all" onclick="setTaskCategory('all')">All</button>
+                    <button class="filter-chip" data-cat="Medicine Pickup" onclick="setTaskCategory('Medicine Pickup')">💊 Medicine</button>
+                    <button class="filter-chip" data-cat="Groceries" onclick="setTaskCategory('Groceries')">🛒 Groceries</button>
+                    <button class="filter-chip" data-cat="Clinic Escort" onclick="setTaskCategory('Clinic Escort')">🩺 Clinic Escort</button>
+                    <button class="filter-chip" data-cat="Tutoring" onclick="setTaskCategory('Tutoring')">📚 Tutoring</button>
+                    <button class="filter-chip" data-cat="urgent-only" onclick="setTaskCategory('urgent-only')" style="border-color: #F87171; color: #B91C1C;">⚡ Urgent</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Tasks Grid -->
+            <div class="tasks-cards-grid" id="tasksListGrid">
+                <!-- Dynamically rendered via JavaScript -->
+            </div>
+
+            <!-- Empty State for Tasks -->
+            <div id="tasksEmptyState" style="display: none; text-align: center; padding: 36px 16px; background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 10px; margin-bottom: 24px;">
+                <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🔍</span>
+                <h4 style="color: #1E293B; font-size: 1.1rem; margin-bottom: 6px;">No Matching Tasks Found</h4>
+                <p style="color: #64748B; font-size: 0.9rem; margin-bottom: 12px;">
+                    Try choosing "All" or clearing search keywords.
+                </p>
+                <button class="btn btn-secondary" onclick="resetTaskFilters()" style="padding: 6px 14px; font-size: 0.85rem;">Reset Filters 🔄</button>
+            </div>
+
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- VIEW B: COMMUNITY SPACES & VENUES                               -->
+        <!-- =============================================================== -->
+        <div id="viewSpacesSection" style="display: none;">
+
+            <!-- Filter & Search Toolbar for Spaces -->
+            <div class="filter-bar-card">
+                <div class="filter-row-top">
+                    <div class="search-box-wrap">
+                        <span class="search-icon">🔍</span>
+                        <input type="text" id="spaceSearchInput" placeholder="Search by venue name, hall, clubhouse..." oninput="filterSpaces()">
+                    </div>
+                </div>
+
+                <!-- Space Filter Chips -->
+                <div class="filter-chips">
+                    <span style="font-size: 0.84rem; font-weight: 700; color: #64748B;">Type:</span>
+                    <button class="filter-chip active" data-sp-cat="all" onclick="setSpaceCategory('all')">All Venues</button>
+                    <button class="filter-chip" data-sp-cat="hall" onclick="setSpaceCategory('hall')">🏛️ Activity Halls</button>
+                    <button class="filter-chip" data-sp-cat="clubhouse" onclick="setSpaceCategory('clubhouse')">🏢 Clubhouses</button>
+                    <button class="filter-chip" data-sp-cat="free" onclick="setSpaceCategory('free')">🟢 Free for Community</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Spaces Grid -->
+            <div class="tasks-cards-grid" id="spacesListGrid">
+                <!-- Dynamically rendered via JavaScript -->
+            </div>
+
+            <!-- Empty State for Spaces -->
+            <div id="spacesEmptyState" style="display: none; text-align: center; padding: 36px 16px; background: #FFFFFF; border: 1.5px dashed #CBD5E1; border-radius: 10px; margin-bottom: 24px;">
+                <span style="font-size: 2.2rem; display: block; margin-bottom: 8px;">🏛️</span>
+                <h4 style="color: #1E293B; font-size: 1.1rem; margin-bottom: 6px;">No Venues Match Your Filter</h4>
+                <button class="btn btn-secondary" onclick="resetSpaceFilters()" style="padding: 6px 14px; font-size: 0.85rem;">Reset Filters 🔄</button>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Task Detail Modal -->
+    <div id="taskDetailModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <h3 style="color: var(--primary-dark); display: flex; align-items: center; gap: 8px; margin: 0; font-size: 1.2rem;" id="modalTaskTitle">
+                    Task Details
+                </h3>
+                <button class="modal-close-btn" onclick="closeTaskModal()">&times;</button>
+            </div>
+            <div style="padding: 14px 0;" id="modalTaskBody">
+                <!-- Populated dynamically -->
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #E2E8F0; padding-top: 12px;">
+                <button type="button" class="btn btn-secondary" onclick="closeTaskModal()" style="padding: 7px 14px; font-size: 0.88rem;">Close</button>
+                <button type="button" class="btn btn-primary" id="modalBtnAccept" onclick="confirmModalAccept()" style="padding: 7px 16px; font-size: 0.88rem; font-weight: 700; display: none;">
+                    ✓ Accept This Task
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SOS Panic Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left; padding: 10px 16px; font-weight: 700;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left; padding: 10px 16px; font-weight: 700;">
+                    👮 Call Society Guard (022-2500-1111)
+                </a>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 4px; font-size: 1rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.85rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        let currentTaskFilter = 'all';
+        let currentSpaceFilter = 'all';
+        let selectedModalTaskId = null;
+
+        // Initialize on DOM Ready
+        document.addEventListener('DOMContentLoaded', () => {
+            initUserBadge();
+
+            // Check URL query parameters (?type=tasks or ?type=spaces)
+            const urlParams = new URLSearchParams(window.location.search);
+            const initialType = urlParams.get('type') || 'tasks';
+            switchExplorerView(initialType);
+
+            renderTasksList();
+            renderSpacesList();
+
+            // Listen for cross-window sync
+            if ('BroadcastChannel' in window) {
+                const syncChannel = new BroadcastChannel('reach_sync');
+                syncChannel.onmessage = () => {
+                    renderTasksList();
+                    renderSpacesList();
+                };
+            }
+            window.addEventListener('storage', () => {
+                renderTasksList();
+                renderSpacesList();
+            });
+        });
+
+        function initUserBadge() {
+            const isLogged = (window.AuthSession && typeof AuthSession.isLoggedIn === 'function') ? AuthSession.isLoggedIn() : false;
+            const currentRole = isLogged ? (localStorage.getItem('reach_auth_role') || 'member') : 'guest';
+            const user = isLogged ? AuthSession.getCurrentUser() : null;
+            
+            const badge = document.getElementById('activeUserBadge');
+            const hint = document.getElementById('explorerRoleHint');
+            const btnSignOut = document.getElementById('btnExplorerSignOut');
+
+            if (!isLogged) {
+                if (badge) badge.innerHTML = `👤 Guest Visitor`;
+                if (hint) hint.innerHTML = `👋 <strong>Guest Mode:</strong> Browsing community requests. <a href="index.html#signInBox" style="color: #93C5FD; font-weight: 700; margin-left: 4px;">Sign In to Request Help or Volunteer →</a>`;
+                if (btnSignOut) btnSignOut.style.display = 'none';
+                return;
+            }
+
+            if (btnSignOut) btnSignOut.style.display = 'inline-block';
+
+            if (currentRole === 'volunteer') {
+                if (badge) badge.innerHTML = `🦸‍♂️ Volunteer (${user ? user.name : 'Karan Verma'})`;
+                if (hint) hint.innerHTML = `🦸‍♂️ <strong>Volunteer Mode Active:</strong> You can click "✓ Accept Task" to assist local seniors.`;
+            } else if (currentRole === 'owner') {
+                if (badge) badge.innerHTML = `🏛️ Space Owner`;
+                if (hint) hint.innerHTML = `🏛️ <strong>Space Provider Mode:</strong> Browsing neighborhood community requests and venues.`;
+            } else if (currentRole === 'organizer') {
+                if (badge) badge.innerHTML = `🤝 Event Organizer`;
+                if (hint) hint.innerHTML = `🤝 <strong>Organizer Mode:</strong> Find community venues or coordinate drives.`;
+            } else {
+                if (badge) badge.innerHTML = `👵 Senior Resident (${user ? user.name : 'Ramesh Patel'})`;
+                if (hint) hint.innerHTML = `👵 <strong>Senior Resident Mode:</strong> View community errands. Need help yourself? <a href="help.html" style="color: #93C5FD; font-weight: 700; margin-left: 4px;">Request Help Here →</a>`;
+            }
+        }
+
+        // Switch between Tasks View and Spaces View
+        function switchExplorerView(view) {
+            const tabTasks = document.getElementById('tabBtnTasks');
+            const tabSpaces = document.getElementById('tabBtnSpaces');
+            const secTasks = document.getElementById('viewTasksSection');
+            const secSpaces = document.getElementById('viewSpacesSection');
+
+            if (view === 'spaces') {
+                tabTasks.classList.remove('active');
+                tabSpaces.classList.add('active');
+                secTasks.style.display = 'none';
+                secSpaces.style.display = 'block';
+                history.replaceState(null, '', 'explore.html?type=spaces');
+            } else {
+                tabSpaces.classList.remove('active');
+                tabTasks.classList.add('active');
+                secSpaces.style.display = 'none';
+                secTasks.style.display = 'block';
+                history.replaceState(null, '', 'explore.html?type=tasks');
+            }
+        }
+
+        function setTaskCategory(cat) {
+            currentTaskFilter = cat;
+            document.querySelectorAll('#viewTasksSection .filter-chip').forEach(btn => {
+                if (btn.getAttribute('data-cat') === cat) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            filterTasks();
+        }
+
+        function setSpaceCategory(cat) {
+            currentSpaceFilter = cat;
+            document.querySelectorAll('#viewSpacesSection .filter-chip').forEach(btn => {
+                if (btn.getAttribute('data-sp-cat') === cat) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            filterSpaces();
+        }
+
+        function resetTaskFilters() {
+            document.getElementById('taskSearchInput').value = '';
+            setTaskCategory('all');
+        }
+
+        function resetSpaceFilters() {
+            document.getElementById('spaceSearchInput').value = '';
+            setSpaceCategory('all');
+        }
+
+        // Render Open Tasks
+        function renderTasksList() {
+            const tasks = AppStore.getTasks() || [];
+            const openTasks = tasks.filter(t => t.status !== 'Task Completed' && t.status !== 'Request Cancelled');
+            document.getElementById('tabCountTasks').textContent = openTasks.length;
+            filterTasks();
+        }
+
+        function filterTasks() {
+            const container = document.getElementById('tasksListGrid');
+            const emptyBox = document.getElementById('tasksEmptyState');
+            const tasks = AppStore.getTasks() || [];
+            const query = (document.getElementById('taskSearchInput').value || '').toLowerCase().trim();
+            const sortMode = document.getElementById('taskSortSelect').value;
+
+            // Check current active role
+            const currentRole = localStorage.getItem('reach_auth_role') || 'member';
+            const currentUser = (window.AuthSession && typeof AuthSession.getCurrentUser === 'function') 
+                ? AuthSession.getCurrentUser() 
+                : null;
+            const isVolunteer = currentRole === 'volunteer';
+
+            let filtered = tasks.filter(t => {
+                if (!query && (t.status === 'Task Completed' || t.status === 'Request Cancelled')) return false;
+
+                if (currentTaskFilter === 'urgent-only') {
+                    if (!((t.urgency || '').toLowerCase().includes('urgent'))) return false;
+                } else if (currentTaskFilter !== 'all') {
+                    if (t.category !== currentTaskFilter) return false;
+                }
+
+                if (query) {
+                    const haystack = `${t.title} ${t.category} ${t.requester} ${t.location} ${t.notes}`.toLowerCase();
+                    if (!haystack.includes(query)) return false;
+                }
+                return true;
+            });
+
+            if (sortMode === 'urgent') {
+                filtered.sort((a, b) => {
+                    const aUrg = (a.urgency || '').toLowerCase().includes('urgent') ? 1 : 0;
+                    const bUrg = (b.urgency || '').toLowerCase().includes('urgent') ? 1 : 0;
+                    return bUrg - aUrg;
+                });
+            } else if (sortMode === 'nearest') {
+                filtered.sort((a, b) => (a.location || '').localeCompare(b.location || ''));
+            }
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyBox.style.display = 'block';
+                return;
+            }
+
+            emptyBox.style.display = 'none';
+
+            container.innerHTML = filtered.map(t => {
+                const isUrgent = (t.urgency || '').toLowerCase().includes('urgent');
+                const isWaiting = t.status === 'Waiting for Volunteer' || !t.assignedVolunteer;
+                const isDone = t.status === 'Task Completed';
+                const isMyTask = currentUser && (t.requester === currentUser.name || t.requesterPhone === currentUser.phone);
+
+                return `
+                    <div class="task-item-card">
+                        <div>
+                            <div class="task-card-header">
+                                <span class="task-cat-badge">
+                                    ${getCategoryIcon(t.category)} ${t.category}
+                                </span>
+                                <span class="badge ${isWaiting ? 'badge-pending' : (isDone ? 'badge-success' : 'badge-primary')}" style="font-size: 0.78rem;">
+                                    ${isWaiting ? 'Waiting for Volunteer' : (isDone ? 'Completed' : 'Volunteer Assigned')}
+                                </span>
+                            </div>
+
+                            <h3 class="task-title">${t.title}</h3>
+                            <p class="task-notes-desc">${t.notes || 'Standard neighborhood assistance.'}</p>
+
+                            <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 12px; line-height: 1.45;">
+                                <div>👤 Requester: <strong style="color: #0F172A;">${t.requester}</strong></div>
+                                <div>📍 Location: ${t.location} • ⏰ ${t.time}</div>
+                            </div>
+                        </div>
+
+                        <div class="task-action-row">
+                            ${isVolunteer ? `
+                                ${isWaiting ? `
+                                    <button class="btn btn-accent" onclick="handleDirectAccept('${t.id}')" style="flex: 1; padding: 8px 12px; font-weight: 700; font-size: 0.88rem;">
+                                        ✓ Accept Task
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="openTaskModal('${t.id}')" style="padding: 8px 12px; font-size: 0.88rem;">
+                                        👁️ Details
+                                    </button>
+                                ` : `
+                                    <a href="confirmation.html?id=${t.id}" class="btn btn-secondary" style="flex: 1; text-align: center; padding: 8px 12px; font-size: 0.88rem;">
+                                        📍 Open Tracker →
+                                    </a>
+                                `}
+                            ` : `
+                                ${isMyTask ? `
+                                    <a href="confirmation.html?id=${t.id}" class="btn btn-primary" style="flex: 1; text-align: center; padding: 8px 12px; font-size: 0.88rem;">
+                                        📍 Track My Errand →
+                                    </a>
+                                    <button class="btn btn-secondary" onclick="openTaskModal('${t.id}')" style="padding: 8px 12px; font-size: 0.88rem;">
+                                        👁️ Details
+                                    </button>
+                                ` : `
+                                    <button class="btn btn-secondary" onclick="openTaskModal('${t.id}')" style="flex: 1; padding: 8px 12px; font-size: 0.88rem;">
+                                        👁️ View Errand Details
+                                    </button>
+                                `}
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getCategoryIcon(cat) {
+            if (!cat) return '🛒';
+            if (cat.includes('Medicine')) return '💊';
+            if (cat.includes('Groceries')) return '🛒';
+            if (cat.includes('Clinic')) return '🩺';
+            if (cat.includes('Tutoring')) return '📚';
+            return '🤝';
+        }
+
+        // Render Spaces List
+        function renderSpacesList() {
+            const container = document.getElementById('spacesListGrid');
+            const spaces = AppStore.getSpaces() || [];
+            document.getElementById('tabCountSpaces').textContent = spaces.length;
+
+            filterSpaces();
+        }
+
+        function filterSpaces() {
+            const container = document.getElementById('spacesListGrid');
+            const emptyBox = document.getElementById('spacesEmptyState');
+            const spaces = AppStore.getSpaces() || [];
+            const query = (document.getElementById('spaceSearchInput').value || '').toLowerCase().trim();
+
+            let filtered = spaces.filter(s => {
+                if (currentSpaceFilter === 'free') {
+                    if (!(s.pricing || '').toLowerCase().includes('free')) return false;
+                } else if (currentSpaceFilter === 'hall') {
+                    if (!(s.name || '').toLowerCase().includes('hall')) return false;
+                } else if (currentSpaceFilter === 'clubhouse') {
+                    if (!(s.name || '').toLowerCase().includes('clubhouse')) return false;
+                }
+
+                if (query) {
+                    const haystack = `${s.name} ${s.location} ${s.pricing}`.toLowerCase();
+                    if (!haystack.includes(query)) return false;
+                }
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = '';
+                emptyBox.style.display = 'block';
+                return;
+            }
+
+            emptyBox.style.display = 'none';
+
+            container.innerHTML = filtered.map(s => {
+                return `
+                    <div class="space-item-card">
+                        <div>
+                            <div class="space-card-hero">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <span style="font-size: 1.6rem;">🏛️</span>
+                                    <span style="background: rgba(15, 23, 42, 0.7); color: white; padding: 3px 8px; border-radius: 12px; font-size: 0.78rem;">
+                                        👥 Capacity: ${s.capacity}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; color: #FFFFFF;">${s.name}</h3>
+                                    <span style="font-size: 0.82rem; color: #E0F2FE;">📍 ${s.location}</span>
+                                </div>
+                            </div>
+
+                            <div class="space-card-body">
+                                <div>
+                                    <div style="font-size: 0.88rem; color: #0284C7; font-weight: 700; margin-bottom: 8px;">
+                                        💰 ${s.pricing}
+                                    </div>
+                                    <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
+                                        ${(s.facilities || []).slice(0, 3).map(f => `<span class="amenity-tag">✓ ${f}</span>`).join('')}
+                                    </div>
+                                </div>
+
+                                <div style="padding-top: 10px; border-top: 1px solid #F1F5F9;">
+                                    <a href="request.html?type=space&spaceId=${s.id}" class="btn btn-primary" style="width: 100%; text-align: center; font-size: 0.88rem; padding: 8px 12px;">
+                                        Reserve Venue →
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Direct Task Acceptance Flow (Volunteer Only)
+        function handleDirectAccept(taskId) {
+            const currentRole = localStorage.getItem('reach_auth_role') || 'member';
+            if (currentRole !== 'volunteer') {
+                alert('Only registered volunteers can accept tasks. Please switch to Volunteer mode.');
+                return;
+            }
+
+            const tasks = AppStore.getTasks();
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const user = AuthSession.getCurrentUser() || DEFAULT_PROFILES.volunteer;
+
+            task.status = 'Volunteer Assigned';
+            task.assignedVolunteer = {
+                name: user.name || 'Karan Verma',
+                phone: user.phone || '+91 98765 43211',
+                rating: user.rating || 4.9,
+                avatar: user.avatar || '🦸‍♂️'
+            };
+            task.etaMinutes = 12;
+
+            AppStore.saveTasks(tasks);
+
+            // Sync active mission
+            localStorage.setItem('reach_accepted_task_id', taskId);
+            localStorage.setItem('reach_active_volunteer_mission', JSON.stringify(task));
+
+            if ('BroadcastChannel' in window) {
+                const bc = new BroadcastChannel('reach_sync');
+                bc.postMessage({ type: 'TASK_ACCEPTED', taskId: taskId, volunteer: user.name });
+            }
+
+            alert(`Task ${taskId} Accepted!\nSenior resident ${task.requester} has been notified.`);
+            window.location.href = `confirmation.html?id=${taskId}`;
+        }
+
+        // Modal Handlers
+        function openTaskModal(taskId) {
+            selectedModalTaskId = taskId;
+            const tasks = AppStore.getTasks();
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+
+            const currentRole = localStorage.getItem('reach_auth_role') || 'member';
+            const isVolunteer = currentRole === 'volunteer';
+            const isWaiting = task.status === 'Waiting for Volunteer' || !task.assignedVolunteer;
+
+            document.getElementById('modalTaskTitle').innerHTML = `<span>${getCategoryIcon(task.category)}</span> <span>${task.title}</span>`;
+
+            document.getElementById('modalTaskBody').innerHTML = `
+                <div class="modal-detail-row">
+                    <strong>CATEGORY & URGENCY</strong>
+                    <span>${task.category} • ${task.urgency || 'Standard'}</span>
+                </div>
+                <div class="modal-detail-row">
+                    <strong>SENIOR RESIDENT</strong>
+                    <span>${task.requester}</span>
+                </div>
+                <div class="modal-detail-row">
+                    <strong>DELIVERY LOCATION</strong>
+                    <span>${task.location}</span>
+                </div>
+                <div class="modal-detail-row">
+                    <strong>TIME</strong>
+                    <span>${task.time}</span>
+                </div>
+                <div class="modal-detail-row">
+                    <strong>NOTES / INSTRUCTIONS</strong>
+                    <span style="font-weight: 400; color: #334155;">${task.notes || 'Standard errand'}</span>
+                </div>
+            `;
+
+            // ONLY show Accept button in modal if viewer is an active Volunteer
+            const btnAccept = document.getElementById('modalBtnAccept');
+            if (btnAccept) {
+                if (isVolunteer && isWaiting) {
+                    btnAccept.style.display = 'inline-block';
+                } else {
+                    btnAccept.style.display = 'none';
+                }
+            }
+
+            document.getElementById('taskDetailModal').classList.add('active');
+        }
+
+        function closeTaskModal() {
+            document.getElementById('taskDetailModal').classList.remove('active');
+            selectedModalTaskId = null;
+        }
+
+        function confirmModalAccept() {
+            if (selectedModalTaskId) {
+                const tid = selectedModalTaskId;
+                closeTaskModal();
+                handleDirectAccept(tid);
+            }
+        }
+    </script>
+</body>
+
+</html>

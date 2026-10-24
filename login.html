@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In & Register - Community Micro-Volunteering & Empty Space</title>
+    <!-- Base Styles and Portals Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/portals.css">
+    <style>
+        .auth-container {
+            max-width: 520px;
+            margin: 24px auto 48px auto;
+        }
+        .auth-toggle-group {
+            display: flex;
+            background: #E2E8F0;
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        .auth-toggle-btn {
+            flex: 1;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .auth-toggle-btn.active {
+            background: #FFFFFF;
+            color: var(--primary-color);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+        .otp-inputs-row {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 16px 0;
+        }
+        .otp-digit {
+            width: 48px;
+            height: 54px;
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: #FFFFFF;
+            color: var(--text-primary);
+        }
+        .otp-digit:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(13, 71, 161, 0.15);
+        }
+        .otp-status-banner {
+            display: none;
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            color: #166534;
+            padding: 12px 14px;
+            border-radius: 8px;
+            font-size: 0.92rem;
+            margin-bottom: 16px;
+            text-align: left;
+        }
+        .form-label {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 6px;
+            font-size: 0.95rem;
+            color: var(--text-primary);
+        }
+        .helper-text {
+            font-size: 0.82rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Accessibility, Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')" title="Smaller text">A-</button>
+            <button onclick="changeFontSize('normal')" title="Standard text">A</button>
+            <button onclick="changeFontSize('large')" title="Larger text for seniors">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">🏠 Home</a>
+            <a href="spaces.html">🏛️ Community Spaces</a>
+            <a href="login.html" class="active">🔑 Sign In / Register</a>
+            <a href="register.html">📝 Create Account</a>
+        </nav>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+
+        <div class="auth-container">
+            
+            <div style="text-align: center; margin-bottom: 24px;">
+                <h1 style="color: var(--primary-color); font-size: 1.9rem; margin-bottom: 8px;">
+                    Welcome to Community Micro-Volunteering & Empty Space
+                </h1>
+                <p style="color: var(--text-secondary); font-size: 1.05rem;">
+                    Sign in to your account or register as a new community member.
+                </p>
+            </div>
+
+            <!-- Tab Switcher: Sign In vs Register -->
+            <div class="auth-toggle-group">
+                <button id="toggleSignIn" class="auth-toggle-btn active" onclick="setAuthTab('signin')">
+                    🔑 Sign In
+                </button>
+                <button id="toggleRegister" class="auth-toggle-btn" onclick="setAuthTab('register')">
+                    📝 Register / Join Us
+                </button>
+            </div>
+
+            <!-- TAB 1: SIGN IN (Existing Members) -->
+            <div id="cardSignIn" class="card" style="padding: 28px;">
+                <form id="formSignIn" onsubmit="handleSignInSubmit(event)">
+                    
+                    <div style="margin-bottom: 18px;">
+                        <label class="form-label">Community Role:</label>
+                        <select id="loginRole" class="form-control" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem;">
+                            <option value="resident">👵 Senior Citizen / Resident</option>
+                            <option value="volunteer">🦸 Community Volunteer</option>
+                            <option value="owner">🏛️ Community Space Provider</option>
+                            <option value="ngo">🤝 NGO / Welfare Society</option>
+                            <option value="admin">🛡️ Platform Support & Safety</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 20px;">
+                        <label class="form-label">Registered Mobile Number:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="tel" id="inputPhone" class="form-control" placeholder="+91 98765 43210" value="+91 98765 43210" required style="flex: 1; padding: 12px 14px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem;">
+                            <button type="button" id="btnSendOtp" onclick="sendOtpCode()" class="btn btn-secondary" style="white-space: nowrap; padding: 12px 16px; font-size: 0.95rem;">
+                                Send OTP 📲
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Clean SMS Sent Confirmation Banner (NO OTP displayed on screen) -->
+                    <div id="otpSentBanner" class="otp-status-banner">
+                        <span>✓ A 6-digit verification code has been sent via SMS to your registered mobile number.</span>
+                    </div>
+
+                    <!-- OTP Input Box (Revealed cleanly when user clicks Send OTP) -->
+                    <div id="otpInputSection" style="display: none; margin-bottom: 24px; background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 10px; padding: 18px; text-align: center;">
+                        <label class="form-label" style="margin-bottom: 8px;">
+                            Enter 6-Digit Verification Code:
+                        </label>
+                        
+                        <!-- Blank 6-digit input boxes -->
+                        <div class="otp-inputs-row">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 1)" id="otp1" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 2)" id="otp2" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 3)" id="otp3" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 4)" id="otp4" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 5)" id="otp5" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 6)" id="otp6" autocomplete="off" inputmode="numeric">
+                        </div>
+
+                        <p class="helper-text">
+                            For evaluation testing, enter <strong>123456</strong> or any 6 digits to proceed.
+                        </p>
+
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; font-size: 0.85rem;">
+                            <span style="color: var(--text-secondary);">Didn't receive SMS?</span>
+                            <button type="button" onclick="sendOtpCode()" style="background: none; border: none; color: var(--primary-color); font-weight: 700; cursor: pointer;">Resend Code</button>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btnSignInSubmit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.05rem;" disabled>
+                        Verify & Sign In →
+                    </button>
+                </form>
+
+                <div style="text-align: center; margin-top: 20px; font-size: 0.95rem; color: var(--text-secondary);">
+                    Don't have an account yet? 
+                    <button onclick="setAuthTab('register')" style="background: none; border: none; color: var(--primary-color); font-weight: 700; cursor: pointer; text-decoration: underline;">
+                        Register / Join Reach
+                    </button>
+                </div>
+            </div>
+
+            <!-- TAB 2: REGISTER NEW ACCOUNT (First-time users can join directly) -->
+            <div id="cardRegister" class="card" style="padding: 28px; display: none;">
+                <form id="formRegister" onsubmit="handleRegisterSubmit(event)">
+                    
+                    <div style="margin-bottom: 16px;">
+                        <label class="form-label">I want to join as:</label>
+                        <select id="regRole" class="form-control" style="width: 100%; padding: 12px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem;">
+                            <option value="resident">👵 Senior Citizen / Resident (Request Help or Book Space)</option>
+                            <option value="volunteer">🦸 Community Volunteer (Help Neighbors)</option>
+                            <option value="owner">🏛️ Space Provider (Share Society Hall or Room)</option>
+                            <option value="ngo">🤝 NGO / Welfare Society (Organize Drives)</option>
+                        </select>
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <label class="form-label">Full Name:</label>
+                        <input type="text" id="regName" required placeholder="e.g. Ramesh Patel" class="form-control" style="width: 100%; padding: 12px 14px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem;">
+                    </div>
+
+                    <div style="margin-bottom: 16px;">
+                        <label class="form-label">Mobile Phone Number:</label>
+                        <div style="display: flex; gap: 8px;">
+                            <input type="tel" id="regPhone" required placeholder="+91 98200 12345" class="form-control" style="flex: 1; padding: 12px 14px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem;">
+                            <button type="button" id="btnSendRegOtp" onclick="sendRegOtpCode()" class="btn btn-secondary" style="white-space: nowrap; padding: 12px 16px; font-size: 0.95rem;">
+                                Send OTP 📲
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 18px;">
+                        <label class="form-label">Residential Address / Building Society:</label>
+                        <input type="text" id="regAddress" required placeholder="e.g. Flat 301, Gulmohar CHS, Sector 4" class="form-control" style="width: 100%; padding: 12px 14px; border: 2px solid var(--border-color); border-radius: 8px; font-size: 1rem;">
+                    </div>
+
+                    <!-- Aadhaar Identity Verification Section -->
+                    <div style="background: #F8FAFC; border: 1.5px solid #CBD5E1; border-radius: 8px; padding: 14px; margin-bottom: 18px;">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px;">
+                            <span style="font-size: 1.4rem;">🆔</span>
+                            <div>
+                                <strong style="color: #0F172A; font-size: 0.95rem;">Identity Verification (Aadhaar Card)</strong>
+                                <p style="margin: 0; font-size: 0.8rem; color: #64748B;">
+                                    Ensures safety of elders, volunteer background checks, and community security.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 10px;">
+                            <label class="form-label" style="font-size: 0.88rem;">12-Digit Aadhaar Card Number:</label>
+                            <input type="text" id="regAadhaarNumber" class="form-control" placeholder="e.g. 5421 8892 4103" maxlength="16" oninput="formatAadhaarNumber(this)" value="5421 8892 4103" required style="letter-spacing: 2px; font-weight: 600; width: 100%; padding: 10px 12px; border: 2px solid var(--border-color); border-radius: 8px;">
+                        </div>
+
+                        <div style="margin-bottom: 6px;">
+                            <label class="form-label" style="font-size: 0.88rem;">Upload Aadhaar Document Front (Photo/PDF):</label>
+                            <div onclick="document.getElementById('fileAadhaarLogin').click()" style="border: 1.5px dashed #94A3B8; background: #FFFFFF; border-radius: 6px; padding: 10px; text-align: center; cursor: pointer;">
+                                <input type="file" id="fileAadhaarLogin" style="display: none;" accept="image/*,.pdf" onchange="document.getElementById('lblDocNameLogin').textContent = this.files[0] ? this.files[0].name : 'aadhaar_card_doc.pdf'">
+                                <span style="font-size: 1.2rem;">📄</span>
+                                <span id="lblDocNameLogin" style="font-size: 0.86rem; color: #1E40AF; font-weight: 600; margin-left: 6px;">
+                                    aadhaar_card_doc.pdf (Pre-verified for demo)
+                                </span>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.78rem; color: #047857; margin-top: 6px;">
+                            🔒 Privacy Safeguard: Masked as XXXX-XXXX-4103 strictly for platform verification.
+                        </div>
+                    </div>
+
+                    <!-- Clean SMS Sent Confirmation Banner for Registration -->
+                    <div id="regOtpSentBanner" class="otp-status-banner">
+                        <span>✓ A 6-digit verification code has been sent via SMS to your mobile phone.</span>
+                    </div>
+
+                    <!-- Register OTP section (revealed when user clicks Send OTP) -->
+                    <div id="regOtpSection" style="display: none; margin-bottom: 20px; background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 10px; padding: 16px; text-align: center;">
+                        <label class="form-label" style="margin-bottom: 8px;">
+                            Enter 6-Digit Verification Code:
+                        </label>
+                        <div class="otp-inputs-row">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 7)" id="otp7" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 8)" id="otp8" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 9)" id="otp9" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 10)" id="otp10" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 11)" id="otp11" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-digit" oninput="focusNextDigit(this, 12)" id="otp12" autocomplete="off" inputmode="numeric">
+                        </div>
+                        <p class="helper-text">
+                            For evaluation testing, enter <strong>123456</strong> or any 6 digits to proceed.
+                        </p>
+                    </div>
+
+                    <button type="submit" id="btnRegisterSubmit" class="btn btn-primary" style="width: 100%; padding: 14px; font-size: 1.05rem;" disabled>
+                        Verify & Complete Registration ✓
+                    </button>
+                </form>
+
+                <div style="text-align: center; margin-top: 20px; font-size: 0.95rem; color: var(--text-secondary);">
+                    Already registered? 
+                    <button onclick="setAuthTab('signin')" style="background: none; border: none; color: var(--primary-color); font-weight: 700; cursor: pointer; text-decoration: underline;">
+                        Sign In here
+                    </button>
+                </div>
+            </div>
+
+
+
+        </div>
+
+    </main>
+
+    <!-- SOS Emergency Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Senior Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left;">
+                    👮 Call Local Society Security Guard (022-2500-1111)
+                </a>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project Footer -->
+    <footer class="main-footer" style="margin-top: 48px; background: #0F172A; color: #FFFFFF; padding: 24px 20px; text-align: center; border-top: 1px solid #1E293B;">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <!-- Shared Scripts -->
+    <script src="js/data.js"></script>
+    <script src="js/main.js"></script>
+
+    <script>
+        // Check for tab query parameter (?tab=register or ?tab=signin)
+        window.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const requestedTab = params.get('tab');
+            if (requestedTab === 'register') {
+                setAuthTab('register');
+            }
+        });
+
+        function setAuthTab(tab) {
+            const btnIn = document.getElementById('toggleSignIn');
+            const btnReg = document.getElementById('toggleRegister');
+            const cardIn = document.getElementById('cardSignIn');
+            const cardReg = document.getElementById('cardRegister');
+
+            if (tab === 'signin') {
+                btnIn.classList.add('active');
+                btnReg.classList.remove('active');
+                cardIn.style.display = 'block';
+                cardReg.style.display = 'none';
+            } else {
+                btnIn.classList.remove('active');
+                btnReg.classList.add('active');
+                cardIn.style.display = 'none';
+                cardReg.style.display = 'block';
+            }
+        }
+
+        // Send OTP for Sign In
+        function sendOtpCode() {
+            const phone = document.getElementById('inputPhone').value;
+            if (!phone || phone.trim().length < 8) {
+                alert('Please enter a valid mobile phone number.');
+                return;
+            }
+            
+            // Show realistic SMS sent banner (NO code shown in web UI!)
+            document.getElementById('otpSentBanner').style.display = 'block';
+            document.getElementById('otpInputSection').style.display = 'block';
+            document.getElementById('btnSignInSubmit').disabled = false;
+            
+            // Focus first digit box
+            setTimeout(() => {
+                const el = document.getElementById('otp1');
+                if (el) el.focus();
+            }, 100);
+        }
+
+        // Send OTP for Registration
+        function sendRegOtpCode() {
+            const phone = document.getElementById('regPhone').value;
+            if (!phone || phone.trim().length < 8) {
+                alert('Please enter a valid mobile number.');
+                return;
+            }
+
+            document.getElementById('regOtpSentBanner').style.display = 'block';
+            document.getElementById('regOtpSection').style.display = 'block';
+            document.getElementById('btnRegisterSubmit').disabled = false;
+
+            setTimeout(() => {
+                const el = document.getElementById('otp7');
+                if (el) el.focus();
+            }, 100);
+        }
+
+        // Auto-advance cursor to next digit box as user types
+        function focusNextDigit(el, idx) {
+            if (el.value.length === 1) {
+                let next = document.getElementById('otp' + (idx + 1));
+                if (next) next.focus();
+            }
+        }
+
+        function handleSignInSubmit(e) {
+            e.preventDefault();
+            const phone = document.getElementById('inputPhone').value;
+            const role = document.getElementById('loginRole').value;
+
+            // Gather entered OTP
+            const entered = [1,2,3,4,5,6].map(i => document.getElementById('otp' + i).value).join('');
+            if (entered.length < 6) {
+                alert('Please enter the 6-digit verification code sent to your mobile (or test code 123456).');
+                return;
+            }
+
+            if (window.ReachData) {
+                ReachData.loginUser(phone, role);
+            }
+
+            redirectToUserArea(role);
+        }
+
+        function handleRegisterSubmit(e) {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const phone = document.getElementById('regPhone').value;
+            const role = document.getElementById('regRole').value;
+            const address = document.getElementById('regAddress').value;
+
+            const entered = [7,8,9,10,11,12].map(i => document.getElementById('otp' + i).value).join('');
+            if (entered.length < 6) {
+                alert('Please enter the 6-digit verification code sent via SMS (or test code 123456).');
+                return;
+            }
+
+            const aadhaarNumber = document.getElementById('regAadhaarNumber')?.value || '5421 8892 4103';
+
+            if (window.ReachData) {
+                ReachData.registerUser({
+                    name,
+                    phone,
+                    role,
+                    address,
+                    idType: 'Aadhaar Card',
+                    aadhaarNumber: aadhaarNumber
+                });
+            }
+
+            if (window.AuthSession && typeof AuthSession.register === 'function') {
+                AuthSession.register({
+                    name,
+                    phone,
+                    role,
+                    area: address,
+                    idType: 'Aadhaar Card',
+                    aadhaarNumber: aadhaarNumber
+                });
+            }
+
+            alert(`Registration successful with Aadhaar Verification! Welcome, ${name}.`);
+            redirectToUserArea(role);
+        }
+
+        function formatAadhaarNumber(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length > 12) val = val.slice(0, 12);
+            const parts = [];
+            for (let i = 0; i < val.length; i += 4) {
+                parts.push(val.slice(i, i + 4));
+            }
+            input.value = parts.join(' ');
+        }
+
+        function quickSelectDemo(roleKey) {
+            if (window.ReachData) {
+                ReachData.setCurrentUserRole(roleKey);
+            }
+            redirectToUserArea(roleKey);
+        }
+
+        function redirectToUserArea(roleKey) {
+            const role = roleKey === 'resident' ? 'member' : (roleKey === 'ngo' ? 'organizer' : roleKey);
+            localStorage.setItem('reach_auth_active', 'true');
+            localStorage.setItem('reach_auth_role', role);
+            window.location.href = 'dashboard.html?role=' + role;
+        }
+    </script>
+</body>
+</html>

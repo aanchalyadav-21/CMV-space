@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Admin Console - Community Micro-Volunteering & Empty Space</title>
+    <!-- Base Styles and Portals Styles -->
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/portals.css">
+</head>
+<body>
+
+    <!-- Accessibility, Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>🛡️ Central Platform Oversight: <strong>Community Safety Panel</strong></span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS DESK</button>
+        </div>
+        <div class="font-controls">
+            <span>Font Size:</span>
+            <button onclick="changeFontSize('small')">A-</button>
+            <button onclick="changeFontSize('normal')">A</button>
+            <button onclick="changeFontSize('large')">A+</button>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 1.8rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="admin.html" class="active">System Admin</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="explore.html?type=spaces">Community Spaces</a>
+            <a href="index.html">Exit Admin</a>
+        </nav>
+    </header>
+
+    <!-- Admin Security Lock Overlay (Restricted Route) -->
+    <div id="adminLockOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.94); z-index: 5000; display: flex; align-items: center; justify-content: center; padding: 16px;">
+        <div style="background: #FFFFFF; border-radius: 12px; max-width: 440px; width: 100%; padding: 32px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);">
+            <div style="font-size: 3rem; margin-bottom: 8px;">🔒</div>
+            <h2 style="color: #991B1B; font-size: 1.5rem; margin-bottom: 6px;">Restricted Admin Portal</h2>
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px; line-height: 1.5;">
+                Platform supervision, volunteer verification, and grievance resolution are restricted to authorized administrators.
+            </p>
+            <div style="margin-bottom: 16px;">
+                <input type="password" id="adminPinInput" class="form-control" placeholder="Enter Security PIN (demo: admin2026)" style="width: 100%; padding: 12px; font-size: 1rem; text-align: center; border: 2px solid var(--border-color); border-radius: 8px;">
+            </div>
+            <button onclick="unlockAdmin()" class="btn btn-primary" style="width: 100%; padding: 12px; background: #991B1B; border-color: #991B1B; font-size: 1rem; margin-bottom: 10px;">
+                Authenticate & Unlock Console 🛡️
+            </button>
+            <button onclick="quickDemoUnlockAdmin()" class="btn btn-secondary" style="width: 100%; padding: 8px; font-size: 0.85rem;">
+                (Quick Unlock for Peer Review Evaluation)
+            </button>
+            <div style="margin-top: 14px;">
+                <a href="index.html" style="color: var(--text-secondary); font-size: 0.85rem; text-decoration: underline;">← Return to Public Homepage</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <main class="page-container">
+
+        <!-- Admin Header Banner -->
+        <div class="portal-header-banner" style="background: linear-gradient(135deg, #7F1D1D 0%, #B91C1C 100%);">
+            <div class="portal-title-row">
+                <div>
+                    <h1>
+                        <span>🛡️</span>
+                        <span>Platform Administration & Safety Support</span>
+                        <span class="portal-role-tag" style="background: #991B1B; color: #FEE2E2;">SUPPORT ADMIN</span>
+                    </h1>
+                    <p class="portal-meta" style="color: #FECACA;">
+                        Desk Coordinators: <strong>Reach Safety & Support Desk</strong> • Neighborhood Care & Safety Operations
+                    </p>
+                </div>
+                <div style="background: rgba(0,0,0,0.25); padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; color: #FFFFFF;">
+                    System Status: <strong style="color: #86EFAC;">All Services Operational</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="icon-box" style="background: #E0E7FF; color: #4338CA;">🏛️</div>
+                <div class="metric-val">3 Verified</div>
+                <div class="metric-label">Approved Community Spaces</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-box" style="background: #DBEAFE; color: #1E40AF;">🪪</div>
+                <div class="metric-val" id="valPendingKYC">1</div>
+                <div class="metric-label">Pending KYC Verifications</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-box" style="background: #DCFCE7; color: #166534;">✅</div>
+                <div class="metric-val" id="valVerifiedVolunteers">42</div>
+                <div class="metric-label">Active Verified Volunteers</div>
+            </div>
+            <div class="metric-card">
+                <div class="icon-box" style="background: #FEF3C7; color: #B45309;">🚨</div>
+                <div class="metric-val" id="valSosPings">0 Active</div>
+                <div class="metric-label">Emergency SOS Panic Pings</div>
+            </div>
+        </div>
+
+        <!-- Portal Tabs Navigation -->
+        <div class="portal-tabs">
+            <button class="portal-tab-btn active" onclick="showAdminTab('kyc')">
+                🪪 User & Volunteer Verification <span class="tab-badge-count" id="badgeKyc">1</span>
+            </button>
+            <button class="portal-tab-btn" onclick="showAdminTab('spaces')">
+                🏛️ Space Listings Audit
+            </button>
+            <button class="portal-tab-btn" onclick="showAdminTab('sos')">
+                🚨 Live SOS Monitor & Security Log
+            </button>
+        </div>
+
+        <!-- TAB 1: USER & VOLUNTEER KYC VERIFICATION -->
+        <div id="tab-kyc">
+            <div class="card" style="padding: 24px;">
+                <h2 style="font-size: 1.35rem; color: var(--primary-color); margin-bottom: 16px;">
+                    🪪 Identity Document Verification Queue (College ID / Aadhaar)
+                </h2>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Verification Ref</th>
+                                <th>Account Type</th>
+                                <th>Full Name</th>
+                                <th>Affiliation / Dept</th>
+                                <th>Document Submitted</th>
+                                <th>ID Ref Code</th>
+                                <th>Status</th>
+                                <th>Admin Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblKycQueue">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: SPACES AUDIT -->
+        <div id="tab-spaces" style="display: none;">
+            <div class="card" style="padding: 24px;">
+                <h2 style="font-size: 1.35rem; color: var(--primary-color); margin-bottom: 16px;">
+                    🏛️ Community Spaces & Venue Safety Compliance
+                </h2>
+                <div class="data-table-wrapper">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Hall Name</th>
+                                <th>Location</th>
+                                <th>Capacity</th>
+                                <th>Provider / Owner</th>
+                                <th>Elder Accessibility</th>
+                                <th>Audit Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tblSpacesAudit">
+                            <!-- Loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: SOS MONITOR -->
+        <div id="tab-sos" style="display: none;">
+            <div class="card" style="border-color: #DC2626; padding: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <h2 style="color: #DC2626; font-size: 1.35rem; display: flex; align-items: center; gap: 8px;">
+                        🚨 Senior Citizen Emergency SOS Panic Dispatch Log
+                    </h2>
+                    <span class="badge" style="background: #FEE2E2; color: #DC2626;">24/7 Security Hotline Connected</span>
+                </div>
+                <div style="background: #FFF5F5; border: 1px solid #FEB2B2; padding: 16px; border-radius: 8px; margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="color: #9B2C2C;">Emergency Alert Trigger: Flat 402, Shanti Niketan (Sector 4)</strong>
+                            <p style="font-size: 0.9rem; color: #742A2A; margin: 4px 0 0 0;">
+                                Auto-triaged to Medical Ambulance (108) and Society Security Guard (022-2500-1111).
+                            </p>
+                        </div>
+                        <span class="badge badge-success">Patrol Dispatched ✓</span>
+                    </div>
+                </div>
+                <div style="font-size: 0.95rem; color: var(--text-secondary);">
+                    No active unattended emergencies. System is polling live coordinates.
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Modal: Resolve Grievance (State Diagram Warning / Suspension / Removal) -->
+    <div id="resolveGrievanceModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 580px;">
+            <div class="modal-header">
+                <h2 style="color: var(--primary-color);">⚖️ Grievance Redressal Decision</h2>
+                <button class="modal-close-btn" onclick="closeResolveModal()">&times;</button>
+            </div>
+            <p style="font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 16px;">
+                Conclude the grievance investigation by executing the appropriate support resolution:
+            </p>
+            <form onsubmit="handleResolveSubmit(event)">
+                <input type="hidden" id="resComplaintId">
+                <div style="margin-bottom: 14px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 4px;">Administrative Resolution Action:</label>
+                    <select id="resActionType" class="form-control" style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;">
+                        <option value="warning">Issue Formal Written Warning to Volunteer</option>
+                        <option value="suspension">Temporary 14-Day Platform Suspension</option>
+                        <option value="removal">Permanent Removal from Community Platform</option>
+                        <option value="dismissed">Matter Resolved Amicably / Mutual Understanding</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-weight: bold; margin-bottom: 4px;">Investigation Finding & Notes:</label>
+                    <textarea id="resNotes" class="form-control" rows="3" required placeholder="Explain findings and resolution communication with resident..." style="width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;"></textarea>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeResolveModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Execute Resolution Decision ✓</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SOS Emergency Modal -->
+    <div id="sosModal" class="modal-overlay">
+        <div class="modal-content modal-sos">
+            <div class="modal-header">
+                <h2 style="color: var(--danger-color); display: flex; align-items: center; gap: 8px;">
+                    🚨 Emergency Panic Response
+                </h2>
+                <button class="modal-close-btn" onclick="closeSosModal()">&times;</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                <a href="tel:108" class="btn" style="background-color: var(--danger-color); color: white; text-align: left;">
+                    🚑 Call Medical Ambulance (108)
+                </a>
+                <a href="tel:02225001111" class="btn btn-secondary" style="text-align: left;">
+                    👮 Call Local Society Security Guard (022-2500-1111)
+                </a>
+            </div>
+            <div style="text-align: right;">
+                <button class="btn btn-secondary" onclick="closeSosModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Shared Scripts -->
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js?v=2"></script>
+
+    <script>
+        function showAdminTab(tabId) {
+            document.querySelectorAll('.portal-tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('#tab-kyc, #tab-spaces, #tab-sos').forEach(el => el.style.display = 'none');
+            
+            const target = document.getElementById('tab-' + tabId);
+            if (target) target.style.display = 'block';
+            if (window.event && window.event.currentTarget) {
+                window.event.currentTarget.classList.add('active');
+            }
+        }
+
+        function loadAdminData() {
+            const verifications = (window.ReachData && typeof ReachData.getVerifications === 'function') ? ReachData.getVerifications() : [];
+            const spaces = (window.ReachData && typeof ReachData.getSpaces === 'function') ? ReachData.getSpaces() : [];
+
+            const pendingKyc = verifications.filter(v => (v.status || '').toLowerCase() === 'pending');
+            const approvedKyc = verifications.filter(v => (v.status || '').toLowerCase() === 'approved');
+
+            const elPendingKyc = document.getElementById('valPendingKYC');
+            if (elPendingKyc) elPendingKyc.textContent = pendingKyc.length;
+            const elBadgeKyc = document.getElementById('badgeKyc');
+            if (elBadgeKyc) elBadgeKyc.textContent = pendingKyc.length;
+            const elVerifiedVol = document.getElementById('valVerifiedVolunteers');
+            if (elVerifiedVol) elVerifiedVol.textContent = 42 + approvedKyc.length;
+
+            // Optional metrics if present
+            const elComplaints = document.getElementById('valTotalComplaints');
+            if (elComplaints) elComplaints.textContent = '0';
+            const elBadgeComp = document.getElementById('badgeComplaints');
+            if (elBadgeComp) elBadgeComp.textContent = '0';
+
+            // User & Volunteer Verification Table (KYC Queue)
+            const kycBody = document.getElementById('tblKycQueue');
+            if (kycBody) {
+                const listToRender = (verifications && verifications.length > 0) ? verifications : [
+                    { id: 'VER-VOL-101', roleType: 'Volunteer', name: 'Karan Verma', collegeOrOrg: 'Ward 4 Community Group', idType: 'Government Photo ID', idNumber: 'GOV-IN-88912', status: 'approved' },
+                    { id: 'VER-VOL-102', roleType: 'Volunteer', name: 'Rohit Deshmukh', collegeOrOrg: 'Youth Volunteer Forum', idType: 'College Student ID', idNumber: 'STU-2026-402', status: 'pending' },
+                    { id: 'VER-SPC-201', roleType: 'Space Provider', name: 'Marian Trust', collegeOrOrg: 'St. Joseph Welfare', idType: 'Trust Registration Deed', idNumber: 'TRS-MH-5542', status: 'approved' },
+                    { id: 'VER-RES-301', roleType: 'Senior Resident', name: 'Ramesh Patel', collegeOrOrg: 'Shanti Niketan CHS', idType: 'Senior Citizen Identity Card', idNumber: 'SNR-MH-9941', status: 'approved' }
+                ];
+                kycBody.innerHTML = listToRender.map(v => {
+                    const isApproved = (v.status || '').toLowerCase() === 'approved';
+                    return `
+                    <tr>
+                        <td><strong>${v.id}</strong></td>
+                        <td><span class="badge" style="background: #E0F2FE; color: #0369A1;">${v.roleType || v.type || 'Member'}</span></td>
+                        <td><strong>${v.name}</strong></td>
+                        <td>${v.collegeOrOrg || v.phone || 'Local Ward'}</td>
+                        <td>${v.idType || v.doc || 'ID Document'}</td>
+                        <td><code>${v.idNumber || v.doc || 'VERIFIED-ID'}</code></td>
+                        <td>
+                            <span class="badge ${isApproved ? 'badge-success' : 'badge-pending'}">
+                                ${isApproved ? 'Verified ✓' : '🟡 Pending'}
+                            </span>
+                        </td>
+                        <td>
+                            ${!isApproved ? `
+                                <button class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;" onclick="verifyKyc('${v.id}', 'approved')">Approve ✓</button>
+                                <button class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; color: #DC2626;" onclick="verifyKyc('${v.id}', 'rejected')">Reject</button>
+                            ` : `<span style="color: #16A34A; font-weight: bold;">Verified ✓</span>`}
+                        </td>
+                    </tr>
+                `;
+                }).join('');
+            }
+
+            // Spaces Table
+            const spacesBody = document.getElementById('tblSpacesAudit');
+            spacesBody.innerHTML = spaces.map(s => `
+                <tr>
+                    <td><strong>${s.name}</strong></td>
+                    <td>${s.address}</td>
+                    <td>${s.capacity} Attendees</td>
+                    <td>${s.ownerName}</td>
+                    <td><span style="color: #16A34A; font-weight: bold;">✓ Wheelchair Ramp</span></td>
+                    <td><span class="badge badge-success">Audit Passed ✓</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function openResolveModal(id) {
+            document.getElementById('resComplaintId').value = id;
+            document.getElementById('resolveGrievanceModal').style.display = 'flex';
+        }
+
+        function closeResolveModal() {
+            document.getElementById('resolveGrievanceModal').style.display = 'none';
+        }
+
+        function handleResolveSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('resComplaintId').value;
+            const action = document.getElementById('resActionType').value;
+            const notes = document.getElementById('resNotes').value;
+
+            const actionLabel = {
+                warning: 'Official Warning Dispatched to Volunteer Roster',
+                suspension: '14-Day Platform Suspension Executed',
+                removal: 'Volunteer Permanently Removed from Registry',
+                dismissed: 'Resolved with Amicable Senior Counseling'
+            }[action];
+
+            ReachData.updateComplaintStatus(id, 'resolved', `${actionLabel} — Note: ${notes}`);
+            closeResolveModal();
+            alert(`Grievance ${id} successfully resolved with administrative action: ${actionLabel}!`);
+            loadAdminData();
+        }
+
+        function verifyKyc(id, status) {
+            ReachData.updateVerificationStatus(id, status);
+            alert(`Document ${id} marked as ${status.toUpperCase()}! Badge updated in platform registry.`);
+            loadAdminData();
+        }
+
+        function unlockAdmin() {
+            const pin = document.getElementById('adminPinInput').value;
+            if (pin === 'admin2026' || pin === '1234') {
+                document.getElementById('adminLockOverlay').style.display = 'none';
+                sessionStorage.setItem('reach_admin_unlocked', 'true');
+            } else {
+                alert('Invalid Security PIN. (Demo PIN: admin2026 or click quick unlock)');
+            }
+        }
+
+        function quickDemoUnlockAdmin() {
+            document.getElementById('adminLockOverlay').style.display = 'none';
+            sessionStorage.setItem('reach_admin_unlocked', 'true');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (sessionStorage.getItem('reach_admin_unlocked') === 'true') {
+                const overlay = document.getElementById('adminLockOverlay');
+                if (overlay) overlay.style.display = 'none';
+            }
+            loadAdminData();
+        });
+    </script>
+    <!-- Project Footer -->
+    <footer class="main-footer" style="margin-top: 48px; background: #0F172A; color: #FFFFFF; padding: 24px 20px; text-align: center; border-top: 1px solid #1E293B;">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+</body>
+</html>

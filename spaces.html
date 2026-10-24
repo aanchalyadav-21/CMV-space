@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Find Community Spaces & Venues - Community Micro-Volunteering & Empty Space</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .filter-toolbar {
+            background: #FFFFFF;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            padding: 18px 24px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .space-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 22px;
+        }
+
+        .space-card {
+            background: #FFFFFF;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .space-card:hover {
+            border-color: #0284C7;
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .space-photo-placeholder {
+            height: 160px;
+            background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%);
+            color: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 16px;
+            text-align: center;
+        }
+
+        .space-badge-capacity {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(15, 23, 42, 0.85);
+            color: #FFFFFF;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .space-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .amenity-chip {
+            background: #F0FDF4;
+            color: #166534;
+            border: 1px solid #BBF7D0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Helpline & SOS Bar -->
+    <div class="top-bar">
+        <div class="top-bar-left">
+            <span>📞 Senior Citizen Helpline: <strong>1800-200-4567</strong> (Toll-Free)</span>
+            <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
+        </div>
+        <div class="top-bar-right">
+            <div class="font-controls">
+                <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
+                <button onclick="changeFontSize('small')">A-</button>
+                <button onclick="changeFontSize('normal')">A</button>
+                <button onclick="changeFontSize('large')">A+</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Navigation -->
+    <header class="main-header">
+        <a href="index.html" class="logo">
+            <span style="font-size: 2rem;">🤝</span>
+            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+        </a>
+        <nav class="main-nav">
+            <a href="index.html">Home</a>
+            <a href="dashboard.html">My Dashboard</a>
+            <a href="explore.html?type=tasks">Browse Tasks</a>
+            <a href="spaces.html" class="active">Community Spaces</a>
+            <a href="help.html">Help & FAQ</a>
+        </nav>
+    </header>
+
+    <main class="page-container">
+
+        <!-- Return / Breadcrumbs -->
+        <a href="dashboard.html" class="btn-back">
+            ← Return to Dashboard
+        </a>
+
+        <!-- Page Heading -->
+        <div style="margin-bottom: 24px;">
+            <div class="neighborhood-badge">
+                <span>🏛️</span>
+                <span>Community Space Sharing Service</span>
+            </div>
+            <h1 style="color: var(--primary-dark); font-size: 1.85rem; margin: 8px 0 4px 0;">
+                Find & Reserve Community Spaces
+            </h1>
+            <p style="color: var(--text-muted); font-size: 1rem;">
+                Browse society clubhouses, parish halls, and learning centers for yoga, wellness camps, tutoring, and community meetings.
+            </p>
+        </div>
+
+        <!-- Filter & Search Toolbar -->
+        <div class="filter-toolbar">
+            <div style="flex: 1; min-width: 260px;">
+                <input type="text" id="searchInput" oninput="filterSpaces()" class="form-control" placeholder="🔍 Search spaces by name, hall, or facility..." style="width: 100%;">
+            </div>
+            <div class="filter-controls">
+                <select id="capacityFilter" onchange="filterSpaces()" class="form-control" style="width: auto;">
+                    <option value="all">👥 Any Capacity</option>
+                    <option value="small">Small (Up to 35)</option>
+                    <option value="large">Large (50+ Attendees)</option>
+                </select>
+
+                <select id="pricingFilter" onchange="filterSpaces()" class="form-control" style="width: auto;">
+                    <option value="all">💰 All Pricing Options</option>
+                    <option value="free">Free / Community Sessions</option>
+                </select>
+
+                <button class="btn btn-secondary" onclick="resetFilters()">Reset 🔄</button>
+            </div>
+        </div>
+
+        <!-- Spaces Grid -->
+        <div class="space-grid" id="spacesGridContainer">
+            <!-- Rendered by JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- Space Booking Modal -->
+    <div id="bookingModal" class="modal-overlay">
+        <div class="modal-content" style="max-width: 580px;">
+            <div class="modal-header">
+                <div>
+                    <h2 id="modalSpaceName" style="color: #0369A1; font-size: 1.35rem; margin-bottom: 2px;">
+                        Book Space
+                    </h2>
+                    <span id="modalSpaceOwner" style="font-size: 0.85rem; color: var(--text-muted);">
+                        Owner: Marian Welfare Trust
+                    </span>
+                </div>
+                <button class="modal-close-btn" onclick="closeBookingModal()">&times;</button>
+            </div>
+
+            <form onsubmit="handleBookingSubmit(event)">
+                <input type="hidden" id="modalSpaceId">
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label">Event / Activity Purpose:</label>
+                    <input type="text" id="bookPurpose" class="form-control" placeholder="e.g. Senior Citizen Morning Yoga & Wellness Circle" value="Senior Citizen Morning Yoga & Wellness Circle" required>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                    <div class="form-group">
+                        <label class="form-label">Booking Date:</label>
+                        <input type="text" id="bookDate" class="form-control" value="Sunday, 29 Oct 2026" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Time Slot:</label>
+                        <select id="bookTime" class="form-control">
+                            <option value="Morning (7:30 AM - 10:30 AM)">Morning (7:30 AM - 10:30 AM)</option>
+                            <option value="Afternoon (11:00 AM - 2:00 PM)">Afternoon (11:00 AM - 2:00 PM)</option>
+                            <option value="Evening (4:00 PM - 7:30 PM)">Evening (4:00 PM - 7:30 PM)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 14px;">
+                    <label class="form-label">Expected Number of Guests:</label>
+                    <input type="number" id="bookAttendees" class="form-control" value="25" min="2" max="150" required>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 18px;">
+                    <label class="form-label">Special Equipment or Notes for Owner:</label>
+                    <textarea id="bookNotes" class="form-control" rows="2" placeholder="e.g. Will require mic and sound system for soft meditation music.">Will require mic and sound system for soft meditation music.</textarea>
+                </div>
+
+                <div style="background: #F0FDF4; border: 1px solid #86EFAC; padding: 12px; border-radius: 6px; font-size: 0.88rem; color: #166534; margin-bottom: 18px;">
+                    ✓ <strong>Approval Lifecycle:</strong> Upon submission, request enters <em>Pending Owner Approval</em>. Once approved, an official digital QR pass is generated for door entry.
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeBookingModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="background: #0284C7; border-color: #0369A1;">
+                        Submit Booking Request →
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Project Footer -->
+    <footer class="main-footer">
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
+            Community Micro-Volunteering & Empty Space
+        </p>
+        <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
+            Connecting People, Helping Communities · Neighborhood Care Network
+        </p>
+    </footer>
+
+    <script src="script.js"></script>
+    <script src="js/data.js"></script>
+    <script src="js/main.js?v=2"></script>
+    <script>
+        let allSpaces = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            allSpaces = AppStore.getSpaces();
+            renderSpaces(allSpaces);
+        });
+
+        function renderSpaces(list) {
+            const container = document.getElementById('spacesGridContainer');
+            if (list.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; background: #FFF; border-radius: 12px; border: 1px solid var(--border);">
+                        <p style="font-size: 1.1rem; color: var(--text-muted);">No community venues matched your filter criteria.</p>
+                        <button onclick="resetFilters()" class="btn btn-secondary" style="margin-top: 10px;">Reset Filters</button>
+                    </div>
+                `;
+                return;
+            }
+
+            let html = '';
+            list.forEach(s => {
+                const amenitiesHtml = (s.facilities || []).map(f => `<span class="amenity-chip">✓ ${f}</span>`).join(' ');
+                html += `
+                    <div class="space-card">
+                        <div class="space-photo-placeholder">
+                            <span style="font-size: 2.8rem; margin-bottom: 4px;">🏛️</span>
+                            <span style="font-size: 0.95rem; font-weight: bold;">Verified Community Venue</span>
+                            <span class="space-badge-capacity">👥 Capacity: ${s.capacity}</span>
+                        </div>
+                        <div class="space-body">
+                            <div>
+                                <h3 style="color: #0369A1; font-size: 1.25rem; margin-bottom: 4px;">
+                                    ${s.name}
+                                </h3>
+                                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 8px;">
+                                    📍 ${s.location} • 👤 Provider: <strong>${s.owner}</strong>
+                                </p>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0;">
+                                    ${amenitiesHtml}
+                                </div>
+                                <p style="font-size: 0.85rem; color: var(--text-main); margin-top: 6px; line-height: 1.4;">
+                                    📋 <em>Rules:</em> ${s.rules || 'Community venue. Clean after use.'}
+                                </p>
+                            </div>
+                            <div style="margin-top: 18px; padding-top: 12px; border-top: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                                <div>
+                                    <span style="display: block; font-size: 0.75rem; color: var(--text-muted);">PRICING:</span>
+                                    <strong style="color: #166534; font-size: 0.92rem;">${s.pricing || 'Free / Community'}</strong>
+                                </div>
+                                <button onclick="openBookingModal('${s.id}')" class="btn btn-primary" style="padding: 8px 18px; font-size: 0.92rem; background: #0284C7; border-color: #0369A1;">
+                                    Request Booking 📅
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        function filterSpaces() {
+            const query = (document.getElementById('searchInput').value || '').toLowerCase();
+            const cap = document.getElementById('capacityFilter').value;
+            const price = document.getElementById('pricingFilter').value;
+
+            const filtered = allSpaces.filter(s => {
+                const matchQuery = s.name.toLowerCase().includes(query) ||
+                                   s.location.toLowerCase().includes(query) ||
+                                   (s.facilities || []).some(f => f.toLowerCase().includes(query));
+                
+                let matchCap = true;
+                if (cap === 'small') matchCap = s.capacity <= 35;
+                if (cap === 'large') matchCap = s.capacity >= 50;
+
+                let matchPrice = true;
+                if (price === 'free') matchPrice = (s.pricing || '').toLowerCase().includes('free');
+
+                return matchQuery && matchCap && matchPrice;
+            });
+
+            renderSpaces(filtered);
+        }
+
+        function resetFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('capacityFilter').value = 'all';
+            document.getElementById('pricingFilter').value = 'all';
+            renderSpaces(allSpaces);
+        }
+
+        function openBookingModal(spaceId) {
+            // STRICT AUTH CHECK: Guests cannot open booking modal!
+            if (!AuthSession.isLoggedIn()) {
+                AuthSession.showAuthModal({
+                    title: 'Sign In Required to Book Venue',
+                    message: 'You must be signed in with an active Resident or Organizer account to book community halls and activity spaces.',
+                    role: 'member',
+                    redirectUrl: 'spaces.html'
+                });
+                return;
+            }
+
+            const space = allSpaces.find(s => s.id === spaceId);
+            if (!space) return;
+
+            document.getElementById('modalSpaceId').value = space.id;
+            document.getElementById('modalSpaceName').textContent = space.name;
+            document.getElementById('modalSpaceOwner').textContent = 'Provider: ' + space.owner + ' • ' + space.location;
+            document.getElementById('bookingModal').style.display = 'flex';
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').style.display = 'none';
+        }
+
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+
+            // STRICT AUTH CHECK
+            if (!AuthSession.isLoggedIn()) {
+                closeBookingModal();
+                AuthSession.showAuthModal({
+                    title: 'Sign In Required to Book Venue',
+                    message: 'You must be signed in with an active account to submit a booking.',
+                    role: 'member',
+                    redirectUrl: 'spaces.html'
+                });
+                return;
+            }
+
+            const spaceId = document.getElementById('modalSpaceId').value;
+            const space = allSpaces.find(s => s.id === spaceId);
+            const user = AuthSession.getCurrentUser();
+
+            const bookings = AppStore.getBookings();
+            const newId = 'BKG-2026-' + Math.floor(100 + Math.random() * 900);
+
+            const newBooking = {
+                id: newId,
+                spaceId: space.id,
+                spaceName: space.name,
+                requester: user ? user.name : 'Resident Member',
+                requesterPhone: user ? user.phone : '+91 98765 43210',
+                purpose: document.getElementById('bookPurpose').value,
+                date: document.getElementById('bookDate').value,
+                time: document.getElementById('bookTime').value,
+                expectedGuests: parseInt(document.getElementById('bookAttendees').value) || 20,
+                notes: document.getElementById('bookNotes').value,
+                status: 'Pending Owner Approval',
+                qrPassId: 'PASS-' + newId,
+                createdAt: 'Just now'
+            };
+
+            bookings.unshift(newBooking);
+            AppStore.saveBookings(bookings);
+
+            localStorage.setItem('reach_last_confirmed', JSON.stringify({
+                id: newId,
+                type: 'space_booking',
+                title: space.name,
+                status: 'Pending Owner Approval'
+            }));
+
+            closeBookingModal();
+            alert(`Booking request submitted for ${space.name}!\nStatus: Pending Owner Approval.`);
+            window.location.href = 'confirmation.html?id=' + newId;
+        }
+    </script>
+</body>
+
+</html>
