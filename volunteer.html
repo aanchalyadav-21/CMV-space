@@ -742,6 +742,8 @@
                 document.getElementById('btnSimArrive').style.display = 'none';
                 document.getElementById('btnSimStart').style.display = 'inline-flex';
                 
+                showVolunteerStatusToast("🚶 Status updated: You have arrived at the senior's residence.");
+
                 // Update ReachData
                 if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
                     ReachData.updateRequestStatus(currentActiveId, 'volunteer_arrived');
@@ -783,6 +785,8 @@
                 document.getElementById('sc4').classList.add('completed');
                 document.getElementById('btnSimStart').style.display = 'none';
                 document.getElementById('btnSimComplete').style.display = 'inline-flex';
+
+                showVolunteerStatusToast("▶️ Status updated: Errand assistance started (In Progress).");
 
                 // Update ReachData
                 if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
@@ -902,10 +906,29 @@
             }
 
             broadcastSync('task_completed', { currentActiveId, pin });
-
             alert('Mission Completed Successfully! Verified with Senior Citizen PIN (' + pin + '). 1.5 Community Service Hours logged.');
             loadVolunteerData();
             showTab('history');
+        }
+
+        function showVolunteerStatusToast(msg, type = 'success') {
+            let toast = document.getElementById('volLiveToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'volLiveToast';
+                toast.style.cssText = 'position: fixed; bottom: 24px; right: 24px; z-index: 10000; padding: 14px 22px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); transition: all 0.3s ease;';
+                document.body.appendChild(toast);
+            }
+            toast.style.background = (type === 'success') ? '#10B981' : '#3B82F6';
+            toast.style.color = '#FFFFFF';
+            toast.textContent = msg;
+            toast.style.display = 'block';
+            toast.style.opacity = '1';
+            clearTimeout(window.volToastTimer);
+            window.volToastTimer = setTimeout(() => {
+                toast.style.opacity = '0';
+                setTimeout(() => { toast.style.display = 'none'; }, 300);
+            }, 4000);
         }
 
         function openDisputeModal() {
