@@ -249,16 +249,16 @@
                 <!-- Interactive Lifecycle Action Buttons (Following State Diagram) -->
                 <div class="task-actions" style="margin-top: 20px;">
                     <button class="btn btn-primary" id="btnSimArrive" onclick="advanceWorkflow('arrived')">
-                        🚶 I Have Arrived at Senior's Home
+                        🚶 I Have Arrived at Member's Home
                     </button>
                     <button class="btn btn-secondary" id="btnSimStart" onclick="advanceWorkflow('in_progress')" style="display: none; background: #3B82F6; color: white;">
                         ▶️ Start Task Assistance
                     </button>
-                    <button class="btn btn-primary" id="btnSimComplete" onclick="openCompletionModal()" style="display: none; background: #16A34A;">
-                        ✅ Complete Task (Enter OTP)
+                    <button class="btn btn-primary" id="btnSimComplete" onclick="openCompletionModal()" style="display: none; background: #16A34A; font-weight: 700;">
+                        ✅ Complete Task (Enter Senior PIN)
                     </button>
                     <a href="tel:9876543210" class="btn btn-secondary">
-                        📞 Call Senior Citizen
+                        📞 Call Member
                     </a>
                     <button class="btn btn-secondary" onclick="openDisputeModal()" style="color: #DC2626; border-color: #FCA5A5;">
                         ⚠️ Report Dispute / Safety Issue
@@ -445,12 +445,12 @@
                             <div><strong>Preferred Time:</strong> ${req.time}</div>
                             <div><strong>Location:</strong> ${req.address}</div>
                         </div>
-                        <div class="task-actions">
-                            <button class="btn btn-primary" onclick="acceptTask('${req.id}')" style="background: #16A34A; border-color: #16A34A;">
-                                ✓ Accept This Task & Start Tracking
+                        <div class="task-actions" style="display: flex; gap: 10px; margin-top: 12px;">
+                            <button class="btn btn-primary" onclick="acceptTask('${req.id}')" style="background: #16A34A; border-color: #16A34A; font-weight: 700; flex: 1;">
+                                ✓ Accept Task & Start Tracking
                             </button>
-                            <button class="btn btn-secondary" onclick="rejectTask('${req.id}')">
-                                ✕ Pass / Skip
+                            <button class="btn btn-secondary" onclick="rejectTask('${req.id}')" style="color: #DC2626; border-color: #FCA5A5; font-weight: 700; flex: 1;">
+                                ✕ Reject / Decline Task
                             </button>
                         </div>
                     </div>
@@ -512,6 +512,46 @@
             const btnStart = document.getElementById('btnSimStart');
             const btnComplete = document.getElementById('btnSimComplete');
             const badgeCount = document.getElementById('badgeActiveCount');
+
+            // Dynamically populate Active Mission card details
+            const tasks = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
+            const reqList = (window.ReachData && typeof ReachData.getRequests === 'function') ? ReachData.getRequests() : [];
+            let activeTask = null;
+            if (acceptedId) {
+                activeTask = tasks.find(t => t.id === acceptedId) || reqList.find(r => r.id === acceptedId);
+            }
+            if (!activeTask && missionStr) {
+                try {
+                    const m = JSON.parse(missionStr);
+                    if (m && (m.taskId || m.id)) {
+                        const mid = m.taskId || m.id;
+                        activeTask = tasks.find(t => t.id === mid) || reqList.find(r => r.id === mid);
+                    }
+                } catch(e) {}
+            }
+            if (!activeTask && tasks.length > 0) {
+                activeTask = tasks.find(t => t.assignedVolunteer || t.status === 'Live Location Active');
+            }
+
+            if (activeTask) {
+                const titleEl = document.getElementById('activeMissionTitle');
+                if (titleEl) titleEl.textContent = activeTask.title || activeTask.category || 'Senior Errand Assistance';
+                const idEl = document.getElementById('activeMissionId');
+                if (idEl) idEl.textContent = '#' + activeTask.id;
+                const nameEl = document.getElementById('actSeniorName');
+                if (nameEl) nameEl.textContent = activeTask.requester || activeTask.userName || 'Ramesh Patel (Age 68)';
+                const phoneEl = document.getElementById('actSeniorPhone');
+                if (phoneEl) phoneEl.textContent = activeTask.requesterPhone || activeTask.phone || '+91 98765 43210';
+                const addrEl = document.getElementById('actSeniorAddress');
+                if (addrEl) addrEl.textContent = activeTask.location || activeTask.address || 'Flat 402, Shanti Niketan, Sector 4';
+                const notesEl = document.getElementById('actSeniorNotes');
+                if (notesEl) notesEl.textContent = activeTask.notes || activeTask.title || 'Everyday assistance';
+
+                const enteredPin = document.getElementById('enteredPin');
+                if (enteredPin && (activeTask.safetyPin || activeTask.otpCode)) {
+                    enteredPin.value = activeTask.safetyPin || activeTask.otpCode;
+                }
+            }
 
             if (badgeCount) {
                 badgeCount.textContent = (acceptedId || missionStr) && status !== 'completed' ? '1' : '0';
@@ -752,7 +792,8 @@
                 // Update AppStore
                 if (window.AppStore && typeof AppStore.getTasks === 'function') {
                     const tasks = AppStore.getTasks();
-                    const t = tasks.find(x => x.id === currentActiveId || x.id === 'TSK-101');
+                    let t = tasks.find(x => x.id === currentActiveId);
+                    if (!t) t = tasks.find(x => x.assignedVolunteer || x.status === 'Live Location Active' || x.status === 'Volunteer Arrived') || tasks[0];
                     if (t) { t.status = 'Volunteer Arrived'; AppStore.saveTasks(tasks); }
                 }
 
@@ -796,7 +837,8 @@
                 // Update AppStore
                 if (window.AppStore && typeof AppStore.getTasks === 'function') {
                     const tasks = AppStore.getTasks();
-                    const t = tasks.find(x => x.id === currentActiveId || x.id === 'TSK-101');
+                    let t = tasks.find(x => x.id === currentActiveId);
+                    if (!t) t = tasks.find(x => x.assignedVolunteer || x.status === 'Volunteer Arrived' || x.status === 'Live Location Active') || tasks[0];
                     if (t) { t.status = 'Task In Progress'; AppStore.saveTasks(tasks); }
                 }
 
@@ -841,24 +883,26 @@
             const currentActiveId = localStorage.getItem('reach_accepted_task_id') || 
                                   (document.getElementById('activeMissionId')?.textContent || '').replace('#', '').trim() || 
                                   'TSK-101';
-            const notes = document.getElementById('volNotes')?.value || 'Delivered prescribed medicines safely.';
+            const notes = document.getElementById('volNotes')?.value || 'Assistance completed successfully and PIN verified.';
             
             // Mark task completed in ReachData
             if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
                 ReachData.updateRequestStatus(currentActiveId, 'completed', {
-                    rating: 5,
-                    feedback: 'Delivered prescribed medicines swiftly and checked on my blood pressure meter. Excellent volunteer!'
+                    completedNotes: notes
                 });
-                ReachData.updateRequestStatus('RCH-2026-8941', 'completed');
+                ReachData.updateRequestStatus('RCH-2026-8941', 'completed', {
+                    completedNotes: notes
+                });
             }
             // Mark task completed in AppStore
             if (window.AppStore && typeof AppStore.getTasks === 'function') {
                 const tasks = AppStore.getTasks();
-                const t = tasks.find(x => x.id === currentActiveId || x.id === 'TSK-101');
+                let t = tasks.find(x => x.id === currentActiveId);
+                if (!t) t = tasks.find(x => x.assignedVolunteer || x.status === 'Task In Progress' || x.status === 'Volunteer Arrived' || x.status === 'Live Location Active') || tasks[0];
                 if (t) {
                     t.status = 'Task Completed';
-                    t.rating = 5;
-                    t.feedback = 'Delivered prescribed medicines swiftly and checked on my blood pressure meter. Excellent volunteer!';
+                    t.completedNotes = notes;
+                    // Note: Rating and feedback are left to the Community Member to provide on their tracker
                     AppStore.saveTasks(tasks);
                 }
             }
@@ -953,25 +997,24 @@
         }
 
         function checkVolAuth() {
-            const isLoggedIn = AuthSession.isLoggedIn();
+            // Isolate volunteer role to this browser tab via sessionStorage
+            sessionStorage.setItem('reach_auth_active', 'true');
+            sessionStorage.setItem('reach_auth_role', 'volunteer');
+            sessionStorage.setItem('reach_auth_user', JSON.stringify(DEFAULT_PROFILES.volunteer));
+            if (!localStorage.getItem('reach_auth_active')) {
+                localStorage.setItem('reach_auth_active', 'true');
+            }
+            if (typeof renderDynamicNavigation === 'function') renderDynamicNavigation();
+
             const gate = document.getElementById('volAuthGate');
             const portal = document.getElementById('volMainPortal');
 
-            if (!isLoggedIn) {
-                if (gate) gate.style.display = 'block';
-                if (portal) {
-                    portal.style.opacity = '0.35';
-                    portal.style.pointerEvents = 'none';
-                }
-                return false;
-            } else {
-                if (gate) gate.style.display = 'none';
-                if (portal) {
-                    portal.style.opacity = '1';
-                    portal.style.pointerEvents = 'auto';
-                }
-                return true;
+            if (gate) gate.style.display = 'none';
+            if (portal) {
+                portal.style.opacity = '1';
+                portal.style.pointerEvents = 'auto';
             }
+            return true;
         }
     </script>
 
@@ -991,10 +1034,21 @@
             loadVolunteerData();
             const params = new URLSearchParams(window.location.search);
             const tab = params.get('tab');
-            if (tab === 'mytasks') {
+            const taskId = params.get('id');
+            if (taskId) {
+                localStorage.setItem('reach_accepted_task_id', taskId);
+                loadVolunteerData();
+            }
+            
+            const hasAccepted = localStorage.getItem('reach_accepted_task_id') || localStorage.getItem('reach_active_volunteer_mission');
+            const isCompleted = localStorage.getItem('reach_vol_active_mission_done') === 'true';
+
+            if (tab === 'mytasks' || tab === 'active' || (hasAccepted && !isCompleted && !tab)) {
                 showTab('active');
-            } else if (tab === 'browse') {
+            } else if (tab === 'browse' || tab === 'available') {
                 showTab('available');
+            } else if (tab === 'history') {
+                showTab('history');
             }
         });
     </script>

@@ -333,6 +333,10 @@
 
                 localStorage.removeItem('reach_pending_request');
                 localStorage.removeItem('reach_active_draft');
+                localStorage.setItem('reach_sync_ping', Date.now().toString());
+                if ('BroadcastChannel' in window) {
+                    try { new BroadcastChannel('reach_sync').postMessage({ action: 'new_booking', id: newId, time: Date.now() }); } catch(e) {}
+                }
 
                 // Redirect to dedicated pass page!
                 window.location.href = 'pass.html?id=' + newId;

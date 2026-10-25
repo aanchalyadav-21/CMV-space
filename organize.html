@@ -304,25 +304,21 @@
     <script src="js/main.js?v=2"></script>
     <script>
         function checkOrgAuth() {
-            const isLoggedIn = AuthSession.isLoggedIn();
+            // When visiting organize.html, ensure active role is organizer
+            if (!AuthSession.isLoggedIn() || AuthSession.getCurrentRole() !== 'organizer') {
+                AuthSession.login('organizer');
+                if (typeof renderDynamicNavigation === 'function') renderDynamicNavigation();
+            }
+
             const gate = document.getElementById('orgAuthGate');
             const portal = document.getElementById('orgMainPortal');
 
-            if (!isLoggedIn) {
-                if (gate) gate.style.display = 'block';
-                if (portal) {
-                    portal.style.opacity = '0.35';
-                    portal.style.pointerEvents = 'none';
-                }
-                return false;
-            } else {
-                if (gate) gate.style.display = 'none';
-                if (portal) {
-                    portal.style.opacity = '1';
-                    portal.style.pointerEvents = 'auto';
-                }
-                return true;
+            if (gate) gate.style.display = 'none';
+            if (portal) {
+                portal.style.opacity = '1';
+                portal.style.pointerEvents = 'auto';
             }
+            return true;
         }
 
         // Real-Time Cross-Window Synchronization Channel

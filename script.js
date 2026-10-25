@@ -10,7 +10,7 @@ const DEFAULT_PROFILES = {
         id: 'usr_mem_01',
         role: 'member',
         name: 'Ramesh Patel',
-        roleTitle: 'Community Member / Senior Resident',
+        roleTitle: 'Senior Resident Member',
         phone: '+91 98765 43210',
         address: 'Flat 402, Shanti Niketan, Sector 4',
         avatar: '👵',
@@ -22,7 +22,7 @@ const DEFAULT_PROFILES = {
         id: 'usr_vol_02',
         role: 'volunteer',
         name: 'Karan Verma',
-        roleTitle: 'Verified Community Volunteer',
+        roleTitle: 'Community Volunteer',
         phone: '+91 98765 43211',
         address: 'B-Wing 104, Gulmohar CHS, Sector 4',
         avatar: '🦸‍♂️',
@@ -36,8 +36,8 @@ const DEFAULT_PROFILES = {
     owner: {
         id: 'usr_own_03',
         role: 'owner',
-        name: 'Marian Community Welfare Trust',
-        roleTitle: 'Community Space Provider',
+        name: 'Marian Trust',
+        roleTitle: 'Space Owner & Provider',
         phone: '+91 98765 43212',
         address: 'Parish Welfare Center, City Center',
         avatar: '🏛️',
@@ -409,8 +409,24 @@ const AppStore = {
     getSpaces() { this.init(); return JSON.parse(localStorage.getItem('reach_spaces') || '[]'); },
     saveSpaces(spaces) { localStorage.setItem('reach_spaces', JSON.stringify(spaces)); },
 
-    getBookings() { this.init(); return JSON.parse(localStorage.getItem('reach_bookings') || '[]'); },
-    saveBookings(bookings) { localStorage.setItem('reach_bookings', JSON.stringify(bookings)); },
+    getBookings() {
+        this.init();
+        try {
+            const raw = localStorage.getItem('reach_bookings');
+            if (raw) {
+                const list = JSON.parse(raw);
+                if (Array.isArray(list) && list.length > 0) return list;
+            }
+        } catch(e) {}
+        localStorage.setItem('reach_bookings', JSON.stringify(SEED_BOOKINGS));
+        return JSON.parse(JSON.stringify(SEED_BOOKINGS));
+    },
+    saveBookings(bookings) {
+        if (!Array.isArray(bookings) || bookings.length === 0) {
+            bookings = JSON.parse(JSON.stringify(SEED_BOOKINGS));
+        }
+        localStorage.setItem('reach_bookings', JSON.stringify(bookings));
+    },
 
     getActivities() { this.init(); return JSON.parse(localStorage.getItem('reach_activities') || '[]'); },
     saveActivities(activities) { localStorage.setItem('reach_activities', JSON.stringify(activities)); },
@@ -494,12 +510,16 @@ window.ReachData = {
 // ==========================================================================
 const AuthSession = {
     isLoggedIn() {
+        const tabActive = sessionStorage.getItem('reach_auth_active');
+        if (tabActive !== null) {
+            return tabActive === 'true';
+        }
         return localStorage.getItem('reach_auth_active') === 'true';
     },
 
     getCurrentRole() {
         if (!this.isLoggedIn()) return null;
-        return localStorage.getItem('reach_auth_role') || 'member';
+        return sessionStorage.getItem('reach_auth_role') || localStorage.getItem('reach_auth_role') || 'member';
     },
 
     getCurrentUser() {
@@ -507,15 +527,20 @@ const AuthSession = {
             return null; // Guest / unauthenticated user: strictly null!
         }
         const role = this.getCurrentRole() || 'member';
-        const stored = localStorage.getItem('reach_auth_user');
+        const stored = sessionStorage.getItem('reach_auth_user') || localStorage.getItem('reach_auth_user');
         if (stored) {
-            try { return JSON.parse(stored); } catch (e) {}
+            try {
+                const u = JSON.parse(stored);
+                if (u && (u.role === role || (!u.role && role === 'member'))) return u;
+            } catch (e) {}
         }
         return DEFAULT_PROFILES[role] || DEFAULT_PROFILES.member;
     },
 
     login(role, phone, name) {
         localStorage.setItem('reach_auth_active', 'true');
+        sessionStorage.setItem('reach_auth_active', 'true');
+        sessionStorage.setItem('reach_auth_role', role);
         localStorage.setItem('reach_auth_role', role);
         const base = DEFAULT_PROFILES[role] || DEFAULT_PROFILES.member;
         const user = {
@@ -523,6 +548,7 @@ const AuthSession = {
             phone: phone || base.phone,
             name: name || base.name
         };
+        sessionStorage.setItem('reach_auth_user', JSON.stringify(user));
         localStorage.setItem('reach_auth_user', JSON.stringify(user));
         return user;
     },
@@ -589,15 +615,13 @@ const AuthSession = {
     },
 
     logout() {
-        localStorage.setItem('reach_auth_active', 'false');
-        localStorage.removeItem('reach_auth_user');
-        localStorage.removeItem('reach_auth_role');
-        localStorage.setItem('reach_is_logged_in', 'false');
-        localStorage.removeItem('reach_user_session');
-        localStorage.removeItem('reach_accepted_task_id');
-        localStorage.removeItem('reach_active_volunteer_mission');
+        // Tab-isolated logout: sign out this specific tab without disturbing other tabs
+        sessionStorage.setItem('reach_auth_active', 'false');
+        sessionStorage.removeItem('reach_auth_user');
+        sessionStorage.removeItem('reach_auth_role');
+        sessionStorage.removeItem('reach_user_session');
 
-        // Immediate DOM cleanup so UI updates instantly even before navigation completes
+        // Immediate DOM cleanup so UI updates instantly
         const welcome = document.getElementById('signedInWelcomeBox');
         if (welcome) welcome.remove();
         if (typeof renderDynamicNavigation === 'function') {
@@ -606,15 +630,7 @@ const AuthSession = {
         const rolePill = document.getElementById('roleSwitcherPill');
         if (rolePill) rolePill.remove();
 
-        // Broadcast to all open tabs and windows
-        if ('BroadcastChannel' in window) {
-            try {
-                const bc = new BroadcastChannel('reach_sync');
-                bc.postMessage({ type: 'USER_LOGOUT' });
-            } catch (e) {}
-        }
-
-        // Clean redirection with replace
+        // Redirect only this tab to index.html with signed_out flag
         window.location.replace('index.html?signed_out=' + Date.now());
     },
 
@@ -941,11 +957,22 @@ function renderDynamicNavigation() {
         if (isLoggedIn) {
             const u = AuthSession.getCurrentUser();
             if (u) {
+                const roleBadgeLabels = {
+                    member: 'Resident',
+                    resident: 'Resident',
+                    volunteer: 'Volunteer',
+                    owner: 'Space Owner',
+                    organizer: 'Organizer',
+                    ngo: 'Organizer',
+                    admin: 'Admin'
+                };
+                const userRoleName = roleBadgeLabels[u.role] || (u.role === 'owner' ? 'Space Owner' : 'Resident');
+                const firstName = (u.name || 'User').split(' ')[0];
                 navUserContainer.innerHTML = `
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <a href="dashboard.html" class="user-badge-pill" title="Signed In Profile">
                             <span>${u.avatar || '👤'}</span>
-                            <span><strong>${(u.name || 'User').split(' ')[0]}</strong> (${u.roleTitle ? u.roleTitle.split(' ')[0] : u.role})</span>
+                            <span><strong>${firstName}</strong> (${userRoleName})</span>
                         </a>
                         <button onclick="AuthSession.logout()" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.82rem; color: #DC2626; border-color: #FCA5A5;">
                             ${t.signOut}

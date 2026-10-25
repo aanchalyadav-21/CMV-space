@@ -72,7 +72,7 @@
             <form id="unifiedRequestForm" onsubmit="handleFormSubmit(event)">
 
                 <!-- Request Type Selector -->
-                <div class="form-group">
+                <div class="form-group" id="reqTypeFormGroup">
                     <label class="form-label">Request Type:</label>
                     <select id="requestTypeSelect" class="form-control" onchange="adjustFormFields(this.value)">
                         <option value="help">🛒 Volunteer Help (Medicine, Groceries, Tutoring, Escort)</option>
@@ -207,71 +207,116 @@
 
     <!-- Scripts -->
     <script src="script.js"></script>
+    <script src="js/data.js"></script>
     <script>
         function adjustFormFields(type) {
+            const isSpace = (type === 'space' || type === 'space_booking');
             const h = document.getElementById('fieldsHelp');
             const sb = document.getElementById('fieldsSpaceBooking');
             const heading = document.getElementById('pageHeading');
             const subheading = document.getElementById('pageSubheading');
+            const helpTitle = document.getElementById('helpTitle');
+            const bookingPurpose = document.getElementById('bookingPurpose');
+            const sel = document.getElementById('requestTypeSelect');
 
-            h.style.display = 'none';
-            sb.style.display = 'none';
-
-            if (type === 'space_booking') {
-                sb.style.display = 'block';
-                heading.textContent = 'Reserve a Community Space or Hall';
-                subheading.textContent = 'Request booking for a verified neighborhood hall or classroom.';
+            if (isSpace) {
+                if (sel) sel.value = 'space_booking';
+                if (h) h.style.display = 'none';
+                if (sb) sb.style.display = 'block';
+                if (helpTitle) helpTitle.removeAttribute('required');
+                if (bookingPurpose) bookingPurpose.setAttribute('required', 'required');
+                if (heading) heading.textContent = 'Reserve a Community Space or Hall';
+                if (subheading) subheading.textContent = 'Fill in your activity details to request an official reservation & QR entry pass.';
             } else {
-                h.style.display = 'block';
-                heading.textContent = 'Request Volunteer Assistance';
-                subheading.textContent = 'Provide details so a verified neighborhood volunteer can assist you.';
+                if (sel) sel.value = 'help';
+                if (h) h.style.display = 'block';
+                if (sb) sb.style.display = 'none';
+                if (helpTitle) helpTitle.setAttribute('required', 'required');
+                if (bookingPurpose) bookingPurpose.removeAttribute('required');
+                if (heading) heading.textContent = 'Request Volunteer Assistance';
+                if (subheading) subheading.textContent = 'Provide details so a verified neighborhood volunteer can assist you.';
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const reqType = urlParams.get('type') || 'help';
-            const sel = document.getElementById('requestTypeSelect');
-            sel.value = reqType;
-            adjustFormFields(reqType);
+            const rawType = (urlParams.get('type') || '').toLowerCase();
+            const spaceId = urlParams.get('spaceId');
+
+            // If user clicked Reserve Space / Venue, hide the "Request Type: Volunteer or Space" selector entirely!
+            const typeGroup = document.getElementById('reqTypeFormGroup');
+            if (rawType === 'space' || rawType === 'space_booking' || rawType === 'help') {
+                if (typeGroup) typeGroup.style.display = 'none';
+            }
+
+            const initialType = (rawType === 'space' || rawType === 'space_booking') ? 'space_booking' : 'help';
+            adjustFormFields(initialType);
+
+            // Populate venue dropdown from available community spaces
+            if (window.AppStore && typeof AppStore.getSpaces === 'function') {
+                const spaces = AppStore.getSpaces();
+                const sel = document.getElementById('bookingSpaceSelect');
+                if (sel && spaces.length > 0) {
+                    sel.innerHTML = spaces.map(s => `
+                        <option value="${s.id}" ${s.id === spaceId ? 'selected' : ''}>
+                            ${s.name} (Capacity: ${s.capacity} • ${s.location})
+                        </option>
+                    `).join('');
+                }
+            } else if (spaceId) {
+                const sel = document.getElementById('bookingSpaceSelect');
+                if (sel) sel.value = spaceId;
+            }
 
             // Pre-fill user profile if logged in
             const user = AuthSession.getCurrentUser();
             if (user) {
-                document.getElementById('commonName').value = user.name;
-                document.getElementById('commonPhone').value = user.phone;
-                if (user.address) document.getElementById('commonLocation').value = user.address;
+                const elName = document.getElementById('commonName');
+                const elPhone = document.getElementById('commonPhone');
+                const elLoc = document.getElementById('commonLocation');
+                if (elName && !elName.value) elName.value = user.name || '';
+                if (elPhone && !elPhone.value) elPhone.value = user.phone || '';
+                if (elLoc && !elLoc.value && user.address) elLoc.value = user.address || '';
             }
         });
 
         function handleFormSubmit(e) {
             e.preventDefault();
-            const type = document.getElementById('requestTypeSelect').value;
+            const rawType = new URLSearchParams(window.location.search).get('type') || '';
+            const selVal = document.getElementById('requestTypeSelect')?.value;
+            const isSpace = (selVal === 'space_booking' || rawType === 'space' || rawType === 'space_booking');
+            const type = isSpace ? 'space_booking' : 'help';
 
             const draft = {
                 type: type,
-                requesterName: document.getElementById('commonName').value,
-                requesterPhone: document.getElementById('commonPhone').value,
-                location: document.getElementById('commonLocation').value,
-                date: document.getElementById('commonDate').value,
-                time: document.getElementById('commonTime').value,
+                requester: document.getElementById('commonName')?.value || 'Resident Member',
+                requesterName: document.getElementById('commonName')?.value || 'Resident Member',
+                requesterPhone: document.getElementById('commonPhone')?.value || '+91 98765 43210',
+                location: document.getElementById('commonLocation')?.value || 'Sector 4',
+                date: document.getElementById('commonDate')?.value || 'Today, 22 Oct 2026',
+                time: document.getElementById('commonTime')?.value || '11:00 AM',
                 createdAt: new Date().toLocaleDateString('en-GB')
             };
 
-            if (type === 'help') {
-                draft.category = document.getElementById('helpCategory').value;
-                draft.title = document.getElementById('helpTitle').value;
-                draft.notes = document.getElementById('helpNotes').value || 'Standard assistance';
-            } else if (type === 'space_booking') {
-                draft.spaceId = document.getElementById('bookingSpaceSelect').value;
-                const spcObj = AppStore.getSpaces().find(s => s.id === draft.spaceId) || { name: 'Community Hall' };
-                draft.spaceName = spcObj.name;
-                draft.purpose = document.getElementById('bookingPurpose').value || 'Community Activity';
-                draft.expectedGuests = document.getElementById('bookingGuests').value || '20';
+            if (isSpace) {
+                const spaceSel = document.getElementById('bookingSpaceSelect');
+                draft.spaceId = spaceSel ? spaceSel.value : 'SPC-501';
+                let spcObj = null;
+                if (window.AppStore && typeof AppStore.getSpaces === 'function') {
+                    spcObj = AppStore.getSpaces().find(s => s.id === draft.spaceId);
+                }
+                draft.spaceName = spcObj ? spcObj.name : (spaceSel?.options[spaceSel.selectedIndex]?.text?.split('(')[0]?.trim() || 'St. Joseph Community Activity Hall');
+                draft.purpose = (document.getElementById('bookingPurpose')?.value || '').trim() || 'Community Activity & Meeting';
+                draft.expectedGuests = document.getElementById('bookingGuests')?.value || '25';
+            } else {
+                draft.category = document.getElementById('helpCategory')?.value || 'Groceries';
+                draft.title = document.getElementById('helpTitle')?.value || 'Neighborhood assistance';
+                draft.notes = document.getElementById('helpNotes')?.value || 'Standard assistance';
             }
 
-            // Save to localStorage draft
+            // Save to localStorage so review page immediately loads complete details
             localStorage.setItem('reach_active_draft', JSON.stringify(draft));
+            localStorage.setItem('reach_pending_request', JSON.stringify(draft));
             window.location.href = 'review.html';
         }
     </script>

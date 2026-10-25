@@ -258,25 +258,24 @@
     <script src="js/main.js?v=2"></script>
     <script>
         function checkOwnerAuth() {
-            const isLoggedIn = AuthSession.isLoggedIn();
+            // Set tab-isolated role so other tabs (like Senior Resident in Tab 1) are never mutated
+            sessionStorage.setItem('reach_auth_active', 'true');
+            sessionStorage.setItem('reach_auth_role', 'owner');
+            sessionStorage.setItem('reach_auth_user', JSON.stringify(DEFAULT_PROFILES.owner));
+            if (!localStorage.getItem('reach_auth_active')) {
+                localStorage.setItem('reach_auth_active', 'true');
+            }
+            if (typeof renderDynamicNavigation === 'function') renderDynamicNavigation();
+
             const gate = document.getElementById('ownerAuthGate');
             const portal = document.getElementById('ownerMainPortal');
 
-            if (!isLoggedIn) {
-                if (gate) gate.style.display = 'block';
-                if (portal) {
-                    portal.style.opacity = '0.35';
-                    portal.style.pointerEvents = 'none';
-                }
-                return false;
-            } else {
-                if (gate) gate.style.display = 'none';
-                if (portal) {
-                    portal.style.opacity = '1';
-                    portal.style.pointerEvents = 'auto';
-                }
-                return true;
+            if (gate) gate.style.display = 'none';
+            if (portal) {
+                portal.style.opacity = '1';
+                portal.style.pointerEvents = 'auto';
             }
+            return true;
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -380,30 +379,56 @@
             const bookings = AppStore.getBookings();
             const b = bookings.find(x => x.id === bookingId);
             if (b) {
-                b.status = decision;
-                if (decision === 'Confirmed') {
+                const standardized = (decision === 'Confirmed' || decision === 'Approved') ? 'Confirmed' : 'Rejected';
+                b.status = standardized;
+                if (standardized === 'Confirmed') {
                     b.qrPassId = 'PASS-' + b.id;
                     b.qrStatus = 'Ready for Check-in';
+                } else {
+                    b.qrStatus = 'Declined';
                 }
                 AppStore.saveBookings(bookings);
 
-                // Also synchronize organizer activity
+                // Synchronize organizer activities if linked
                 const acts = AppStore.getActivities();
                 const act = acts.find(a => bookingId.includes(a.id) || (a.title && b.purpose && a.title.includes(b.purpose)));
                 if (act) {
-                    act.spaceStatus = (decision === 'Confirmed') ? 'Confirmed & QR Pass Issued' : 'Rejected';
-                    if (decision === 'Confirmed') act.qrPassId = b.qrPassId;
+                    act.spaceStatus = (standardized === 'Confirmed') ? 'Confirmed & QR Pass Issued' : 'Rejected';
                     AppStore.saveActivities(acts);
                 }
 
-                // Broadcast sync to organizer window
+                // Update reach_last_confirmed
+                localStorage.setItem('reach_last_confirmed', JSON.stringify({
+                    id: b.id,
+                    type: 'space_booking',
+                    title: b.spaceName,
+                    status: standardized,
+                    qrPassId: b.qrPassId || ('PASS-' + b.id)
+                }));
+                localStorage.setItem('reach_last_booking_decision', JSON.stringify({
+                    id: b.id,
+                    status: standardized,
+                    time: Date.now()
+                }));
                 localStorage.setItem('reach_sync_ping', Date.now().toString());
-                if (reachChannel) {
-                    try { reachChannel.postMessage({ action: 'booking_decision', bookingId, decision, time: Date.now() }); } catch (e) {}
+
+                // Broadcast sync to resident pass window and other tabs
+                if ('BroadcastChannel' in window) {
+                    try {
+                        const bc = new BroadcastChannel('reach_sync');
+                        bc.postMessage({
+                            type: 'BOOKING_UPDATED',
+                            action: 'booking_decision',
+                            bookingId: b.id,
+                            status: standardized,
+                            decision: standardized,
+                            time: Date.now()
+                        });
+                    } catch (e) {}
                 }
 
                 loadOwnerData();
-                alert(`Booking ${bookingId} has been marked as ${decision.toUpperCase()}.\n${decision === 'Confirmed' ? 'Official entry QR pass generated for the requester.' : 'Requester informed to search alternative venue.'}`);
+                alert(`Booking ${bookingId} has been marked as ${standardized.toUpperCase()}.\n${standardized === 'Confirmed' ? 'Official entry QR pass activated for the requester.' : 'Requester slip updated to Declined.'}`);
             }
         }
 

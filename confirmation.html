@@ -200,7 +200,7 @@
                 <span>Live Tracking & Status</span>
             </div>
         </div>
-
+        
         <div class="confirmation-card">
 
             <div style="font-size: 3rem; margin-bottom: 6px;">📋</div>
@@ -465,10 +465,6 @@
             }
 
             // 2. Handle Help / Micro-Volunteering Task
-            const viewSpacePass = document.getElementById('viewSpacePass');
-            if (viewSpacePass) viewSpacePass.style.display = 'none';
-            document.getElementById('viewVolunteerTrack').style.display = 'block';
-
             let task = null;
             if (reqId) {
                 task = tasks.find(t => t.id === reqId) || reqList.find(r => r.id === reqId);
@@ -502,18 +498,19 @@
                     const matchesActiveMission = !!(activeMission && (activeMission.taskId === task.id || activeMission.id === task.id));
                     const missionStatus = matchesActiveMission && activeMission.status ? activeMission.status.toLowerCase() : '';
                     const matchesLastConfirmed = !!(currentItem && currentItem.id === task.id);
+                    const lastConfirmedStatus = matchesLastConfirmed && currentItem.status ? currentItem.status.toLowerCase() : '';
                     const hasVolunteer = !!(task.assignedVolunteer || (matchesLastConfirmed && currentItem.assignedVolunteer) || (matchesActiveMission && activeMission.volunteerName) || (acceptedId === task.id));
                     
-                    const isCompleted = status.includes('completed') || missionStatus === 'completed';
-                    const isInProgress = status.includes('progress') || missionStatus === 'in_progress';
-                    const isArrived = status.includes('arrived') || missionStatus === 'volunteer_arrived';
+                    const isCompleted = status.includes('completed') || missionStatus === 'completed' || lastConfirmedStatus.includes('completed');
+                    const isInProgress = status.includes('progress') || missionStatus === 'in_progress' || lastConfirmedStatus.includes('progress');
+                    const isArrived = status.includes('arrived') || missionStatus === 'volunteer_arrived' || lastConfirmedStatus.includes('arrived');
                     const isAccepted = hasVolunteer || status.includes('live') || status.includes('location_active') || status.includes('assigned') || status.includes('accept');
 
                     if (isCompleted) {
                         const feedbackKey = 'reach_feedback_done_' + (task.id || 'default');
-                        const existingFeedback = localStorage.getItem(feedbackKey) || (task.feedback ? JSON.stringify({ rating: task.rating || 5, feedback: task.feedback }) : null);
+                        const existingFeedback = localStorage.getItem(feedbackKey);
 
-                        // Privacy safeguard: After task completion, do NOT show volunteer card, name, or phone number (just like a food delivery app)
+                        // Privacy safeguard: After task completion, do NOT show volunteer card, name, or phone number
                         const volCard = document.getElementById('assignedVolunteerCard');
                         if (volCard) volCard.style.display = 'none';
 
@@ -525,9 +522,10 @@
                         const simCard = document.getElementById('liveSimulationControlCard');
                         if (simCard) simCard.style.display = 'none';
 
-                        document.getElementById('pinVol').style.left = '320px';
+                        const pinVol = document.getElementById('pinVol');
+                        if (pinVol) pinVol.style.left = '320px';
 
-                        // At the end of task completion, Cancel Request is not allowed / hidden
+                        // Cancel Request is not allowed / hidden
                         const btnCancel = document.getElementById('btnCancelReq');
                         if (btnCancel) btnCancel.style.display = 'none';
 
@@ -535,7 +533,7 @@
                             let fbObj = null;
                             try { fbObj = JSON.parse(existingFeedback); } catch(e) {}
                             const stars = fbObj ? fbObj.rating : 5;
-                            const txt = fbObj ? fbObj.feedback : 'Excellent service!';
+                            const txt = fbObj ? fbObj.feedback : 'Helpful and polite assistance!';
                             document.getElementById('badgeStatus').textContent = `⭐ Feedback Submitted (${stars}/5 Stars)`;
                             document.getElementById('badgeStatus').className = 'status-pill-big badge-success';
                             document.getElementById('lblEta').textContent = `Task completed & rated: "${txt}"`;
@@ -554,7 +552,7 @@
                         } else {
                             document.getElementById('badgeStatus').textContent = '✅ Status: Task Completed (PIN Verified)';
                             document.getElementById('badgeStatus').className = 'status-pill-big badge-success';
-                            document.getElementById('lblEta').textContent = 'Task completed! Senior safety PIN verified with volunteer.';
+                            document.getElementById('lblEta').textContent = 'Task completed! Senior safety PIN verified with volunteer. Please rate your experience.';
                             updateStepHighlight('step-completed');
 
                             const pBox = document.getElementById('feedbackPromptBox');
@@ -567,7 +565,7 @@
                                 window.ratingModalOpened = true;
                                 setTimeout(() => {
                                     openRatingModal();
-                                }, 700);
+                                }, 500);
                             }
                         }
 
@@ -625,7 +623,6 @@
                     }
                 }
             }
-        }
 
         function updateSimulationControls(stage) {
             // Live simulation progression card removed per user requirement
@@ -699,9 +696,7 @@
                 }
             } else if (action === 'completed') {
                 if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
-                    ReachData.updateRequestStatus(taskId, 'completed', {
-                        rating: 5, feedback: 'Delivered prescribed medicines swiftly. Excellent volunteer!'
-                    });
+                    ReachData.updateRequestStatus(taskId, 'completed');
                     ReachData.updateRequestStatus('RCH-2026-8941', 'completed');
                 }
                 if (window.AppStore && typeof AppStore.getTasks === 'function') {
@@ -709,8 +704,6 @@
                     const t = tasks.find(x => x.id === taskId || x.id === 'TSK-101');
                     if (t) {
                         t.status = 'Task Completed';
-                        t.rating = 5;
-                        t.feedback = 'Delivered prescribed medicines swiftly. Excellent volunteer!';
                         AppStore.saveTasks(tasks);
                     }
                 }
@@ -819,12 +812,7 @@
         function submitReviewDone() {
             const txtBox = document.getElementById('feedbackText');
             const feedbackInput = (txtBox?.value || '').trim();
-            if (!feedbackInput) {
-                alert('Please enter your feedback / experience note before submitting.');
-                if (txtBox) txtBox.focus();
-                return;
-            }
-            const feedback = feedbackInput;
+            const feedback = feedbackInput || (currentRating >= 4 ? 'Very helpful and polite assistance!' : 'Assistance completed safely.');
             const taskId = new URLSearchParams(window.location.search).get('id') || 
                            localStorage.getItem('reach_accepted_task_id') || 
                            'TSK-101';

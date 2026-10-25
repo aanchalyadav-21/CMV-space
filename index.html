@@ -610,8 +610,19 @@
         function quickDemoSignIn(role) {
             selectSignInRole(role);
             const phone = roleDefaultPhones[role] || '+91 98765 43210';
-            AuthSession.login(role, phone);
-            window.location.href = 'dashboard.html?role=' + role;
+            sessionStorage.setItem('reach_auth_active', 'true');
+            sessionStorage.setItem('reach_auth_role', role);
+            const base = (window.DEFAULT_PROFILES && DEFAULT_PROFILES[role]) ? DEFAULT_PROFILES[role] : { name: role };
+            sessionStorage.setItem('reach_auth_user', JSON.stringify({ ...base, phone }));
+            if (role === 'owner') {
+                window.location.href = 'owner.html';
+            } else if (role === 'volunteer') {
+                window.location.href = 'volunteer.html';
+            } else if (role === 'organizer') {
+                window.location.href = 'organize.html';
+            } else {
+                window.location.href = 'dashboard.html?role=' + role;
+            }
         }
 
         function renderHomeSessionState() {
@@ -639,23 +650,6 @@
                         `;
                         hero.appendChild(welcomeDiv);
                     }
-
-                    // Hide sign-in role picker card when already signed in
-                    const signInCard = document.getElementById('signInBox');
-                    if (signInCard) {
-                        signInCard.innerHTML = `
-                            <div style="text-align: center; padding: 24px 16px;">
-                                <div style="font-size: 2.2rem; margin-bottom: 8px;">👤</div>
-                                <h3 style="color: var(--primary-dark); margin-bottom: 6px; font-size: 1.25rem;">Active Account Session</h3>
-                                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
-                                    You are currently authenticated as <strong>${user.name}</strong> (${user.roleTitle || role}).
-                                </p>
-                                <a href="dashboard.html?role=${role}" class="btn btn-primary" style="padding: 9px 20px; font-size: 0.95rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
-                                    📊 Access Your Dashboard →
-                                </a>
-                            </div>
-                        `;
-                    }
                 }
             }
         }
@@ -669,16 +663,6 @@
                 switchAuthTab('register');
             }
 
-            // Cross-tab sync for logout
-            if ('BroadcastChannel' in window) {
-                const bc = new BroadcastChannel('reach_sync');
-                bc.onmessage = (e) => {
-                    if (e.data && e.data.type === 'USER_LOGOUT') {
-                        renderHomeSessionState();
-                        if (typeof renderDynamicNavigation === 'function') renderDynamicNavigation();
-                    }
-                };
-            }
         });
     </script>
 </body>

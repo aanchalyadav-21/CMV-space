@@ -505,9 +505,21 @@
 
         function redirectToUserArea(roleKey) {
             const role = roleKey === 'resident' ? 'member' : (roleKey === 'ngo' ? 'organizer' : roleKey);
-            localStorage.setItem('reach_auth_active', 'true');
-            localStorage.setItem('reach_auth_role', role);
-            window.location.href = 'dashboard.html?role=' + role;
+            sessionStorage.setItem('reach_auth_active', 'true');
+            sessionStorage.setItem('reach_auth_role', role);
+            const prof = (window.DEFAULT_PROFILES && DEFAULT_PROFILES[role]) ? DEFAULT_PROFILES[role] : null;
+            if (prof) {
+                sessionStorage.setItem('reach_auth_user', JSON.stringify(prof));
+            }
+            if (role === 'owner') {
+                window.location.href = 'owner.html';
+            } else if (role === 'volunteer') {
+                window.location.href = 'volunteer.html';
+            } else if (role === 'organizer') {
+                window.location.href = 'organize.html';
+            } else {
+                window.location.href = 'dashboard.html?role=' + role;
+            }
         }
     </script>
 </body>

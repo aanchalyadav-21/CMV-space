@@ -741,8 +741,8 @@
                                         👁️ Details
                                     </button>
                                 ` : `
-                                    <a href="confirmation.html?id=${t.id}" class="btn btn-secondary" style="flex: 1; text-align: center; padding: 8px 12px; font-size: 0.88rem;">
-                                        📍 Open Tracker →
+                                    <a href="volunteer.html?tab=active&id=${t.id}" class="btn btn-secondary" style="flex: 1; text-align: center; padding: 8px 12px; font-size: 0.88rem; color: #047857; border-color: #059669; font-weight: 600;">
+                                        🛵 Mission Desk →
                                     </a>
                                 `}
                             ` : `
@@ -877,17 +877,34 @@
 
             AppStore.saveTasks(tasks);
 
+            // Update ReachData & cross-tab sync keys
+            if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                ReachData.updateRequestStatus(taskId, 'location_active', { assignedVolunteer: task.assignedVolunteer });
+            }
+            const lastStr = localStorage.getItem('reach_last_confirmed');
+            if (lastStr) {
+                try {
+                    const it = JSON.parse(lastStr);
+                    if (it.id === taskId) {
+                        it.status = 'Live Location Active';
+                        it.assignedVolunteer = user.name || 'Karan Verma';
+                        localStorage.setItem('reach_last_confirmed', JSON.stringify(it));
+                    }
+                } catch(e) {}
+            }
+
             // Sync active mission
             localStorage.setItem('reach_accepted_task_id', taskId);
             localStorage.setItem('reach_active_volunteer_mission', JSON.stringify(task));
+            localStorage.setItem('reach_sync_ping', Date.now().toString());
 
             if ('BroadcastChannel' in window) {
                 const bc = new BroadcastChannel('reach_sync');
-                bc.postMessage({ type: 'TASK_ACCEPTED', taskId: taskId, volunteer: user.name });
+                bc.postMessage({ type: 'TASK_ACCEPTED', action: 'accept_task', taskId: taskId, volunteer: user.name, time: Date.now() });
             }
 
-            alert(`Task ${taskId} Accepted!\nSenior resident ${task.requester} has been notified.`);
-            window.location.href = `confirmation.html?id=${taskId}`;
+            alert(`Task ${taskId} Accepted!\nSenior resident ${task.requester} has been notified in real time.`);
+            window.location.href = `volunteer.html?tab=active&id=${taskId}`;
         }
 
         // Modal Handlers

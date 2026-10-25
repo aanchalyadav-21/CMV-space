@@ -192,8 +192,6 @@
     <!-- Main Container -->
     <main class="page-container">
 
-
-
         <!-- =============================================================== -->
         <!-- ROLE A: SENIOR RESIDENT / COMMUNITY MEMBER                      -->
         <!-- Simple, uncluttered: Request Help, Book Space, Track Requests   -->
@@ -298,6 +296,39 @@
                     <button id="btnVolStatusToggle" onclick="toggleVolunteerDuty()" class="btn" style="background: #10B981; color: white; padding: 8px 16px; font-size: 0.88rem; font-weight: 700; border-radius: 20px;">
                         🟢 Online & Ready
                     </button>
+                </div>
+            </div>
+
+            <!-- Active Mission Controller for Volunteer (Arrived -> Start -> Complete) -->
+            <div id="dashVolActiveMissionCard" class="clean-section-card" style="display: none; border: 2px solid #10B981; background: #F0FDF4; padding: 22px; margin-bottom: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 2.2rem;">🛵</span>
+                        <div>
+                            <span class="badge badge-accent" style="font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px;">YOUR CURRENT ACTIVE MISSION</span>
+                            <h3 id="dashMissionTitle" style="margin: 4px 0 2px 0; color: #166534; font-size: 1.25rem;">Prescription BP Medicine</h3>
+                            <span id="dashMissionSenior" style="font-size: 0.88rem; color: #15803D;">Senior: <strong>Ramesh Patel (+91 98765 43210)</strong> • Flat 402, Shanti Niketan</span>
+                        </div>
+                    </div>
+                    <span id="dashMissionStateBadge" class="badge badge-success" style="font-size: 0.92rem; padding: 6px 14px;">
+                        Live Location Active (En Route)
+                    </span>
+                </div>
+
+                <!-- 3 Action Buttons for Volunteer Mission -->
+                <div style="display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center;">
+                    <button id="btnDashArrived" onclick="advanceVolunteerDuty('arrived')" class="btn btn-primary" style="background: #2563EB; font-weight: 700; padding: 10px 18px;">
+                        🚶 I Have Arrived at Senior's Home
+                    </button>
+                    <button id="btnDashStart" onclick="advanceVolunteerDuty('in_progress')" class="btn btn-accent" style="display: none; background: #059669; font-weight: 700; padding: 10px 18px;">
+                        ▶️ Start Task Assistance
+                    </button>
+                    <button id="btnDashComplete" onclick="openDashCompletionModal()" class="btn btn-primary" style="display: none; background: #16A34A; font-weight: 700; padding: 10px 18px;">
+                        ✅ Complete Task (Enter Senior PIN)
+                    </button>
+                    <a href="volunteer.html?tab=active" class="btn btn-secondary" style="padding: 10px 18px; font-weight: 600; color: #047857;">
+                        🗺️ Detailed GPS Desk →
+                    </a>
                 </div>
             </div>
 
@@ -526,19 +557,36 @@
             const urlParams = new URLSearchParams(window.location.search);
             const queryRole = urlParams.get('role');
 
-            if (!AuthSession.isLoggedIn()) {
-                if (queryRole) {
-                    AuthSession.login(queryRole);
-                } else {
-                    window.location.href = 'index.html#signInBox';
-                    return;
+            if (queryRole) {
+                // If this tab was specifically opened with ?role=..., lock this tab to that role
+                sessionStorage.setItem('reach_auth_role', queryRole);
+                const prof = DEFAULT_PROFILES[queryRole];
+                if (prof) {
+                    sessionStorage.setItem('reach_auth_user', JSON.stringify(prof));
                 }
-            } else if (queryRole) {
-                localStorage.setItem('reach_auth_role', queryRole);
+                sessionStorage.setItem('reach_auth_active', 'true');
+            } else if (!sessionStorage.getItem('reach_auth_role')) {
+                // Initialize this tab from AuthSession or fallback
+                const initialRole = AuthSession.getCurrentRole() || 'member';
+                sessionStorage.setItem('reach_auth_role', initialRole);
+                const prof = DEFAULT_PROFILES[initialRole];
+                if (prof) {
+                    sessionStorage.setItem('reach_auth_user', JSON.stringify(prof));
+                }
             }
 
-            const currentRole = AuthSession.getCurrentRole() || 'member';
-            const user = AuthSession.getCurrentUser() || DEFAULT_PROFILES[currentRole];
+            // Strictly read this tab's isolated role so another tab cannot switch this tab's view
+            const currentRole = sessionStorage.getItem('reach_auth_role') || 'member';
+            const user = (function() {
+                const s = sessionStorage.getItem('reach_auth_user');
+                if (s) {
+                    try {
+                        const u = JSON.parse(s);
+                        if (u && (u.role === currentRole || (!u.role && currentRole === 'member'))) return u;
+                    } catch(e) {}
+                }
+                return DEFAULT_PROFILES[currentRole] || DEFAULT_PROFILES.member;
+            })();
 
             // Hide all sections
             ['sectionMember', 'sectionVolunteer', 'sectionOwner', 'sectionOrganizer'].forEach(id => {
@@ -550,6 +598,7 @@
             if (currentRole === 'volunteer') {
                 document.getElementById('sectionVolunteer').style.display = 'block';
                 document.getElementById('volName').textContent = user.name || 'Karan Verma';
+                renderVolunteerActiveMission();
                 renderVolunteerTasks();
             } else if (currentRole === 'owner') {
                 document.getElementById('sectionOwner').style.display = 'block';
@@ -606,10 +655,35 @@
                 return;
             }
 
+            const acceptedId = localStorage.getItem('reach_accepted_task_id');
+            const missionStr = localStorage.getItem('reach_active_volunteer_mission');
+            let mission = null;
+            if (missionStr) { try { mission = JSON.parse(missionStr); } catch(e) {} }
+
             let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
             myTasks.forEach(t => {
-                const isWaiting = t.status === 'Waiting for Volunteer' || !t.assignedVolunteer;
-                const isCompleted = t.status === 'Task Completed';
+                const matchesMission = !!(mission && (mission.taskId === t.id || mission.id === t.id));
+                const isAssigned = !!(t.assignedVolunteer || acceptedId === t.id || matchesMission || (t.status && (t.status.includes('Live') || t.status.includes('Active'))));
+                const sLower = (matchesMission && mission.status ? mission.status : (t.status || '')).toLowerCase();
+                const isCompleted = sLower.includes('completed');
+                const isInProgress = sLower.includes('progress');
+                const isArrived = sLower.includes('arrived');
+
+                let badgeText = '🟡 Waiting for Volunteer';
+                let badgeClass = 'badge-pending';
+                if (isCompleted) {
+                    badgeText = '✅ Completed';
+                    badgeClass = 'badge-success';
+                } else if (isInProgress) {
+                    badgeText = '⚡ Task in Progress';
+                    badgeClass = 'badge-pending';
+                } else if (isArrived) {
+                    badgeText = '🟢 Volunteer Arrived';
+                    badgeClass = 'badge-primary';
+                } else if (isAssigned) {
+                    badgeText = '🟢 Volunteer Assigned (En Route)';
+                    badgeClass = 'badge-success';
+                }
 
                 html += `
                     <div class="clean-item-row">
@@ -619,12 +693,12 @@
                                 <strong style="color: #0F172A; font-size: 1.02rem;">${t.category}: ${t.title}</strong>
                             </div>
                             <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
-                                📍 ${t.location} • ⏰ ${t.time}
+                                📍 ${t.location} • ⏰ ${t.time} ${isAssigned ? '• 🦸 Helper: <strong>Karan Verma</strong>' : ''}
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="badge ${isWaiting ? 'badge-pending' : (isCompleted ? 'badge-success' : 'badge-primary')}">
-                                ${isWaiting ? '🟡 Waiting for Volunteer' : (isCompleted ? '✅ Completed' : '🟢 Volunteer En Route')}
+                            <span class="badge ${badgeClass}">
+                                ${badgeText}
                             </span>
                             <a href="confirmation.html?id=${t.id}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; font-weight: 600;">
                                 Track Status →
@@ -647,7 +721,7 @@
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="badge ${b.status === 'Approved' ? 'badge-success' : 'badge-pending'}">${b.status}</span>
+                            <span class="badge ${(b.status === 'Confirmed' || b.status === 'Approved') ? 'badge-success' : ((b.status || '').includes('Reject') || (b.status || '').includes('Decline') || (b.status || '').includes('Not') ? 'badge-danger' : 'badge-pending')}">${b.status}</span>
                             <a href="pass.html?id=${b.id}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; border-color: #0284C7; color: #0369A1; font-weight: 600;">View Pass →</a>
                         </div>
                     </div>
@@ -680,11 +754,14 @@
                         <div style="display: flex; gap: 8px; align-items: center;">
                             ${isWaiting ? `
                                 <button onclick="acceptTask('${t.id}')" class="btn btn-accent" style="padding: 7px 14px; font-size: 0.88rem; font-weight: 700;">
-                                    ✓ Accept Task
+                                    ✓ Accept
+                                </button>
+                                <button onclick="rejectTask('${t.id}')" class="btn btn-secondary" style="padding: 7px 14px; font-size: 0.88rem; font-weight: 700; color: #DC2626; border-color: #FCA5A5;">
+                                    ✕ Reject
                                 </button>
                             ` : `
                                 <span class="badge ${t.status === 'Task Completed' ? 'badge-success' : 'badge-primary'}">${t.status}</span>
-                                <a href="confirmation.html?id=${t.id}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Tracker →</a>
+                                <a href="volunteer.html?tab=active&id=${t.id}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; color: #047857; border-color: #059669; font-weight: 600;">Mission Desk →</a>
                             `}
                         </div>
                     </div>
@@ -700,7 +777,7 @@
             const task = tasks.find(t => t.id === taskId);
             if (task) {
                 const user = AuthSession.getCurrentUser() || DEFAULT_PROFILES.volunteer;
-                task.status = 'Volunteer Assigned';
+                task.status = 'Live Location Active';
                 task.assignedVolunteer = {
                     name: user.name || 'Karan Verma',
                     phone: user.phone || '+91 98765 43211',
@@ -710,17 +787,259 @@
                 task.etaMinutes = 12;
                 AppStore.saveTasks(tasks);
 
+                // Update ReachData & sync storage keys
+                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                    ReachData.updateRequestStatus(taskId, 'location_active', { assignedVolunteer: task.assignedVolunteer });
+                }
+                const lastStr = localStorage.getItem('reach_last_confirmed');
+                if (lastStr) {
+                    try {
+                        const it = JSON.parse(lastStr);
+                        if (it.id === taskId) {
+                            it.status = 'Live Location Active';
+                            it.assignedVolunteer = user.name || 'Karan Verma';
+                            localStorage.setItem('reach_last_confirmed', JSON.stringify(it));
+                        }
+                    } catch(e) {}
+                }
+
                 localStorage.setItem('reach_accepted_task_id', taskId);
                 localStorage.setItem('reach_active_volunteer_mission', JSON.stringify(task));
+                localStorage.setItem('reach_sync_ping', Date.now().toString());
 
                 if ('BroadcastChannel' in window) {
                     const bc = new BroadcastChannel('reach_sync');
-                    bc.postMessage({ type: 'TASK_ACCEPTED', taskId: taskId, volunteer: user.name });
+                    bc.postMessage({ type: 'TASK_ACCEPTED', action: 'accept_task', taskId: taskId, volunteer: user.name, time: Date.now() });
                 }
 
-                alert(`Task ${taskId} Accepted! Heading to mission tracking.`);
-                window.location.href = `confirmation.html?id=${taskId}`;
+                alert(`Task ${taskId} Accepted! Heading to your Volunteer Mission Desk.`);
+                window.location.href = `volunteer.html?tab=active&id=${taskId}`;
             }
+        }
+
+        function rejectTask(taskId) {
+            if (confirm(`Decline / reject task ${taskId}? It will remain in the pool for other neighborhood volunteers.`)) {
+                let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+                if (!dismissed.includes(taskId)) {
+                    dismissed.push(taskId);
+                    localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
+                }
+                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                    ReachData.updateRequestStatus(taskId, 'waiting_volunteer');
+                }
+                if (window.AppStore && typeof AppStore.getTasks === 'function') {
+                    const tasks = AppStore.getTasks();
+                    const t = tasks.find(x => x.id === taskId);
+                    if (t) {
+                        t.status = 'Waiting for Volunteer';
+                        t.assignedVolunteer = null;
+                        AppStore.saveTasks(tasks);
+                    }
+                }
+                renderVolunteerTasks();
+                if ('BroadcastChannel' in window) {
+                    try { new BroadcastChannel('reach_sync').postMessage({ action: 'reject_task', taskId }); } catch(e) {}
+                }
+                alert(`Task ${taskId} declined and kept in the community pool.`);
+            }
+        }
+
+        // Render Volunteer Active Mission Controller on Dashboard
+        function renderVolunteerActiveMission() {
+            const acceptedId = localStorage.getItem('reach_accepted_task_id');
+            const missionStr = localStorage.getItem('reach_active_volunteer_mission');
+            const card = document.getElementById('dashVolActiveMissionCard');
+            if (!card) return;
+
+            let task = null;
+            const tasks = AppStore.getTasks();
+            const reqList = (window.ReachData && typeof ReachData.getRequests === 'function') ? ReachData.getRequests() : [];
+
+            if (acceptedId) {
+                task = tasks.find(t => t.id === acceptedId) || reqList.find(r => r.id === acceptedId);
+            }
+            if (!task && missionStr) {
+                try {
+                    const m = JSON.parse(missionStr);
+                    if (m && (m.taskId || m.id)) {
+                        const mid = m.taskId || m.id;
+                        task = tasks.find(t => t.id === mid) || reqList.find(r => r.id === mid);
+                    }
+                } catch(e) {}
+            }
+            if (!task && tasks.length > 0) {
+                task = tasks.find(t => t.assignedVolunteer || t.status === 'Live Location Active' || t.status === 'Volunteer Arrived' || t.status === 'Task In Progress');
+            }
+
+            if (!task) {
+                card.style.display = 'none';
+                return;
+            }
+
+            let status = (task.status || '').toLowerCase();
+            let missionStatus = '';
+            if (missionStr) {
+                try {
+                    const m = JSON.parse(missionStr);
+                    if (m && m.status) missionStatus = m.status.toLowerCase();
+                } catch(e) {}
+            }
+
+            if (status.includes('completed') || missionStatus === 'completed') {
+                card.style.display = 'none';
+                return;
+            }
+
+            card.style.display = 'block';
+            document.getElementById('dashMissionTitle').textContent = (task.category && task.category.includes('Medicine') ? '💊 ' : '🛒 ') + (task.title || task.category);
+            document.getElementById('dashMissionSenior').innerHTML = `Senior: <strong>${task.requester || 'Senior Resident'} (${task.requesterPhone || '+91 98765 43210'})</strong> • 📍 ${task.location}`;
+
+            const pinHint = document.getElementById('dashPinHint');
+            const pinInput = document.getElementById('dashPinInput');
+            const pinVal = task.safetyPin || task.otpCode || '4829';
+            if (pinHint) pinHint.textContent = pinVal;
+            if (pinInput) pinInput.value = pinVal;
+
+            const badge = document.getElementById('dashMissionStateBadge');
+            const btnArrive = document.getElementById('btnDashArrived');
+            const btnStart = document.getElementById('btnDashStart');
+            const btnComplete = document.getElementById('btnDashComplete');
+
+            if (status.includes('arrived') || missionStatus === 'volunteer_arrived') {
+                badge.textContent = '🟢 Arrived at Senior Doorstep';
+                badge.className = 'badge badge-primary';
+                btnArrive.style.display = 'none';
+                btnStart.style.display = 'inline-flex';
+                btnComplete.style.display = 'none';
+            } else if (status.includes('progress') || missionStatus === 'in_progress') {
+                badge.textContent = '⚡ Assistance in Progress';
+                badge.className = 'badge badge-pending';
+                btnArrive.style.display = 'none';
+                btnStart.style.display = 'none';
+                btnComplete.style.display = 'inline-flex';
+            } else {
+                badge.textContent = 'Live Location Active (En Route)';
+                badge.className = 'badge badge-success';
+                btnArrive.style.display = 'inline-flex';
+                btnStart.style.display = 'none';
+                btnComplete.style.display = 'none';
+            }
+        }
+
+        function advanceVolunteerDuty(stage) {
+            const acceptedId = localStorage.getItem('reach_accepted_task_id') || 'TSK-101';
+            const tasks = AppStore.getTasks();
+            const task = tasks.find(t => t.id === acceptedId) || tasks[0];
+            const tid = task ? task.id : acceptedId;
+
+            if (stage === 'arrived') {
+                if (task) task.status = 'Volunteer Arrived';
+                AppStore.saveTasks(tasks);
+                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                    ReachData.updateRequestStatus(tid, 'volunteer_arrived');
+                }
+                localStorage.setItem('reach_active_volunteer_mission', JSON.stringify({
+                    taskId: tid,
+                    status: 'volunteer_arrived',
+                    volunteerName: 'Karan Verma',
+                    volunteerPhone: '+91 98765 43211',
+                    timestamp: Date.now()
+                }));
+                const lastStr = localStorage.getItem('reach_last_confirmed');
+                if (lastStr) {
+                    try {
+                        const item = JSON.parse(lastStr);
+                        item.status = 'Volunteer Arrived';
+                        localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                    } catch (e) {}
+                }
+                localStorage.setItem('reach_sync_ping', Date.now().toString());
+                if ('BroadcastChannel' in window) {
+                    const bc = new BroadcastChannel('reach_sync');
+                    bc.postMessage({ action: 'stage_arrived', taskId: tid, time: Date.now() });
+                }
+                alert("🚶 Status updated: You have arrived at the senior resident's home! The resident's screen is updated live.");
+                renderVolunteerActiveMission();
+            } else if (stage === 'in_progress') {
+                if (task) task.status = 'Task In Progress';
+                AppStore.saveTasks(tasks);
+                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                    ReachData.updateRequestStatus(tid, 'in_progress');
+                }
+                localStorage.setItem('reach_active_volunteer_mission', JSON.stringify({
+                    taskId: tid,
+                    status: 'in_progress',
+                    volunteerName: 'Karan Verma',
+                    volunteerPhone: '+91 98765 43211',
+                    timestamp: Date.now()
+                }));
+                const lastStr = localStorage.getItem('reach_last_confirmed');
+                if (lastStr) {
+                    try {
+                        const item = JSON.parse(lastStr);
+                        item.status = 'Task In Progress';
+                        localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                    } catch (e) {}
+                }
+                localStorage.setItem('reach_sync_ping', Date.now().toString());
+                if ('BroadcastChannel' in window) {
+                    const bc = new BroadcastChannel('reach_sync');
+                    bc.postMessage({ action: 'stage_in_progress', taskId: tid, time: Date.now() });
+                }
+                alert("▶️ Status updated: Task assistance in progress! The resident's screen is updated live.");
+                renderVolunteerActiveMission();
+            }
+        }
+
+        function openDashCompletionModal() {
+            const m = document.getElementById('dashCompletionModal');
+            if (m) m.style.display = 'flex';
+        }
+
+        function closeDashCompletionModal() {
+            const m = document.getElementById('dashCompletionModal');
+            if (m) m.style.display = 'none';
+        }
+
+        function handleDashCompleteSubmit(e) {
+            e.preventDefault();
+            const acceptedId = localStorage.getItem('reach_accepted_task_id') || 'TSK-101';
+            const tasks = AppStore.getTasks();
+            const task = tasks.find(t => t.id === acceptedId) || tasks[0];
+            const tid = task ? task.id : acceptedId;
+
+            if (task) {
+                task.status = 'Task Completed';
+                task.rating = 5;
+                task.feedback = 'Assisted on time with full verification.';
+                AppStore.saveTasks(tasks);
+            }
+            if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                ReachData.updateRequestStatus(tid, 'completed');
+            }
+            localStorage.setItem('reach_active_volunteer_mission', JSON.stringify({
+                taskId: tid,
+                status: 'completed',
+                volunteerName: 'Karan Verma',
+                timestamp: Date.now()
+            }));
+            const lastStr = localStorage.getItem('reach_last_confirmed');
+            if (lastStr) {
+                try {
+                    const item = JSON.parse(lastStr);
+                    item.status = 'Task Completed';
+                    localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                } catch (e) {}
+            }
+            localStorage.setItem('reach_sync_ping', Date.now().toString());
+            if ('BroadcastChannel' in window) {
+                const bc = new BroadcastChannel('reach_sync');
+                bc.postMessage({ action: 'finish_task', taskId: tid, time: Date.now() });
+            }
+            closeDashCompletionModal();
+            alert("✅ Mission Completed! The senior resident's screen is updated to completed and prompted for 5-star rating.");
+            renderVolunteerActiveMission();
+            renderVolunteerTasks();
         }
 
         // Render Space Owner Bookings
@@ -741,14 +1060,14 @@
                         </div>
                         <div style="display:flex; gap: 8px; align-items: center;">
                             ${isPending ? `
-                                <button onclick="decideBooking('${b.id}', 'Approved')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem;">
-                                    ✓ Approve
+                                <button onclick="decideBooking('${b.id}', 'Confirmed')" class="btn btn-primary" style="padding: 6px 12px; font-size: 0.85rem; background: #10B981; border-color: #059669;">
+                                    ✓ Approve (QR Pass)
                                 </button>
-                                <button onclick="decideBooking('${b.id}', 'Not Approved')" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; color: #DC2626; border-color: #FCA5A5;">
+                                <button onclick="decideBooking('${b.id}', 'Rejected')" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; color: #DC2626; border-color: #FCA5A5;">
                                     ✗ Decline
                                 </button>
                             ` : `
-                                <span class="badge ${b.status.includes('Approved') && !b.status.includes('Not') ? 'badge-success' : 'badge-danger'}">${b.status}</span>
+                                <span class="badge ${(b.status === 'Confirmed' || b.status === 'Approved') ? 'badge-success' : 'badge-danger'}">${b.status}</span>
                             `}
                         </div>
                     </div>
@@ -762,16 +1081,56 @@
             const bookings = AppStore.getBookings();
             const b = bookings.find(x => x.id === id);
             if (b) {
-                b.status = status;
+                const standardized = (status === 'Confirmed' || status === 'Approved') ? 'Confirmed' : 'Rejected';
+                b.status = standardized;
+                if (standardized === 'Confirmed') {
+                    b.qrPassId = 'PASS-' + b.id;
+                    b.qrStatus = 'Ready for Check-in';
+                } else {
+                    b.qrStatus = 'Declined';
+                }
                 AppStore.saveBookings(bookings);
-                renderOwnerBookings();
 
-                if ('BroadcastChannel' in window) {
-                    const bc = new BroadcastChannel('reach_sync');
-                    bc.postMessage({ type: 'BOOKING_UPDATED', id: id, status: status });
+                // Always synchronize reach_last_confirmed and reach_last_booking_decision
+                localStorage.setItem('reach_last_confirmed', JSON.stringify({
+                    id: b.id,
+                    type: 'space_booking',
+                    title: b.spaceName,
+                    status: standardized,
+                    qrPassId: b.qrPassId || ('PASS-' + b.id)
+                }));
+                localStorage.setItem('reach_last_booking_decision', JSON.stringify({
+                    id: b.id,
+                    status: standardized,
+                    time: Date.now()
+                }));
+
+                // Synchronize organizer activities if linked
+                const acts = AppStore.getActivities();
+                const act = acts.find(a => id.includes(a.id) || (a.title && b.purpose && a.title.includes(b.purpose)));
+                if (act) {
+                    act.spaceStatus = (standardized === 'Confirmed') ? 'Confirmed & QR Pass Issued' : 'Rejected';
+                    AppStore.saveActivities(acts);
                 }
 
-                alert(`Booking updated to: "${status}".`);
+                localStorage.setItem('reach_sync_ping', Date.now().toString());
+
+                if ('BroadcastChannel' in window) {
+                    try {
+                        const bc = new BroadcastChannel('reach_sync');
+                        bc.postMessage({
+                            type: 'BOOKING_UPDATED',
+                            action: 'booking_decision',
+                            bookingId: id,
+                            status: standardized,
+                            decision: standardized,
+                            time: Date.now()
+                        });
+                    } catch (e) {}
+                }
+
+                renderOwnerBookings();
+                alert(`Booking ${id} marked as ${standardized.toUpperCase()}.\n${standardized === 'Confirmed' ? 'Official entry QR pass activated for requester slip.' : 'Requester slip updated to Declined.'}`);
             }
         }
 
@@ -809,9 +1168,36 @@
         window.addEventListener('storage', () => {
             loadDashboard();
         });
+        setInterval(loadDashboard, 1000);
 
         document.addEventListener('DOMContentLoaded', loadDashboard);
     </script>
+
+    <!-- Volunteer Mission Completion PIN Modal on Dashboard -->
+    <div id="dashCompletionModal" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15,23,42,0.65); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="modal-content" style="background: #FFFFFF; border-radius: 16px; padding: 28px; width: 90%; max-width: 480px; text-align: center; position: relative;">
+            <button type="button" onclick="closeDashCompletionModal()" style="position: absolute; top: 14px; right: 16px; background: none; border: none; font-size: 1.6rem; cursor: pointer; color: #64748B;">&times;</button>
+            <div style="font-size: 2.8rem; margin-bottom: 8px;">🔐</div>
+            <h2 style="color: #166534; font-size: 1.45rem; margin-bottom: 6px;">
+                Verify Handover & Complete Mission
+            </h2>
+            <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 16px;">
+                Ask the senior citizen for their 4-digit security PIN to confirm safe delivery/handover.
+            </p>
+            <div style="background: #F0FDF4; border: 1.5px dashed #86EFAC; border-radius: 8px; padding: 12px; margin-bottom: 18px; font-size: 0.88rem; color: #166534;">
+                Senior's registered SMS verification PIN is: <strong id="dashPinHint">4829</strong>
+            </div>
+            <form onsubmit="handleDashCompleteSubmit(event)">
+                <div style="margin-bottom: 18px;">
+                    <input type="text" id="dashPinInput" maxlength="4" value="4829" required style="width: 100%; text-align: center; font-size: 1.6rem; font-weight: 800; letter-spacing: 6px; padding: 10px; border: 2px solid #16A34A; border-radius: 8px; color: #166534;">
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" onclick="closeDashCompletionModal()" class="btn btn-secondary" style="flex: 1; padding: 10px;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="flex: 2; padding: 10px; background: #16A34A; border-color: #15803D; font-weight: 700;">Finish Mission ✓</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </body>
 
 </html>
