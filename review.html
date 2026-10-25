@@ -67,7 +67,6 @@
         <nav class="main-nav">
             <a href="index.html">Home</a>
             <a href="dashboard.html">My Dashboard</a>
-            <a href="explore.html?type=tasks">Browse Tasks</a>
             <a href="spaces.html">Community Spaces</a>
             <a href="help.html">Help & FAQ</a>
         </nav>
@@ -217,6 +216,42 @@
 
         function renderReviewData(d) {
             const container = document.getElementById('reviewDetailsContainer');
+            if (d.type === 'space_booking' || d.spaceId) {
+                container.innerHTML = `
+                    <div class="review-row">
+                        <span class="review-label">Request Type:</span>
+                        <span class="review-value" style="color: #0284C7; font-size: 1.1rem; font-weight: 800;">
+                            🏛️ Community Space Reservation
+                        </span>
+                    </div>
+                    <div class="review-row">
+                        <span class="review-label">Venue Name:</span>
+                        <span class="review-value" style="font-weight: 700; color: #0369A1;">${d.spaceName || 'Community Facility'}</span>
+                    </div>
+                    <div class="review-row">
+                        <span class="review-label">Purpose / Activity:</span>
+                        <span class="review-value">${d.purpose || 'Community Session'}</span>
+                    </div>
+                    <div class="review-row">
+                        <span class="review-label">Expected Attendees:</span>
+                        <span class="review-value">${d.expectedGuests || 20} Attendees</span>
+                    </div>
+                    <div class="review-row">
+                        <span class="review-label">Requester Name:</span>
+                        <span class="review-value">${d.requester || d.requesterName || 'Resident Member'}</span>
+                    </div>
+                    <div class="review-row">
+                        <span class="review-label">Contact Phone:</span>
+                        <span class="review-value">${d.requesterPhone || '+91 98765 43210'}</span>
+                    </div>
+                    <div class="review-row" style="border-bottom: none;">
+                        <span class="review-label">Reserved Date & Time:</span>
+                        <span class="review-value">${d.date ? d.date + ' • ' : ''}${d.time || 'Standard Hours'}</span>
+                    </div>
+                `;
+                return;
+            }
+
             let rows = `
                 <div class="review-row">
                     <span class="review-label">Task Category:</span>
@@ -256,8 +291,8 @@
             // STRICT AUTH CHECK: Cannot confirm without account!
             if (!AuthSession.isLoggedIn()) {
                 AuthSession.showAuthModal({
-                    title: 'Sign In Required to Submit Help Request',
-                    message: 'You cannot submit a volunteer request without signing in. Please sign in or create an account to proceed.',
+                    title: 'Sign In Required to Submit Request',
+                    message: 'Please sign in or create an account to proceed.',
                     role: 'member',
                     redirectUrl: 'review.html'
                 });
@@ -265,10 +300,48 @@
             }
 
             if (!currentDraft) return;
+            const user = AuthSession.getCurrentUser();
 
+            // Check if this draft is a Community Space reservation
+            if (currentDraft.type === 'space_booking' || currentDraft.spaceId) {
+                const bookings = AppStore.getBookings();
+                const newId = 'BKG-2026-' + Math.floor(100 + Math.random() * 900);
+                const newBooking = {
+                    id: newId,
+                    spaceId: currentDraft.spaceId || 'SPC-501',
+                    spaceName: currentDraft.spaceName || 'Community Hall',
+                    requester: user ? user.name : (currentDraft.requester || 'Resident Member'),
+                    requesterPhone: user ? user.phone : (currentDraft.requesterPhone || '+91 98765 43210'),
+                    purpose: currentDraft.purpose || 'Community Gathering',
+                    date: currentDraft.date || 'Upcoming',
+                    time: currentDraft.time || 'Standard Hours',
+                    expectedGuests: parseInt(currentDraft.expectedGuests) || 20,
+                    status: 'Pending Owner Approval',
+                    qrPassId: 'PASS-' + newId,
+                    createdAt: 'Just now'
+                };
+
+                bookings.unshift(newBooking);
+                AppStore.saveBookings(bookings);
+
+                localStorage.setItem('reach_last_confirmed', JSON.stringify({
+                    id: newId,
+                    type: 'space_booking',
+                    title: newBooking.spaceName,
+                    status: 'Pending Owner Approval'
+                }));
+
+                localStorage.removeItem('reach_pending_request');
+                localStorage.removeItem('reach_active_draft');
+
+                // Redirect to dedicated pass page!
+                window.location.href = 'pass.html?id=' + newId;
+                return;
+            }
+
+            // Otherwise, handle Volunteer Task
             const tasks = AppStore.getTasks();
             const newId = 'TSK-' + Math.floor(100 + Math.random() * 900);
-            const user = AuthSession.getCurrentUser();
 
             const newTask = {
                 id: newId,
@@ -321,6 +394,7 @@
 
             // Clear draft
             localStorage.removeItem('reach_pending_request');
+            localStorage.removeItem('reach_active_draft');
 
             // Broadcast real-time ping so open Volunteer Hub displays this immediately
             localStorage.setItem('reach_sync_ping', Date.now().toString());

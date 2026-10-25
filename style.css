@@ -185,6 +185,28 @@ body {
     background-color: var(--primary-light);
 }
 
+/* Highly Prominent Dashboard Button Across All Pages & Tabs */
+.main-nav a[href*="dashboard"] {
+    font-weight: 700 !important;
+    color: #1E40AF !important;
+    background: #EFF6FF !important;
+    border: 1.5px solid #93C5FD !important;
+    border-radius: var(--radius-sm);
+    padding: 7px 14px;
+    box-shadow: 0 1px 3px rgba(30, 58, 138, 0.12);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.main-nav a[href*="dashboard"]:hover,
+.main-nav a[href*="dashboard"].active {
+    background: #2563EB !important;
+    border-color: #1D4ED8 !important;
+    color: #FFFFFF !important;
+    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+}
+
 /* User Badge in Nav */
 .user-badge-pill {
     display: inline-flex;
@@ -539,12 +561,12 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    background: #FFFFFF;
-    border: 1.5px solid var(--border);
+    background: #EFF6FF;
+    border: 2px solid #93C5FD;
     border-radius: var(--radius-sm);
-    font-weight: 600;
+    font-weight: 700;
     font-size: 0.95rem;
-    color: var(--primary-dark);
+    color: #1E3A8A;
     text-decoration: none;
     margin-bottom: 20px;
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
@@ -553,10 +575,11 @@ body {
 }
 
 .btn-back:hover {
-    background: #EFF6FF;
-    border-color: var(--primary);
-    color: var(--primary);
+    background: #1E3A8A;
+    border-color: #1E3A8A;
+    color: #FFFFFF;
     transform: translateX(-3px);
+    box-shadow: var(--shadow-md);
 }
 
 .breadcrumbs {

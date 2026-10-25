@@ -2,6 +2,8 @@
 ### Platform Documentation & Architecture
 **Tagline:** *Connecting People, Helping Communities.*
 
+🔗 **Live Deployed Web Application:** [https://aanchalyadav-21.github.io/CMV-space/](https://aanchalyadav-21.github.io/CMV-space/)
+
 ---
 
 ## 🌟 Overview & Platform Mission
@@ -28,6 +30,7 @@
 | `confirmation.html` | Request Tracker | Live operational status tracking, safety PIN verification, and volunteer contact. |
 | `volunteer.html` | Volunteer Operations Hub | Dedicated volunteer desk to browse nearby errands, accept/pass tasks, and enter completion PIN. |
 | `spaces.html` | Empty Spaces Directory | Public directory to discover and request reservations for community halls and clubhouses. |
+| `pass.html` | Space Digital Entry Pass | Dedicated facility entry pass with SVG QR gate verification, caretaker contact, and venue rules. |
 | `owner.html` | Space Provider Portal | Facility management hub to approve booking requests and generate passes. |
 | `organize.html` | Event Organizer Desk | Platform integration module to run community activities utilizing volunteers and venues. |
 | `my-activity.html` | Activity History | Comprehensive history of errand requests, venue reservations, and completed tasks. |

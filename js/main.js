@@ -159,111 +159,21 @@ function setupRolePill() {
                 <span>${currentUser.avatar || '👤'}</span>
                 <span><strong>${currentUser.name ? currentUser.name.split(' ')[0] : 'Member'}</strong></span>
             </span>
-            <a href="index.html" onclick="event.preventDefault(); if(window.AuthSession) AuthSession.logout(); else { localStorage.clear(); window.location.href='index.html'; }" style="color: #FCD34D; font-size: 0.85rem; text-decoration: underline; margin-left: 4px; cursor: pointer;">Sign Out</a>
         `;
         topBar.appendChild(pillContainer);
     }
 }
 
 function openRoleSwitcherModal() {
-    // Disabled: role switching requires authentic sign in
     return false;
 }
 
 function switchRole(roleKey) {
-    // Disabled: role switching requires authentic sign in
-    window.location.href = 'index.html#signInBox';
+    return false;
 }
 
-// 6. Profile Switcher Modal (Allows live instant testing of all platform roles)
-function openRoleSwitcherModal() {
-    let modal = document.getElementById('roleModal');
-    if (!modal) {
-        modal = document.createElement('div');
-        modal.id = 'roleModal';
-        modal.className = 'modal-overlay';
-        modal.style.display = 'flex';
-        modal.innerHTML = `
-            <div class="modal-content" style="max-width: 580px;">
-                <div class="modal-header">
-                    <h2 style="color: var(--primary-color); display: flex; align-items: center; gap: 8px;">
-                        👤 Switch Community Profile
-                    </h2>
-                    <button class="modal-close-btn" onclick="closeRoleSwitcherModal()">&times;</button>
-                </div>
-                <p style="color: var(--text-secondary); margin-bottom: 18px; font-size: 0.95rem;">
-                    Select a profile to experience how each community member uses the platform:
-                </p>
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
-                    <div class="role-select-card" onclick="switchRole('resident')" style="padding: 14px;">
-                        <div class="profile-avatar" style="width: 44px; height: 44px; font-size: 1.4rem;">👴</div>
-                        <div style="flex: 1;">
-                            <strong style="font-size: 1.05rem; color: var(--primary-color);">Resident — Ramesh Patel</strong>
-                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 2px 0 0 0;">
-                                Request helper visits, book community spaces, and track volunteer arrivals.
-                            </p>
-                        </div>
-                        <span class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Select →</span>
-                    </div>
-
-                    <div class="role-select-card" onclick="switchRole('volunteer')" style="padding: 14px;">
-                        <div class="profile-avatar" style="width: 44px; height: 44px; font-size: 1.4rem; background: #DCFCE7;">🦸‍♂️</div>
-                        <div style="flex: 1;">
-                            <strong style="font-size: 1.05rem; color: #16A34A;">Volunteer — Karan Verma</strong>
-                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 2px 0 0 0;">
-                                View neighborhood requests, accept tasks, and share live location status.
-                            </p>
-                        </div>
-                        <span class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Select →</span>
-                    </div>
-
-                    <div class="role-select-card" onclick="switchRole('owner')" style="padding: 14px;">
-                        <div class="profile-avatar" style="width: 44px; height: 44px; font-size: 1.4rem; background: #E0F2FE;">🏛️</div>
-                        <div style="flex: 1;">
-                            <strong style="font-size: 1.05rem; color: #0284C7;">Space Provider — Marian Welfare Trust</strong>
-                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 2px 0 0 0;">
-                                Manage hall availability, approve booking requests, and scan entry QR passes.
-                            </p>
-                        </div>
-                        <span class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Select →</span>
-                    </div>
-
-                    <div class="role-select-card" onclick="switchRole('ngo')" style="padding: 14px;">
-                        <div class="profile-avatar" style="width: 44px; height: 44px; font-size: 1.4rem; background: #EFF6FF;">🤝</div>
-                        <div style="flex: 1;">
-                            <strong style="font-size: 1.05rem; color: #2563EB;">NGO Partner — CareForward Foundation</strong>
-                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 2px 0 0 0;">
-                                Organize community drives and coordinate volunteer team deployments.
-                            </p>
-                        </div>
-                        <span class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Select →</span>
-                    </div>
-
-                    <div class="role-select-card" onclick="switchRole('admin')" style="padding: 14px;">
-                        <div class="profile-avatar" style="width: 44px; height: 44px; font-size: 1.4rem; background: #FEE2E2;">🛡️</div>
-                        <div style="flex: 1;">
-                            <strong style="font-size: 1.05rem; color: #DC2626;">Support Desk — Safety & Grievance Panel</strong>
-                            <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 2px 0 0 0;">
-                                Volunteer identity verification, dispute mediation, and emergency SOS monitoring.
-                            </p>
-                        </div>
-                        <span class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Select →</span>
-                    </div>
-                </div>
-                <div style="text-align: right;">
-                    <button class="btn btn-secondary" onclick="closeRoleSwitcherModal()">Close</button>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
-    } else {
-        modal.style.display = 'flex';
-    }
-}
-
-// Aliases for compatibility
 function openActorSwitcherModal() {
-    openRoleSwitcherModal();
+    return false;
 }
 
 function closeRoleSwitcherModal() {

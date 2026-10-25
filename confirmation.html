@@ -172,7 +172,6 @@
         <nav class="main-nav">
             <a href="index.html">Home</a>
             <a href="dashboard.html">My Dashboard</a>
-            <a href="explore.html?type=tasks">Browse Tasks</a>
             <a href="spaces.html">Community Spaces</a>
             <a href="my-activity.html">My Activity</a>
             <a href="help.html">Help & FAQ</a>
@@ -222,9 +221,9 @@
 
             <!-- Reference ID & Timestamp -->
             <div style="background: #F8FAFC; border: 1.5px solid var(--border-light); padding: 12px 20px; border-radius: 8px; display: inline-flex; gap: 24px; margin-bottom: 20px; font-size: 0.95rem;">
-                <span>Task Reference: <strong id="valRefId" style="color: var(--primary);">#TSK-101</strong></span>
-                <span>Category: <strong id="valCategory">Prescription BP Medicine</strong></span>
-                <span>PIN: <strong id="valPin" style="color: #B45309;">4829</strong></span>
+                <span>Task Reference: <strong id="valRefId" style="color: var(--primary);">#---</strong></span>
+                <span>Category: <strong id="valCategory">Loading task details...</strong></span>
+                <span>Handover PIN: <strong id="valPin" style="color: #B45309;">----</strong></span>
             </div>
 
             <!-- Workflow Lifecycle Visual Horizontal Stepper -->
@@ -346,28 +345,6 @@
 
             </div>
 
-            <!-- DYNAMIC VIEW B: VENUE BOOKING PASS & QR CODE -->
-            <div id="viewSpacePass" style="display: none; margin-top: 20px;">
-                <div style="background: #F8FAFC; border: 2px dashed #0284C7; border-radius: 12px; padding: 26px; display: inline-block; max-width: 440px; margin: 0 auto;">
-                    <span class="badge badge-success" style="letter-spacing: 1px; font-size: 0.85rem; padding: 6px 14px;">
-                        OFFICIAL COMMUNITY FACILITY PASS
-                    </span>
-                    <h2 id="qrPassHall" style="color: #0369A1; font-size: 1.45rem; margin: 14px 0 4px 0;">
-                        St. Joseph Community Activity Hall
-                    </h2>
-                    <p style="color: var(--text-muted); font-size: 0.92rem; margin-bottom: 14px;">
-                        Pass Token: <strong id="qrTokenVal">PASS-SPACE-2026-501</strong> • Marian Welfare Trust
-                    </p>
-
-                    <!-- SVG QR Code -->
-                    <div id="qrCodeContainer" style="display: inline-block; margin-bottom: 10px;">
-                        <!-- SVG injected by JS -->
-                    </div>
-
-                    <p style="font-size: 0.88rem; color: var(--text-muted); margin-top: 10px;">
-                        Present this pass at the parish security gate for biometric check-in & door access.
-                    </p>
-                </div>
 
             <!-- Footer Return Buttons -->
             <div style="margin-top: 32px; display: flex; justify-content: center; gap: 14px; flex-wrap: wrap;">
@@ -456,17 +433,14 @@
         setInterval(refreshConfirmationTracker, 700);
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Render default QR Code in pass view
-            const qrContainer = document.getElementById('qrCodeContainer');
-            if (qrContainer) qrContainer.innerHTML = generateQrSvg('PASS-SPACE-2026-501', 170);
-            
             refreshConfirmationTracker();
         });
 
         function refreshConfirmationTracker() {
             const lastStr = localStorage.getItem('reach_last_confirmed');
             const urlParams = new URLSearchParams(window.location.search);
-            const taskId = urlParams.get('id');
+            const reqId = urlParams.get('id');
+            const reqType = urlParams.get('type');
             const acceptedId = localStorage.getItem('reach_accepted_task_id');
             const missionStr = localStorage.getItem('reach_active_volunteer_mission');
             let activeMission = null;
@@ -479,18 +453,30 @@
                 try { currentItem = JSON.parse(lastStr); } catch (e) {}
             }
 
-            // Find matching task from storage
+            const bookings = (window.AppStore && typeof AppStore.getBookings === 'function') ? AppStore.getBookings() : [];
             const tasks = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
             const reqList = (window.ReachData && typeof ReachData.getRequests === 'function') ? ReachData.getRequests() : [];
-            
+
+            // 1. If this is a space booking, redirect immediately to dedicated pass.html page
+            if (reqType === 'space' || (reqId && reqId.startsWith('BKG-')) || (currentItem && currentItem.type === 'space_booking')) {
+                const targetId = (reqId && reqId.startsWith('BKG-')) ? reqId : (currentItem && currentItem.id ? currentItem.id : '');
+                window.location.replace('pass.html' + (targetId ? `?id=${targetId}` : ''));
+                return;
+            }
+
+            // 2. Handle Help / Micro-Volunteering Task
+            const viewSpacePass = document.getElementById('viewSpacePass');
+            if (viewSpacePass) viewSpacePass.style.display = 'none';
+            document.getElementById('viewVolunteerTrack').style.display = 'block';
+
             let task = null;
-            if (taskId) {
-                task = tasks.find(t => t.id === taskId) || reqList.find(r => r.id === taskId);
+            if (reqId) {
+                task = tasks.find(t => t.id === reqId) || reqList.find(r => r.id === reqId);
             }
             if (!task && acceptedId) {
                 task = tasks.find(t => t.id === acceptedId) || reqList.find(r => r.id === acceptedId);
             }
-            if (!task && currentItem && currentItem.id) {
+            if (!task && currentItem && currentItem.id && currentItem.type !== 'space_booking') {
                 task = tasks.find(t => t.id === currentItem.id) || reqList.find(r => r.id === currentItem.id);
             }
             if (!task && tasks.length > 0) {
@@ -499,17 +485,6 @@
             if (!task && reqList.length > 0) {
                 task = reqList.find(r => r.status === 'location_active' || r.assignedVolunteer) || reqList[0];
             }
-
-            if (currentItem && currentItem.type === 'space_booking') {
-                document.getElementById('confTitle').textContent = 'Space Booking Status';
-                document.getElementById('confSub').textContent = 'Official booking and QR verification status tracker.';
-                document.getElementById('viewVolunteerTrack').style.display = 'none';
-                document.getElementById('viewSpacePass').style.display = 'block';
-                document.getElementById('badgeStatus').textContent = '🟡 Status: Pending Owner Approval';
-                document.getElementById('badgeStatus').className = 'status-pill-big badge-pending';
-                if (currentItem.id) document.getElementById('valRefId').textContent = '#' + currentItem.id;
-                if (currentItem.title) document.getElementById('valCategory').textContent = currentItem.title;
-            } else {
                 // HELP / MICRO-VOLUNTEERING TASK
                 if (task) {
                     document.getElementById('valRefId').textContent = '#' + task.id;
@@ -522,10 +497,12 @@
                         if (pinBox) pinBox.textContent = task.safetyPin || task.otpCode;
                     }
 
-                    // Check live status across data objects
+                    // Check live status across data objects accurately for THIS specific task
                     const status = (task.status || '').toLowerCase();
-                    const missionStatus = activeMission && activeMission.status ? activeMission.status.toLowerCase() : '';
-                    const hasVolunteer = !!(task.assignedVolunteer || (currentItem && currentItem.assignedVolunteer) || (activeMission && activeMission.volunteerName) || acceptedId);
+                    const matchesActiveMission = !!(activeMission && (activeMission.taskId === task.id || activeMission.id === task.id));
+                    const missionStatus = matchesActiveMission && activeMission.status ? activeMission.status.toLowerCase() : '';
+                    const matchesLastConfirmed = !!(currentItem && currentItem.id === task.id);
+                    const hasVolunteer = !!(task.assignedVolunteer || (matchesLastConfirmed && currentItem.assignedVolunteer) || (matchesActiveMission && activeMission.volunteerName) || (acceptedId === task.id));
                     
                     const isCompleted = status.includes('completed') || missionStatus === 'completed';
                     const isInProgress = status.includes('progress') || missionStatus === 'in_progress';

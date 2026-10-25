@@ -175,20 +175,10 @@
                         </small>
                     </div>
 
-                    <!-- Area & Preferred Language -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px;">
-                        <div class="form-group">
-                            <label class="form-label">Area / Locality:</label>
-                            <input type="text" id="regArea" class="form-control" value="Sector 4, City Center" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Preferred Language:</label>
-                            <select id="regLanguage" class="form-control">
-                                <option value="en">English</option>
-                                <option value="hi">हिंदी (Hindi)</option>
-                                <option value="mr">मराठी (Marathi)</option>
-                            </select>
-                        </div>
+                    <!-- Area / Locality -->
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label class="form-label">Area / Locality:</label>
+                        <input type="text" id="regArea" class="form-control" value="Sector 4, City Center" required>
                     </div>
 
                     <!-- 3. Government Identity & Aadhaar Verification Section -->
@@ -438,7 +428,7 @@
 
             const name = document.getElementById('regName').value;
             const area = document.getElementById('regArea').value;
-            const language = document.getElementById('regLanguage').value;
+            const language = 'en';
             const idType = document.getElementById('regIdType')?.value || 'Aadhaar Card';
             const aadhaarNumber = (document.getElementById('regAadhaarNumber')?.value || '').trim();
 

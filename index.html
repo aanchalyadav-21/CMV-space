@@ -145,16 +145,6 @@
             <button class="btn-sos" onclick="openSosModal()" title="Emergency Help">🚨 EMERGENCY SOS</button>
         </div>
         <div class="top-bar-right">
-            <!-- Language Selection -->
-            <div style="display: flex; align-items: center; gap: 6px;">
-                <span style="font-size: 0.85rem; color: #94A3B8;">🌐 Language:</span>
-                <select id="langSelect" class="lang-select-box" onchange="setLanguage(this.value)">
-                    <option value="en">English</option>
-                    <option value="hi">हिंदी (Hindi)</option>
-                    <option value="mr">मराठी (Marathi)</option>
-                </select>
-            </div>
-
             <!-- Font Size Controls -->
             <div class="font-controls">
                 <span style="font-size: 0.85rem; color: #94A3B8; margin-right: 4px;">Font Size:</span>
@@ -173,11 +163,10 @@
         </a>
         <nav class="main-nav">
             <a href="index.html" class="active">🏠 Home</a>
-            <a href="explore.html?type=tasks">🛒 Browse Tasks</a>
-            <a href="explore.html?type=spaces">🏛️ Community Spaces</a>
+            <a href="spaces.html">🏛️ Community Spaces</a>
             <a href="#servicesOverview">📋 Services</a>
             <a href="#signInBox" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.88rem;">🔑 Sign In</a>
-            <a href="#signInBox" onclick="switchAuthTab('register')" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.88rem;">📝 Create Account</a>
+            <a href="register.html" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.88rem;">📝 Create Account</a>
             <div id="navUserSection"></div>
         </nav>
     </header>
@@ -319,19 +308,9 @@
                         <input type="tel" id="regMobile" class="form-control" placeholder="+91 98200 12345" required>
                     </div>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
-                        <div class="form-group">
-                            <label class="form-label">Area / Locality:</label>
-                            <input type="text" id="regArea" class="form-control" value="Sector 4" placeholder="e.g. Sector 4, Shanti Niketan" required>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Preferred Language:</label>
-                            <select id="regLanguage" class="form-control">
-                                <option value="en">English</option>
-                                <option value="hi">हिंदी (Hindi)</option>
-                                <option value="mr">मराठी (Marathi)</option>
-                            </select>
-                        </div>
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label class="form-label">Area / Locality:</label>
+                        <input type="text" id="regArea" class="form-control" value="Sector 4" placeholder="e.g. Sector 4, Shanti Niketan" required>
                     </div>
 
                     <div class="form-group" style="margin-bottom: 14px;">
@@ -590,7 +569,7 @@
             const name = document.getElementById('regFullName').value;
             const phone = document.getElementById('regMobile').value;
             const area = document.getElementById('regArea').value;
-            const language = document.getElementById('regLanguage').value;
+            const language = 'en';
             const role = document.getElementById('regAccountRole').value;
 
             const aadhaarNumber = document.getElementById('regAadhaarNumber')?.value || '5421 8892 4103';
@@ -655,11 +634,27 @@
                                 <span class="badge badge-success" style="font-size: 0.78rem; margin-left: 6px;">${user.roleTitle || role}</span>
                             </div>
                             <div style="display: flex; gap: 8px;">
-                                <a href="dashboard.html?role=${role}" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.85rem; text-decoration: none;">Go to Dashboard →</a>
-                                <button onclick="AuthSession.logout()" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; color: #DC2626; cursor: pointer;">Sign Out</button>
+                                <a href="dashboard.html?role=${role}" class="btn btn-primary" style="padding: 7px 16px; font-size: 0.88rem; font-weight: 700; text-decoration: none;">Go to Dashboard →</a>
                             </div>
                         `;
                         hero.appendChild(welcomeDiv);
+                    }
+
+                    // Hide sign-in role picker card when already signed in
+                    const signInCard = document.getElementById('signInBox');
+                    if (signInCard) {
+                        signInCard.innerHTML = `
+                            <div style="text-align: center; padding: 24px 16px;">
+                                <div style="font-size: 2.2rem; margin-bottom: 8px;">👤</div>
+                                <h3 style="color: var(--primary-dark); margin-bottom: 6px; font-size: 1.25rem;">Active Account Session</h3>
+                                <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 16px;">
+                                    You are currently authenticated as <strong>${user.name}</strong> (${user.roleTitle || role}).
+                                </p>
+                                <a href="dashboard.html?role=${role}" class="btn btn-primary" style="padding: 9px 20px; font-size: 0.95rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                                    📊 Access Your Dashboard →
+                                </a>
+                            </div>
+                        `;
                     }
                 }
             }

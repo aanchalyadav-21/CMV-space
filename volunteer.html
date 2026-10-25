@@ -35,8 +35,7 @@
             <a href="dashboard.html?role=volunteer">My Dashboard</a>
             <a href="explore.html?type=tasks">Browse Tasks</a>
             <a href="volunteer.html" class="active">Volunteer Hub</a>
-            <a href="admin.html">System Admin</a>
-            <a href="index.html" onclick="event.preventDefault(); AuthSession.logout();" style="cursor: pointer;">Sign Out 🚪</a>
+            <div id="navUserSection"></div>
         </nav>
     </header>
 
@@ -44,8 +43,8 @@
     <main class="page-container">
 
         <!-- Return / Breadcrumbs -->
-        <a href="dashboard.html?role=volunteer" class="btn-back" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: #FFFFFF; border: 1.5px solid #CBD5E1; border-radius: 8px; font-weight: 600; color: #1E3A8A; text-decoration: none; margin-bottom: 18px;">
-            ← Return to Dashboard
+        <a href="dashboard.html?role=volunteer" class="btn-back" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; background: #1E3A8A; border: 1.5px solid #1E3A8A; border-radius: 8px; font-weight: 700; color: #FFFFFF; text-decoration: none; margin-bottom: 18px; box-shadow: 0 2px 6px rgba(30,58,138,0.25);">
+            📊 ← Return to Dashboard
         </a>
 
         <!-- Auth Gate Barrier (Shown when unauthenticated) -->

@@ -10,6 +10,45 @@
     <link rel="stylesheet" href="css/portals.css">
     <link rel="stylesheet" href="style.css">
     <style>
+        /* High-visibility prominent dashboard button (prevents camouflaging with background) */
+        .btn-dashboard-prominent {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: #1E3A8A;
+            color: #FFFFFF !important;
+            border: 1.5px solid #1E3A8A;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-decoration: none;
+            box-shadow: 0 2px 6px rgba(30, 58, 138, 0.28);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .btn-dashboard-prominent:hover {
+            background: #1D4ED8;
+            border-color: #1D4ED8;
+            color: #FFFFFF !important;
+            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.35);
+            transform: translateX(-2px);
+        }
+
+        /* Ensure Dashboard link in main-nav is crisp and never washed out */
+        .main-nav a[href*="dashboard"] {
+            font-weight: 700;
+            color: #1E3A8A;
+            background: #EFF6FF;
+            border: 1px solid #BFDBFE;
+        }
+
+        .main-nav a[href*="dashboard"]:hover {
+            background: #DBEAFE;
+            color: #1D4ED8;
+        }
+
         /* Clean Modern Explorer Styles */
         .explorer-hero {
             background: linear-gradient(135deg, #0F2B5C 0%, #1E40AF 100%);
@@ -304,14 +343,13 @@
     <main class="page-container">
 
         <!-- Simple Top Bar with Back & Active User -->
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
-            <a href="dashboard.html" class="btn-back" style="margin-bottom: 0; padding: 6px 12px; font-size: 0.88rem;">
-                ← Back to Dashboard
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 8px;">
+            <a href="dashboard.html" class="btn-dashboard-prominent" style="margin-bottom: 0;">
+                📊 ← Back to Dashboard
             </a>
             <div style="display: flex; align-items: center; gap: 6px; font-size: 0.88rem;">
                 <span style="color: var(--text-muted);">Active Profile:</span>
                 <strong id="activeUserBadge" style="color: var(--primary);">👵 Senior Resident</strong>
-                <button id="btnExplorerSignOut" onclick="AuthSession.logout();" class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.8rem; margin-left: 8px; cursor: pointer;">Sign Out 🚪</button>
             </div>
         </div>
 
@@ -818,7 +856,7 @@
         function handleDirectAccept(taskId) {
             const currentRole = localStorage.getItem('reach_auth_role') || 'member';
             if (currentRole !== 'volunteer') {
-                alert('Only registered volunteers can accept tasks. Please switch to Volunteer mode.');
+                alert('Only verified volunteers can accept errand requests. Please sign in with a Volunteer account.');
                 return;
             }
 

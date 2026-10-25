@@ -11,53 +11,6 @@
     <link rel="stylesheet" href="style.css">
     <style>
         /* Clean, Uncluttered Modern Dashboard Styles */
-        .role-switch-container {
-            background: #FFFFFF;
-            border: 1px solid #E2E8F0;
-            border-radius: 10px;
-            padding: 10px 16px;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .role-pills-wrap {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .role-pill-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.88rem;
-            font-weight: 600;
-            cursor: pointer;
-            border: 1px solid #CBD5E1;
-            background: #F8FAFC;
-            color: #334155;
-            transition: all 0.15s ease;
-        }
-
-        .role-pill-btn:hover {
-            border-color: #93C5FD;
-            background: #EFF6FF;
-            color: #1E40AF;
-        }
-
-        .role-pill-btn.active {
-            background: #1E40AF;
-            color: #FFFFFF;
-            border-color: #1E40AF;
-        }
-
         /* Simplified Hero Banner */
         .dash-hero-simple {
             background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
@@ -231,8 +184,7 @@
         <nav class="main-nav">
             <a href="index.html">Home</a>
             <a href="dashboard.html" class="active">My Dashboard</a>
-            <a href="explore.html?type=tasks">Browse Tasks</a>
-            <a href="explore.html?type=spaces">Community Spaces</a>
+            <a href="spaces.html">Community Spaces</a>
             <div id="navUserSection"></div>
         </nav>
     </header>
@@ -240,29 +192,7 @@
     <!-- Main Container -->
     <main class="page-container">
 
-        <!-- Simple Role Switcher Bar -->
-        <div class="role-switch-container">
-            <div class="role-pills-wrap">
-                <span style="font-size: 0.85rem; font-weight: 700; color: #64748B;">Role View:</span>
-                <button class="role-pill-btn active" id="pillMember" onclick="switchDashboardRole('member')">
-                    👵 Senior Resident
-                </button>
-                <button class="role-pill-btn" id="pillVolunteer" onclick="switchDashboardRole('volunteer')">
-                    🦸‍♂️ Volunteer
-                </button>
-                <button class="role-pill-btn" id="pillOwner" onclick="switchDashboardRole('owner')">
-                    🏛️ Space Owner
-                </button>
-                <button class="role-pill-btn" id="pillOrganizer" onclick="switchDashboardRole('organizer')">
-                    🤝 Event Organizer
-                </button>
-            </div>
-            <div>
-                <button onclick="AuthSession.logout();" class="btn btn-secondary" style="padding: 6px 14px; font-size: 0.88rem; font-weight: 600; cursor: pointer;">
-                    Sign Out 🚪
-                </button>
-            </div>
-        </div>
+
 
         <!-- =============================================================== -->
         <!-- ROLE A: SENIOR RESIDENT / COMMUNITY MEMBER                      -->
@@ -295,7 +225,7 @@
             <!-- Role explanation hint -->
             <div class="member-role-hint">
                 <span>ℹ️</span>
-                <span>As a <strong>Senior Resident</strong>, you can request daily errand help or book neighborhood halls. To volunteer and accept tasks for others, switch to the <strong>🦸‍♂️ Volunteer</strong> tab above.</span>
+                <span>As a <strong>Senior Resident</strong>, you can request daily errand help, track ongoing volunteer visits, and book neighborhood community spaces.</span>
             </div>
 
             <!-- 2 Simple Clean Action Cards for Senior Resident -->
@@ -607,20 +537,8 @@
                 localStorage.setItem('reach_auth_role', queryRole);
             }
 
-            const currentRole = localStorage.getItem('reach_auth_role') || 'member';
+            const currentRole = AuthSession.getCurrentRole() || 'member';
             const user = AuthSession.getCurrentUser() || DEFAULT_PROFILES[currentRole];
-
-            // Update role pill active state
-            const rolePillMap = {
-                member: 'pillMember',
-                volunteer: 'pillVolunteer',
-                owner: 'pillOwner',
-                organizer: 'pillOrganizer'
-            };
-
-            document.querySelectorAll('.role-pill-btn').forEach(b => b.classList.remove('active'));
-            const activePill = document.getElementById(rolePillMap[currentRole]);
-            if (activePill) activePill.classList.add('active');
 
             // Hide all sections
             ['sectionMember', 'sectionVolunteer', 'sectionOwner', 'sectionOrganizer'].forEach(id => {
@@ -653,11 +571,6 @@
                 }
                 renderMemberRequests();
             }
-        }
-
-        function switchDashboardRole(role) {
-            AuthSession.login(role);
-            window.location.href = 'dashboard.html?role=' + role;
         }
 
         function toggleVolunteerDuty() {
@@ -735,7 +648,7 @@
                         </div>
                         <div style="display: flex; align-items: center; gap: 8px;">
                             <span class="badge ${b.status === 'Approved' ? 'badge-success' : 'badge-pending'}">${b.status}</span>
-                            <a href="confirmation.html" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">View Pass →</a>
+                            <a href="pass.html?id=${b.id}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem; border-color: #0284C7; color: #0369A1; font-weight: 600;">View Pass →</a>
                         </div>
                     </div>
                 `;

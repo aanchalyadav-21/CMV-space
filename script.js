@@ -162,6 +162,25 @@ const SEED_TASKS = [
         createdAt: 'Yesterday, 09:30 AM',
         rating: 5,
         feedback: 'Karan was extremely respectful, patient, and guided me step-by-step!'
+    },
+    {
+        id: 'TSK-105',
+        category: 'Groceries',
+        title: 'Weekly Vegetables & Dairy Pack',
+        requester: 'Ramesh Patel',
+        requesterPhone: '+91 98765 43210',
+        location: 'Flat 402, Shanti Niketan, Sector 4',
+        time: 'Today, 5:30 PM',
+        urgency: 'Today',
+        skillsNeeded: 'Local Market Produce Selection',
+        status: 'Waiting for Volunteer',
+        assignedVolunteer: null,
+        safetyPin: '6192',
+        etaMinutes: null,
+        notes: 'Need 1 crate eggs, 2L toned milk, and fresh vegetables from local dairy.',
+        createdAt: 'Today, 09:30 AM',
+        rating: null,
+        feedback: null
     }
 ];
 
@@ -357,6 +376,15 @@ const AppStore = {
     init() {
         if (!localStorage.getItem('reach_tasks')) {
             localStorage.setItem('reach_tasks', JSON.stringify(SEED_TASKS));
+        } else {
+            try {
+                const stored = JSON.parse(localStorage.getItem('reach_tasks') || '[]');
+                if (!stored.some(t => t.id === 'TSK-105')) {
+                    const t105 = SEED_TASKS.find(x => x.id === 'TSK-105');
+                    if (t105) stored.push(t105);
+                    localStorage.setItem('reach_tasks', JSON.stringify(stored));
+                }
+            } catch (e) {}
         }
         if (!localStorage.getItem('reach_spaces')) {
             localStorage.setItem('reach_spaces', JSON.stringify(SEED_SPACES));
@@ -737,11 +765,11 @@ const I18N_STRINGS = {
 };
 
 function getActiveLanguage() {
-    return localStorage.getItem('reach_lang') || 'en';
+    return 'en';
 }
 
 function setLanguage(lang) {
-    localStorage.setItem('reach_lang', lang);
+    localStorage.setItem('reach_lang', 'en');
     applyLanguageTranslations();
 }
 
