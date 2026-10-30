@@ -1,5 +1,5 @@
 // ==========================================================================
-// Community Micro-Volunteering & Empty Space Sharing Platform
+// ConnectSphere - Community Platform
 // Tagline: Connecting People, Helping Communities.
 // Master Engine (script.js)
 // ==========================================================================
@@ -710,7 +710,7 @@ const AuthSession = {
 // ==========================================================================
 const I18N_STRINGS = {
     en: {
-        projectName: 'Community Micro-Volunteering & Empty Space',
+        projectName: 'ConnectSphere',
         subtitle: '',
         tagline: 'Connecting People, Helping Communities.',
         seniorHelpline: 'Senior Helpline',
@@ -888,8 +888,9 @@ function renderDynamicNavigation() {
     const isRegister = path.endsWith('register.html');
     const isDashboard = path.endsWith('dashboard.html');
     const isHelp = path.endsWith('help.html') || path.endsWith('request.html') || path.endsWith('request-help.html') || path.endsWith('categories.html');
+    const isBrowseTasks = (path.endsWith('explore.html') && !window.location.search.includes('type=spaces'));
     const isVolunteer = path.endsWith('volunteer.html');
-    const isSpaces = path.endsWith('spaces.html') || path.endsWith('explore.html');
+    const isSpaces = path.endsWith('spaces.html') || (path.endsWith('explore.html') && window.location.search.includes('type=spaces'));
     const isOwner = path.endsWith('owner.html') || path.endsWith('space-owner.html');
     const isOrganize = path.endsWith('organize.html') || path.endsWith('ngo-admin.html');
     const isActivity = path.endsWith('my-activity.html') || path.endsWith('confirmation.html');
@@ -908,12 +909,12 @@ function renderDynamicNavigation() {
             <a href="register.html" class="btn btn-primary" style="padding: 6px 14px; font-size: 0.88rem;">📝 ${t.createAccount}</a>
         `;
     } else {
-        // LOGGED IN: Role-Based Navigation
+        // LOGGED IN: Role-Based Navigation (each destination has a single, distinct purpose)
         if (role === 'volunteer') {
             links = `
                 <a href="dashboard.html?role=volunteer" class="${isDashboard ? 'active' : ''}">📊 Dashboard</a>
-                <a href="volunteer.html?tab=browse" class="${isVolunteer ? 'active' : ''}">🔍 ${t.browseTasks}</a>
-                <a href="volunteer.html?tab=mytasks">🦸 ${t.myTasks}</a>
+                <a href="explore.html?type=tasks" class="${isBrowseTasks ? 'active' : ''}">🔍 ${t.browseTasks}</a>
+                <a href="volunteer.html" class="${isVolunteer ? 'active' : ''}">🦸 Volunteer Hub</a>
                 <a href="spaces.html" class="${isSpaces ? 'active' : ''}">🏛️ ${t.communitySpaces}</a>
             `;
         } else if (role === 'owner') {

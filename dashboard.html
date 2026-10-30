@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Dashboard - Community Micro-Volunteering & Empty Space</title>
+    <title>My Dashboard — ConnectSphere</title>
     <!-- Base Styles and Portals Styles for cohesive modern UI -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/portals.css">
@@ -179,7 +179,7 @@
     <header class="main-header">
         <a href="index.html" class="logo">
             <span style="font-size: 1.8rem;">🤝</span>
-            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+            <span><strong>ConnectSphere</strong></span>
         </a>
         <nav class="main-nav">
             <a href="index.html">Home</a>
@@ -195,11 +195,10 @@
         <!-- =============================================================== -->
         <!-- ROLE A: SENIOR RESIDENT / COMMUNITY MEMBER                      -->
         <!-- Simple, uncluttered: Request Help, Book Space, Track Requests   -->
-        <!-- NO accept or reject buttons!                                    -->
         <!-- =============================================================== -->
         <div id="sectionMember" style="display: none;">
 
-            <!-- Simple Member Hero -->
+            <!-- Member Profile Hero -->
             <div class="dash-hero-simple" style="background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);">
                 <div>
                     <h1>
@@ -213,27 +212,22 @@
                         </span>
                     </div>
                 </div>
-                <div>
-                    <a href="help.html" class="btn" style="background: #10B981; color: white; padding: 10px 18px; font-weight: 700; border-radius: 8px; text-decoration: none;">
-                        + Request Errand Help 🛒
-                    </a>
-                </div>
             </div>
 
             <!-- Role explanation hint -->
             <div class="member-role-hint">
                 <span>ℹ️</span>
-                <span>As a <strong>Senior Resident</strong>, you can request daily errand help, track ongoing volunteer visits, and book neighborhood community spaces.</span>
+                <span>Request neighborhood errand assistance, track volunteer visits in real time, or reserve community spaces.</span>
             </div>
 
-            <!-- 2 Simple Clean Action Cards for Senior Resident -->
+            <!-- 2 Action Cards for Senior Resident -->
             <div class="simple-action-grid">
                 <div class="simple-action-card">
                     <div>
                         <div class="simple-card-icon">🛒</div>
                         <h3 class="simple-card-title">Request Volunteer Help</h3>
                         <p class="simple-card-desc">
-                            Need help picking up medicines from the chemist, grocery shopping, or walking assistance?
+                            Prescription pickup, grocery shopping, or walking assistance.
                         </p>
                     </div>
                     <a href="help.html" class="btn btn-primary" style="width: 100%; text-align: center; padding: 11px;">
@@ -246,10 +240,10 @@
                         <div class="simple-card-icon">🏛️</div>
                         <h3 class="simple-card-title">Book a Community Space</h3>
                         <p class="simple-card-desc">
-                            Find and reserve society clubhouses, activity halls, or terrace gardens for meetings or yoga.
+                            Reserve activity halls, society clubhouses, or gardens.
                         </p>
                     </div>
-                    <a href="explore.html?type=spaces" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px; border-color: #0284C7; color: #0284C7;">
+                    <a href="explore.html?type=spaces" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px;">
                         Find Community Venues →
                     </a>
                 </div>
@@ -259,9 +253,6 @@
             <div class="clean-section-card">
                 <div class="clean-section-header">
                     <h3>📦 My Recent Help Requests & Bookings</h3>
-                    <a href="help.html" style="font-size: 0.88rem; font-weight: 700; color: #2563EB; text-decoration: none;">
-                        + New Request
-                    </a>
                 </div>
                 <div id="memberRequestsList">
                     <!-- Populated dynamically -->
@@ -315,31 +306,28 @@
                     </span>
                 </div>
 
-                <!-- 3 Action Buttons for Volunteer Mission -->
+                <!-- Action Buttons for Volunteer Mission -->
                 <div style="display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; align-items: center;">
-                    <button id="btnDashArrived" onclick="advanceVolunteerDuty('arrived')" class="btn btn-primary" style="background: #2563EB; font-weight: 700; padding: 10px 18px;">
+                    <button id="btnDashArrived" onclick="advanceVolunteerDuty('arrived')" class="btn btn-primary" style="font-weight: 700; padding: 10px 18px;">
                         🚶 I Have Arrived at Senior's Home
                     </button>
-                    <button id="btnDashStart" onclick="advanceVolunteerDuty('in_progress')" class="btn btn-accent" style="display: none; background: #059669; font-weight: 700; padding: 10px 18px;">
+                    <button id="btnDashStart" onclick="advanceVolunteerDuty('in_progress')" class="btn btn-accent" style="display: none; font-weight: 700; padding: 10px 18px;">
                         ▶️ Start Task Assistance
                     </button>
-                    <button id="btnDashComplete" onclick="openDashCompletionModal()" class="btn btn-primary" style="display: none; background: #16A34A; font-weight: 700; padding: 10px 18px;">
+                    <button id="btnDashComplete" onclick="openDashCompletionModal()" class="btn btn-primary" style="display: none; background: #059669; font-weight: 700; padding: 10px 18px;">
                         ✅ Complete Task (Enter Senior PIN)
                     </button>
-                    <a href="volunteer.html?tab=active" class="btn btn-secondary" style="padding: 10px 18px; font-weight: 600; color: #047857;">
-                        🗺️ Detailed GPS Desk →
-                    </a>
                 </div>
             </div>
 
-            <!-- 2 Simple Action Cards for Volunteer -->
+            <!-- 2 Action Cards for Volunteer -->
             <div class="simple-action-grid">
                 <div class="simple-action-card">
                     <div>
                         <div class="simple-card-icon">🔍</div>
                         <h3 class="simple-card-title">Browse Available Tasks</h3>
                         <p class="simple-card-desc">
-                            View open requests from neighborhood seniors needing medicine delivery, groceries, or clinic walk assistance.
+                            Neighborhood errands needing medicine delivery or groceries.
                         </p>
                     </div>
                     <a href="explore.html?type=tasks" class="btn btn-accent" style="width: 100%; text-align: center; padding: 11px;">
@@ -350,13 +338,13 @@
                 <div class="simple-action-card">
                     <div>
                         <div class="simple-card-icon">🛵</div>
-                        <h3 class="simple-card-title">Active Duty Tracker</h3>
+                        <h3 class="simple-card-title">Field Mission Hub</h3>
                         <p class="simple-card-desc">
-                            View your accepted missions, share live location ETA, and enter senior citizen safety PINs.
+                            Live location tracker, member contact, and safety PINs.
                         </p>
                     </div>
                     <a href="volunteer.html" class="btn btn-primary" style="width: 100%; text-align: center; padding: 11px;">
-                        Open Mission Tracker →
+                        Open Mission Hub →
                     </a>
                 </div>
             </div>
@@ -365,9 +353,6 @@
             <div class="clean-section-card">
                 <div class="clean-section-header">
                     <h3>⚡ Open Tasks Waiting for Volunteers</h3>
-                    <a href="explore.html?type=tasks" style="font-size: 0.88rem; font-weight: 700; color: #059669; text-decoration: none;">
-                        View All in Explorer →
-                    </a>
                 </div>
                 <div id="volTasksFeed">
                     <!-- Populated dynamically -->
@@ -382,7 +367,7 @@
         <!-- =============================================================== -->
         <div id="sectionOwner" style="display: none;">
 
-            <!-- Simple Owner Hero -->
+            <!-- Space Owner Hero -->
             <div class="dash-hero-simple" style="background: linear-gradient(135deg, #0C4A6E 0%, #0284C7 100%);">
                 <div>
                     <h1>
@@ -396,21 +381,16 @@
                         </span>
                     </div>
                 </div>
-                <div>
-                    <a href="owner.html?tab=add" class="btn" style="background: #10B981; color: white; padding: 8px 16px; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.9rem;">
-                        + Add Space 🏛️
-                    </a>
-                </div>
             </div>
 
-            <!-- 2 Simple Action Cards for Space Owner -->
+            <!-- 2 Action Cards for Space Owner -->
             <div class="simple-action-grid">
                 <div class="simple-action-card">
                     <div>
                         <div class="simple-card-icon">📥</div>
                         <h3 class="simple-card-title">Review Booking Requests</h3>
                         <p class="simple-card-desc">
-                            Approve or decline venue reservations from resident groups and welfare NGOs.
+                            Approve or decline venue reservations for community activities.
                         </p>
                     </div>
                     <a href="owner.html?tab=bookings" class="btn btn-primary" style="width: 100%; text-align: center; padding: 11px;">
@@ -423,11 +403,11 @@
                         <div class="simple-card-icon">➕</div>
                         <h3 class="simple-card-title">Manage Listed Venues</h3>
                         <p class="simple-card-desc">
-                            Update venue capacity, free/subsidized community pricing, and available hours.
+                            Update capacity, subsidized pricing, and available hours.
                         </p>
                     </div>
-                    <a href="owner.html?tab=add" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px; border-color: #0284C7; color: #0284C7;">
-                        Edit Listings →
+                    <a href="owner.html?tab=add" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px;">
+                        Add or Edit Venues →
                     </a>
                 </div>
             </div>
@@ -450,7 +430,7 @@
         <!-- =============================================================== -->
         <div id="sectionOrganizer" style="display: none;">
 
-            <!-- Simple Organizer Hero -->
+            <!-- Organizer Hero -->
             <div class="dash-hero-simple" style="background: linear-gradient(135deg, #581C87 0%, #7C3AED 100%);">
                 <div>
                     <h1>
@@ -461,21 +441,16 @@
                         <span>🎯 <strong>Community Welfare Drives Coordinator</strong></span>
                     </div>
                 </div>
-                <div>
-                    <a href="organize.html?tab=create" class="btn" style="background: #10B981; color: white; padding: 8px 16px; font-weight: 700; border-radius: 8px; text-decoration: none; font-size: 0.9rem;">
-                        + New Drive 🎯
-                    </a>
-                </div>
             </div>
 
-            <!-- 2 Simple Action Cards for Organizer -->
+            <!-- 2 Action Cards for Organizer -->
             <div class="simple-action-grid">
                 <div class="simple-action-card">
                     <div>
                         <div class="simple-card-icon">🎯</div>
                         <h3 class="simple-card-title">Schedule Community Drive</h3>
                         <p class="simple-card-desc">
-                            Create health checkup camps, tutoring sessions, or food distribution drives.
+                            Health checkups, tutoring sessions, or food distribution drives.
                         </p>
                     </div>
                     <a href="organize.html?tab=create" class="btn btn-primary" style="width: 100%; text-align: center; padding: 11px;">
@@ -488,10 +463,10 @@
                         <div class="simple-card-icon">🏛️</div>
                         <h3 class="simple-card-title">Reserve Venue</h3>
                         <p class="simple-card-desc">
-                            Browse verified neighborhood halls and clubhouses for your community drive.
+                            Browse neighborhood halls and clubhouses for your community drive.
                         </p>
                     </div>
-                    <a href="explore.html?type=spaces" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px; border-color: #7C3AED; color: #7C3AED;">
+                    <a href="explore.html?type=spaces" class="btn btn-secondary" style="width: 100%; text-align: center; padding: 11px;">
                         Find Community Hall →
                     </a>
                 </div>

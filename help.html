@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Request Volunteer Help - Community Micro-Volunteering & Empty Space</title>
+    <title>Request Volunteer Help — ConnectSphere</title>
     <link rel="stylesheet" href="style.css">
     <style>
         .category-grid {
@@ -54,17 +54,6 @@
             color: var(--text-muted);
             line-height: 1.4;
         }
-
-        .audio-help-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #EFF6FF;
-            border: 1px solid #BFDBFE;
-            padding: 10px 16px;
-            border-radius: var(--radius-sm);
-            margin-bottom: 20px;
-        }
     </style>
 </head>
 
@@ -90,7 +79,7 @@
     <header class="main-header">
         <a href="index.html" class="logo">
             <span style="font-size: 2rem;">🤝</span>
-            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+            <span><strong>ConnectSphere</strong></span>
         </a>
         <nav class="main-nav">
             <a href="index.html">Home</a>
@@ -121,19 +110,6 @@
                 <span class="step-circle">3</span>
                 <span>Live Tracking & Status</span>
             </div>
-        </div>
-
-        <!-- Audio Help Bar for Senior Accessibility -->
-        <div class="audio-help-bar">
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 1.3rem;">🔊</span>
-                <span style="font-size: 0.92rem; color: var(--primary-dark);">
-                    Need spoken audio assistance with this form?
-                </span>
-            </div>
-            <button type="button" class="btn btn-secondary" onclick="speakFormInstructions()" style="padding: 4px 12px; font-size: 0.84rem;">
-                Listen Instructions 🗣️
-            </button>
         </div>
 
         <!-- Card Container -->
@@ -189,37 +165,37 @@
                     </label>
 
                     <div class="category-grid">
-                        <div class="category-card selected" onclick="pickCategory('Medicine Pickup', 'Prescription BP & Diabetes Medicine')" id="cat-med">
+                        <div class="category-card selected" onclick="pickCategory('Medicine Pickup')" id="cat-med">
                             <div class="category-icon">💊</div>
                             <div class="category-title">Medicine Pickup</div>
                             <div class="category-desc">Prescription collection from chemist & delivery</div>
                         </div>
 
-                        <div class="category-card" onclick="pickCategory('Groceries', 'Fresh Vegetables & 2L Milk Delivery')" id="cat-groc">
+                        <div class="category-card" onclick="pickCategory('Groceries')" id="cat-groc">
                             <div class="category-icon">🛒</div>
                             <div class="category-title">Grocery Aid</div>
                             <div class="category-desc">Fresh market produce, milk & daily essentials</div>
                         </div>
 
-                        <div class="category-card" onclick="pickCategory('Tutoring', 'Class 8 Math/Science Homework Tutoring')" id="cat-tutor">
+                        <div class="category-card" onclick="pickCategory('Tutoring')" id="cat-tutor">
                             <div class="category-icon">📚</div>
                             <div class="category-title">Student Tutoring</div>
                             <div class="category-desc">School coaching & subject guidance</div>
                         </div>
 
-                        <div class="category-card" onclick="pickCategory('Digital Guidance', 'Smartphone & Pension App Guidance')" id="cat-tech">
+                        <div class="category-card" onclick="pickCategory('Digital Guidance')" id="cat-tech">
                             <div class="category-icon">📱</div>
                             <div class="category-title">Digital / App Help</div>
                             <div class="category-desc">Digital life certificate & phone assistance</div>
                         </div>
 
-                        <div class="category-card" onclick="pickCategory('Clinic Companion', 'Companion Walk to Clinic & Park')" id="cat-walk">
+                        <div class="category-card" onclick="pickCategory('Clinic Companion')" id="cat-walk">
                             <div class="category-icon">🩺</div>
                             <div class="category-title">Clinic Escort</div>
                             <div class="category-desc">Doctor visits, routine checks & morning walks</div>
                         </div>
 
-                        <div class="category-card" onclick="pickCategory('Other Everyday Help', 'General Household / Errand Help')" id="cat-other">
+                        <div class="category-card" onclick="pickCategory('Other Everyday Help')" id="cat-other">
                             <div class="category-icon">🤝</div>
                             <div class="category-title">Other Errand</div>
                             <div class="category-desc">Utility bill deposit or parcel drop</div>
@@ -230,7 +206,7 @@
                 <!-- 2. Task Details Form -->
                 <div class="form-group" style="margin-bottom: 16px;">
                     <label class="form-label">Task Title / Brief Summary:</label>
-                    <input type="text" id="taskTitle" class="form-control" value="Prescription BP & Diabetes Medicine" placeholder="e.g. Need urgent medicines picked up from Apex Chemist" required>
+                    <input type="text" id="taskTitle" class="form-control" placeholder="e.g. Need urgent medicines picked up from Apex Chemist" required>
                 </div>
 
                 <div class="form-group" style="margin-bottom: 16px;">
@@ -260,7 +236,7 @@
 
                 <div class="form-group" style="margin-bottom: 20px;">
                     <label class="form-label">Special Instructions & Required Skills (if any):</label>
-                    <textarea id="taskNotes" class="form-control" rows="3" placeholder="e.g. Please bring small change, or resident has difficulty climbing stairs.">Prescription slip will be given at Apex chemist counter. Payment already made via UPI. Please verify seal before handover.</textarea>
+                    <textarea id="taskNotes" class="form-control" rows="3" placeholder="e.g. Chemist name, prescription details, payment mode, or floor number..."></textarea>
                 </div>
 
                 <!-- Forward Navigation CTA Button -->
@@ -277,9 +253,7 @@
 
     <!-- Footer -->
     <footer class="main-footer">
-        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
-            Community Micro-Volunteering & Empty Space
-        </p>
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">ConnectSphere</p>
         <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
             Connecting People, Helping Communities · Neighborhood Care Network
         </p>
@@ -316,7 +290,34 @@
             }
         }
 
-        function pickCategory(cat, sampleTitle) {
+        const categoryPlaceholders = {
+            'Medicine Pickup': {
+                title: 'e.g. Need urgent medicines picked up from Apex Chemist',
+                notes: 'e.g. Chemist name, prescription details, payment mode, or floor number...'
+            },
+            'Groceries': {
+                title: 'e.g. Fresh vegetables, 2L milk, and daily essentials',
+                notes: 'e.g. Item list, preferred grocery store, delivery instructions...'
+            },
+            'Tutoring': {
+                title: 'e.g. Class 8 Math & Science homework coaching',
+                notes: 'e.g. Student grade, subjects, specific topics...'
+            },
+            'Digital Guidance': {
+                title: 'e.g. Smartphone, WhatsApp, or pension app assistance',
+                notes: 'e.g. Phone model, specific app or digital service needed...'
+            },
+            'Clinic Companion': {
+                title: 'e.g. Companion walk to clinic or routine health checkup',
+                notes: 'e.g. Walking assistance, clinic name, appointment time...'
+            },
+            'Other Everyday Help': {
+                title: 'e.g. General household errand, parcel drop, or bill payment',
+                notes: 'e.g. Provide any specific instructions, floor number, timing...'
+            }
+        };
+
+        function pickCategory(cat) {
             selectedCategory = cat;
             const ids = {
                 'Medicine Pickup': 'cat-med',
@@ -335,21 +336,11 @@
                 }
             });
 
-            if (sampleTitle) {
-                document.getElementById('taskTitle').value = sampleTitle;
-            }
-        }
-
-        function speakFormInstructions() {
-            if ('speechSynthesis' in window) {
-                const text = "Please select the help category you need. Enter your address, preferred time, and any instructions for the neighborhood volunteer. Then click review request details.";
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.rate = 0.9;
-                utterance.pitch = 1.0;
-                window.speechSynthesis.speak(utterance);
-            } else {
-                alert('Audio narration is not supported on this browser.');
-            }
+            const ph = categoryPlaceholders[cat] || categoryPlaceholders['Other Everyday Help'];
+            const titleInput = document.getElementById('taskTitle');
+            const notesInput = document.getElementById('taskNotes');
+            if (titleInput && ph) titleInput.placeholder = ph.title;
+            if (notesInput && ph) notesInput.placeholder = ph.notes;
         }
 
         function handleProceedToReview(e) {
@@ -371,12 +362,13 @@
             const timeVal = document.getElementById('taskTime').value || '11:30';
 
             const pendingRequest = {
+                type: 'help',
                 category: selectedCategory,
                 title: document.getElementById('taskTitle').value,
                 location: document.getElementById('taskLocation').value,
                 date: dateVal,
                 time: timeVal,
-                notes: document.getElementById('taskNotes').value,
+                notes: document.getElementById('taskNotes').value.trim(),
                 requester: user ? user.name : 'Resident',
                 requesterPhone: user ? user.phone : '+91 98765 43210'
             };
@@ -385,7 +377,7 @@
             window.location.href = 'review.html';
         }
 
-        // Restore existing draft if user came back via "Edit Details"
+        // Restore existing draft if user came back via "Edit Details" (?edit=1)
         document.addEventListener('DOMContentLoaded', () => {
             checkAuthStatus();
 
@@ -396,16 +388,20 @@
                 dateInput.min = todayStr;
             }
 
+            const isEdit = new URLSearchParams(window.location.search).get('edit') === '1';
             const saved = localStorage.getItem('reach_pending_request');
-            if (saved) {
+            if (isEdit && saved) {
                 try {
                     const data = JSON.parse(saved);
-                    pickCategory(data.category, data.title);
+                    if (data.category) pickCategory(data.category);
+                    if (data.title) document.getElementById('taskTitle').value = data.title;
                     if (data.location) document.getElementById('taskLocation').value = data.location;
                     if (data.date && dateInput) dateInput.value = data.date;
                     if (data.time) document.getElementById('taskTime').value = data.time;
                     if (data.notes) document.getElementById('taskNotes').value = data.notes;
                 } catch (e) {}
+            } else {
+                pickCategory('Medicine Pickup');
             }
         });
     </script>

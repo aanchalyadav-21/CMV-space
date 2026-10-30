@@ -4,49 +4,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Browse Tasks & Community Spaces - Community Micro-Volunteering & Empty Space</title>
+    <title>Browse Tasks & Community Spaces — ConnectSphere</title>
     <!-- Base Styles and Portals Styles for cohesive modern UI -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/portals.css">
     <link rel="stylesheet" href="style.css">
     <style>
-        /* High-visibility prominent dashboard button (prevents camouflaging with background) */
+        /* Breadcrumb back to dashboard button */
         .btn-dashboard-prominent {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 18px;
-            background: #1E3A8A;
-            color: #FFFFFF !important;
-            border: 1.5px solid #1E3A8A;
+            padding: 8px 16px;
+            background: #FFFFFF;
+            color: #334155 !important;
+            border: 1.5px solid #E2E8F0;
             border-radius: 8px;
-            font-weight: 700;
+            font-weight: 600;
             font-size: 0.92rem;
             text-decoration: none;
-            box-shadow: 0 2px 6px rgba(30, 58, 138, 0.28);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             transition: all 0.2s ease;
             cursor: pointer;
         }
 
         .btn-dashboard-prominent:hover {
-            background: #1D4ED8;
-            border-color: #1D4ED8;
-            color: #FFFFFF !important;
-            box-shadow: 0 4px 10px rgba(30, 58, 138, 0.35);
+            background: #F8FAFC;
+            border-color: #CBD5E1;
+            color: #0F172A !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
             transform: translateX(-2px);
-        }
-
-        /* Ensure Dashboard link in main-nav is crisp and never washed out */
-        .main-nav a[href*="dashboard"] {
-            font-weight: 700;
-            color: #1E3A8A;
-            background: #EFF6FF;
-            border: 1px solid #BFDBFE;
-        }
-
-        .main-nav a[href*="dashboard"]:hover {
-            background: #DBEAFE;
-            color: #1D4ED8;
         }
 
         /* Clean Modern Explorer Styles */
@@ -328,7 +315,7 @@
     <header class="main-header">
         <a href="index.html" class="logo">
             <span style="font-size: 1.8rem;">🤝</span>
-            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+            <span><strong>ConnectSphere</strong></span>
         </a>
         <nav class="main-nav">
             <a href="index.html">Home</a>
@@ -832,9 +819,6 @@
 
                             <div class="space-card-body">
                                 <div>
-                                    <div style="font-size: 0.88rem; color: #0284C7; font-weight: 700; margin-bottom: 8px;">
-                                        💰 ${s.pricing}
-                                    </div>
                                     <div style="display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 12px;">
                                         ${(s.facilities || []).slice(0, 3).map(f => `<span class="amenity-tag">✓ ${f}</span>`).join('')}
                                     </div>

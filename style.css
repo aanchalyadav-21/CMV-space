@@ -137,10 +137,12 @@ body {
 .main-header {
     background-color: var(--surface);
     border-bottom: 2px solid var(--border-light);
-    padding: 14px 24px;
+    padding: 12px 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
     position: sticky;
     top: 0;
     z-index: 100;
@@ -153,8 +155,10 @@ body {
     gap: 10px;
     text-decoration: none;
     color: var(--primary);
-    font-size: 1.4rem;
+    font-size: 1.25rem;
     font-weight: 800;
+    flex-shrink: 0;
+    max-width: 100%;
 }
 
 .logo-sub {
@@ -167,44 +171,52 @@ body {
 .main-nav {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-left: auto;
 }
 
 .main-nav a {
-    color: var(--text-main);
+    color: #475569;
     text-decoration: none;
     font-weight: 600;
-    font-size: 0.95rem;
-    padding: 8px 14px;
-    border-radius: var(--radius-sm);
-    transition: all 0.2s;
-}
-
-.main-nav a:hover, .main-nav a.active {
-    color: var(--primary);
-    background-color: var(--primary-light);
-}
-
-/* Highly Prominent Dashboard Button Across All Pages & Tabs */
-.main-nav a[href*="dashboard"] {
-    font-weight: 700 !important;
-    color: #1E40AF !important;
-    background: #EFF6FF !important;
-    border: 1.5px solid #93C5FD !important;
-    border-radius: var(--radius-sm);
+    font-size: 0.94rem;
     padding: 7px 14px;
-    box-shadow: 0 1px 3px rgba(30, 58, 138, 0.12);
+    border-radius: 9999px;
+    border: 1px solid transparent;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     display: inline-flex;
     align-items: center;
     gap: 6px;
 }
 
-.main-nav a[href*="dashboard"]:hover,
-.main-nav a[href*="dashboard"].active {
-    background: #2563EB !important;
-    border-color: #1D4ED8 !important;
-    color: #FFFFFF !important;
-    box-shadow: 0 3px 8px rgba(37, 99, 235, 0.35);
+.main-nav a:hover {
+    color: #0F172A;
+    background-color: #F1F5F9;
+    border-color: #E2E8F0;
+}
+
+.main-nav a.active {
+    color: #1D4ED8 !important;
+    background-color: #EFF6FF !important;
+    border: 1px solid #BFDBFE !important;
+    border-radius: 9999px !important;
+    font-weight: 700 !important;
+    box-shadow: 0 1px 2px rgba(37, 99, 235, 0.08) !important;
+}
+
+/* Standard Nav Link behavior for Dashboard link (only highlighted when active) */
+.main-nav a[href*="dashboard"] {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+button:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+.btn:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* User Badge in Nav */

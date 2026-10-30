@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volunteer Field Operations - Community Micro-Volunteering & Empty Space</title>
+    <title>Volunteer Field Operations — ConnectSphere</title>
     <!-- Base Styles and Portals Styles -->
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/portals.css">
@@ -28,13 +28,13 @@
     <header class="main-header">
         <a href="index.html" class="logo">
             <span style="font-size: 1.8rem;">🤝</span>
-            <span><strong>Community Micro-Volunteering & Empty Space</strong></span>
+            <span><strong>ConnectSphere</strong></span>
         </a>
         <nav class="main-nav">
-            <a href="index.html">Home</a>
-            <a href="dashboard.html?role=volunteer">My Dashboard</a>
-            <a href="explore.html?type=tasks">Browse Tasks</a>
-            <a href="volunteer.html" class="active">Volunteer Hub</a>
+            <a href="dashboard.html?role=volunteer">📊 Dashboard</a>
+            <a href="explore.html?type=tasks">🔍 Browse Tasks</a>
+            <a href="volunteer.html" class="active">🦸 Volunteer Hub</a>
+            <a href="spaces.html">🏛️ Community Spaces</a>
             <div id="navUserSection"></div>
         </nav>
     </header>
@@ -43,7 +43,7 @@
     <main class="page-container">
 
         <!-- Return / Breadcrumbs -->
-        <a href="dashboard.html?role=volunteer" class="btn-back" style="display: inline-flex; align-items: center; gap: 8px; padding: 8px 18px; background: #1E3A8A; border: 1.5px solid #1E3A8A; border-radius: 8px; font-weight: 700; color: #FFFFFF; text-decoration: none; margin-bottom: 18px; box-shadow: 0 2px 6px rgba(30,58,138,0.25);">
+        <a href="dashboard.html?role=volunteer" class="btn-back">
             📊 ← Return to Dashboard
         </a>
 
@@ -121,13 +121,13 @@
 
         <!-- Portal Tabs Navigation -->
         <div class="portal-tabs">
-            <button class="portal-tab-btn active" onclick="showTab('available')">
+            <button class="portal-tab-btn active" data-tab="available" onclick="showTab('available')">
                 📡 Nearby Available Tasks <span class="tab-badge-count" id="badgeAvailCount">2</span>
             </button>
-            <button class="portal-tab-btn" onclick="showTab('active')">
+            <button class="portal-tab-btn" data-tab="active" onclick="showTab('active')">
                 🚀 Active Mission & GPS Tracker <span class="tab-badge-count" id="badgeActiveCount">1</span>
             </button>
-            <button class="portal-tab-btn" onclick="showTab('history')">
+            <button class="portal-tab-btn" data-tab="history" onclick="showTab('history')">
                 📜 Completed Tasks & Reviews
             </button>
         </div>
@@ -248,19 +248,19 @@
 
                 <!-- Interactive Lifecycle Action Buttons (Following State Diagram) -->
                 <div class="task-actions" style="margin-top: 20px;">
-                    <button class="btn btn-primary" id="btnSimArrive" onclick="advanceWorkflow('arrived')">
+                    <button class="btn-accept" id="btnSimArrive" onclick="advanceWorkflow('arrived')" style="padding: 10px 20px; font-size: 0.95rem;">
                         🚶 I Have Arrived at Member's Home
                     </button>
-                    <button class="btn btn-secondary" id="btnSimStart" onclick="advanceWorkflow('in_progress')" style="display: none; background: #3B82F6; color: white;">
+                    <button class="btn-details" id="btnSimStart" onclick="advanceWorkflow('in_progress')" style="display: none; padding: 10px 20px; font-size: 0.95rem;">
                         ▶️ Start Task Assistance
                     </button>
-                    <button class="btn btn-primary" id="btnSimComplete" onclick="openCompletionModal()" style="display: none; background: #16A34A; font-weight: 700;">
+                    <button class="btn-accept" id="btnSimComplete" onclick="openCompletionModal()" style="display: none; padding: 10px 20px; font-size: 0.95rem;">
                         ✅ Complete Task (Enter Senior PIN)
                     </button>
-                    <a href="tel:9876543210" class="btn btn-secondary">
+                    <a href="tel:9876543210" class="btn-details" style="text-decoration: none;">
                         📞 Call Member
                     </a>
-                    <button class="btn btn-secondary" onclick="openDisputeModal()" style="color: #DC2626; border-color: #FCA5A5;">
+                    <button class="btn-decline" onclick="openDisputeModal()">
                         ⚠️ Report Dispute / Safety Issue
                     </button>
                 </div>
@@ -367,6 +367,12 @@
         </div>
     </div>
 
+    <!-- Smooth Toast Notification -->
+    <div id="reachToast" class="reach-toast">
+        <span id="toastIcon">✨</span>
+        <span id="toastMessage">Action completed</span>
+    </div>
+
     <!-- Shared Scripts -->
     <script src="script.js"></script>
     <script src="js/data.js"></script>
@@ -375,23 +381,36 @@
     <script>
         let currentWorkflowStage = 'location_active';
 
-        function showTab(tabId, btnElement) {
-            document.querySelectorAll('.portal-tab-btn').forEach(btn => btn.classList.remove('active'));
+        function showVolunteerToast(message, icon = '✓') {
+            const toast = document.getElementById('reachToast');
+            const msgEl = document.getElementById('toastMessage');
+            const iconEl = document.getElementById('toastIcon');
+            if (toast && msgEl) {
+                msgEl.textContent = message;
+                if (iconEl) iconEl.textContent = icon;
+                toast.classList.add('show');
+                clearTimeout(window._toastTimer);
+                window._toastTimer = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 2800);
+            }
+        }
+
+        function showTab(tabId) {
+            // Strictly activate portal tabs, NEVER touch .main-nav links
+            const tabs = document.querySelectorAll('.portal-tab-btn');
+            tabs.forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('#tab-available, #tab-active, #tab-history').forEach(el => el.style.display = 'none');
             
             const targetContent = document.getElementById('tab-' + tabId);
             if (targetContent) targetContent.style.display = 'block';
 
-            let targetBtn = btnElement;
-            if (!targetBtn && window.event && window.event.currentTarget) {
-                targetBtn = window.event.currentTarget;
-            }
-            if (!targetBtn) {
+            const activeBtn = document.querySelector(`.portal-tab-btn[data-tab="${tabId}"]`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            } else {
                 const idx = tabId === 'available' ? 0 : tabId === 'active' ? 1 : 2;
-                targetBtn = document.querySelectorAll('.portal-tab-btn')[idx];
-            }
-            if (targetBtn && targetBtn.classList) {
-                targetBtn.classList.add('active');
+                if (tabs[idx]) tabs[idx].classList.add('active');
             }
         }
 
@@ -400,9 +419,58 @@
             if (btn.textContent.includes('Online')) {
                 btn.textContent = '⏸️ Paused (Offline)';
                 btn.style.background = '#64748B';
+                showVolunteerToast('Status set to Paused. You will not receive active errand alerts.', '⏸️');
             } else {
                 btn.textContent = '🟢 Online & Ready';
                 btn.style.background = '#10B981';
+                showVolunteerToast('Status is Online! You are visible for nearby missions.', '🟢');
+            }
+        }
+
+        function renderStateFlowProgress(currentStage) {
+            // Steps 1..6: sn1..sn6, connectors sc1..sc5
+            const stageOrder = {
+                'assigned': 2,
+                'location_active': 3,
+                'en_route': 3,
+                'volunteer_arrived': 4,
+                'arrived': 4,
+                'in_progress': 5,
+                'completed': 6
+            };
+            const currentStep = stageOrder[currentStage] || 3;
+
+            for (let i = 1; i <= 6; i++) {
+                const node = document.getElementById('sn' + i);
+                if (!node) continue;
+                const circle = node.querySelector('.state-circle');
+
+                node.classList.remove('active', 'completed');
+
+                if (i < currentStep) {
+                    node.classList.add('completed');
+                    if (circle) circle.textContent = '✓';
+                } else if (i === currentStep) {
+                    if (currentStep === 6) {
+                        node.classList.add('completed');
+                    } else {
+                        node.classList.add('active', 'completed');
+                    }
+                    if (circle) circle.textContent = '✓';
+                } else {
+                    // Future step
+                    if (circle) circle.textContent = i;
+                }
+            }
+
+            for (let c = 1; c <= 5; c++) {
+                const conn = document.getElementById('sc' + c);
+                if (!conn) continue;
+                if (c < currentStep) {
+                    conn.classList.add('completed');
+                } else {
+                    conn.classList.remove('completed');
+                }
             }
         }
 
@@ -412,9 +480,12 @@
             
             // Available Tasks (excluding dismissed/passed tasks)
             const waiting = requests.filter(r => r.status === 'waiting_volunteer' && !dismissed.includes(r.id));
-            document.getElementById('badgeAvailCount').textContent = waiting.length;
+            const badgeCount = document.getElementById('badgeAvailCount');
+            if (badgeCount) badgeCount.textContent = waiting.length;
 
             const container = document.getElementById('availableTasksContainer');
+            if (!container) return;
+
             if (waiting.length === 0) {
                 container.innerHTML = `
                     <div class="card" style="text-align: center; padding: 40px;">
@@ -436,7 +507,7 @@
                             </div>
                             <span class="badge badge-pending">🟡 Pending Volunteer</span>
                         </div>
-                        <p style="color: var(--text-primary); margin: 6px 0 10px 0; font-size: 1.05rem;">
+                        <p style="color: var(--text-primary); margin: 6px 0 10px 0; font-size: 1.02rem;">
                             <strong>Task Notes:</strong> "${req.notes}"
                         </p>
                         <div class="task-meta-grid">
@@ -445,12 +516,12 @@
                             <div><strong>Preferred Time:</strong> ${req.time}</div>
                             <div><strong>Location:</strong> ${req.address}</div>
                         </div>
-                        <div class="task-actions" style="display: flex; gap: 10px; margin-top: 12px;">
-                            <button class="btn btn-primary" onclick="acceptTask('${req.id}')" style="background: #16A34A; border-color: #16A34A; font-weight: 700; flex: 1;">
+                        <div class="task-actions">
+                            <button class="btn-accept" onclick="acceptTask('${req.id}')">
                                 ✓ Accept Task & Start Tracking
                             </button>
-                            <button class="btn btn-secondary" onclick="rejectTask('${req.id}')" style="color: #DC2626; border-color: #FCA5A5; font-weight: 700; flex: 1;">
-                                ✕ Reject / Decline Task
+                            <button class="btn-decline" onclick="rejectTask('${req.id}')">
+                                ✕ Pass / Skip
                             </button>
                         </div>
                     </div>
@@ -557,16 +628,17 @@
                 badgeCount.textContent = (acceptedId || missionStr) && status !== 'completed' ? '1' : '0';
             }
 
+            // Synchronize all 6 workflow step circles and connectors (all completed steps are green with ✓)
+            renderStateFlowProgress(status);
+
             if (status === 'volunteer_arrived' || status === 'arrived') {
                 if (marker) { marker.style.top = '145px'; marker.style.left = '480px'; }
                 if (etaText) etaText.textContent = "Volunteer has arrived at senior resident's residence!";
                 if (badge) {
                     badge.textContent = '🟢 Arrived at Location';
-                    badge.style.background = '#DBEAFE';
-                    badge.style.color = '#1E40AF';
+                    badge.style.background = '#DCFCE7';
+                    badge.style.color = '#166534';
                 }
-                document.getElementById('sn4')?.classList.add('active', 'completed');
-                document.getElementById('sc3')?.classList.add('completed');
                 if (btnArrive) btnArrive.style.display = 'none';
                 if (btnStart) btnStart.style.display = 'inline-flex';
                 if (btnComplete) btnComplete.style.display = 'none';
@@ -578,10 +650,6 @@
                     badge.style.background = '#FEF3C7';
                     badge.style.color = '#B45309';
                 }
-                document.getElementById('sn4')?.classList.add('completed');
-                document.getElementById('sc3')?.classList.add('completed');
-                document.getElementById('sn5')?.classList.add('active', 'completed');
-                document.getElementById('sc4')?.classList.add('completed');
                 if (btnArrive) btnArrive.style.display = 'none';
                 if (btnStart) btnStart.style.display = 'none';
                 if (btnComplete) btnComplete.style.display = 'inline-flex';
@@ -593,12 +661,6 @@
                     badge.style.background = '#DCFCE7';
                     badge.style.color = '#166534';
                 }
-                document.getElementById('sn4')?.classList.add('completed');
-                document.getElementById('sc3')?.classList.add('completed');
-                document.getElementById('sn5')?.classList.add('completed');
-                document.getElementById('sc4')?.classList.add('completed');
-                document.getElementById('sn6')?.classList.add('active', 'completed');
-                document.getElementById('sc5')?.classList.add('completed');
                 if (btnArrive) btnArrive.style.display = 'none';
                 if (btnStart) btnStart.style.display = 'none';
                 if (btnComplete) btnComplete.style.display = 'none';
@@ -610,12 +672,6 @@
                     badge.style.background = '#DCFCE7';
                     badge.style.color = '#166534';
                 }
-                document.getElementById('sn4')?.classList.remove('active', 'completed');
-                document.getElementById('sc3')?.classList.remove('completed');
-                document.getElementById('sn5')?.classList.remove('active', 'completed');
-                document.getElementById('sc4')?.classList.remove('completed');
-                document.getElementById('sn6')?.classList.remove('active', 'completed');
-                document.getElementById('sc5')?.classList.remove('completed');
                 if (btnArrive) btnArrive.style.display = 'inline-flex';
                 if (btnStart) btnStart.style.display = 'none';
                 if (btnComplete) btnComplete.style.display = 'none';
@@ -721,39 +777,37 @@
             // Broadcast real-time change to resident confirmation page
             broadcastSync('accept_task', { id });
 
-            alert(`Task ${id} Accepted! You are now assigned as the volunteer helper. Resident tracker is updated in real time.`);
+            showVolunteerToast(`Mission ${id} Accepted! Live GPS tracker activated.`, '🛵');
             loadVolunteerData();
             showTab('active');
         }
 
         function rejectTask(id) {
-            if (confirm(`Are you sure you want to pass on task ${id}? It will be returned to the neighborhood available pool.`)) {
-                let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
-                if (!dismissed.includes(id)) {
-                    dismissed.push(id);
-                    localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
-                }
-                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
-                    ReachData.updateRequestStatus(id, 'waiting_volunteer');
-                }
-                // Clear active mission if it was this task
-                if (localStorage.getItem('reach_accepted_task_id') === id) {
-                    localStorage.removeItem('reach_accepted_task_id');
-                    localStorage.removeItem('reach_active_volunteer_mission');
-                    const lastStr = localStorage.getItem('reach_last_confirmed');
-                    if (lastStr) {
-                        try {
-                            const item = JSON.parse(lastStr);
-                            item.status = 'Waiting for Volunteer';
-                            item.assignedVolunteer = null;
-                            localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
-                        } catch (e) {}
-                    }
-                }
-                broadcastSync('reject_task', { id });
-                alert(`Task ${id} has been passed and returned to the neighborhood pool.`);
-                loadVolunteerData();
+            let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            if (!dismissed.includes(id)) {
+                dismissed.push(id);
+                localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
             }
+            if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                ReachData.updateRequestStatus(id, 'waiting_volunteer');
+            }
+            // Clear active mission if it was this task
+            if (localStorage.getItem('reach_accepted_task_id') === id) {
+                localStorage.removeItem('reach_accepted_task_id');
+                localStorage.removeItem('reach_active_volunteer_mission');
+                const lastStr = localStorage.getItem('reach_last_confirmed');
+                if (lastStr) {
+                    try {
+                        const item = JSON.parse(lastStr);
+                        item.status = 'Waiting for Volunteer';
+                        item.assignedVolunteer = null;
+                        localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                    } catch (e) {}
+                }
+            }
+            broadcastSync('reject_task', { id });
+            showVolunteerToast(`Task ${id} skipped and returned to the pool.`, 'ℹ️');
+            loadVolunteerData();
         }
 
         // State Diagram Lifecycle Progressions
@@ -773,15 +827,14 @@
                 marker.style.left = '480px';
                 etaText.textContent = 'Volunteer has arrived at senior resident\'s residence!';
                 badge.textContent = '🟢 Arrived at Location';
-                badge.style.background = '#DBEAFE';
-                badge.style.color = '#1E40AF';
+                badge.style.background = '#DCFCE7';
+                badge.style.color = '#166534';
 
-                document.getElementById('sn4').classList.add('active', 'completed');
-                document.getElementById('sc3').classList.add('completed');
+                renderStateFlowProgress('arrived');
                 document.getElementById('btnSimArrive').style.display = 'none';
                 document.getElementById('btnSimStart').style.display = 'inline-flex';
                 
-                showVolunteerStatusToast("🚶 Status updated: You have arrived at the senior's residence.");
+                showVolunteerToast("🚶 Status updated: You have arrived at the senior's residence.", '📍');
 
                 // Update ReachData
                 if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
@@ -821,12 +874,11 @@
                 badge.style.background = '#FEF3C7';
                 badge.style.color = '#B45309';
 
-                document.getElementById('sn5').classList.add('active', 'completed');
-                document.getElementById('sc4').classList.add('completed');
+                renderStateFlowProgress('in_progress');
                 document.getElementById('btnSimStart').style.display = 'none';
                 document.getElementById('btnSimComplete').style.display = 'inline-flex';
 
-                showVolunteerStatusToast("▶️ Status updated: Errand assistance started (In Progress).");
+                showVolunteerToast("▶️ Status updated: Errand assistance started (In Progress).", '⚡');
 
                 // Update ReachData
                 if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
@@ -925,8 +977,7 @@
             }
 
             closeCompletionModal();
-            document.getElementById('sn6').classList.add('active', 'completed');
-            document.getElementById('sc5').classList.add('completed');
+            renderStateFlowProgress('completed');
             
             // Update active mission state and hide badge
             const badge = document.getElementById('missionStateBadge');
@@ -955,23 +1006,7 @@
         }
 
         function showVolunteerStatusToast(msg, type = 'success') {
-            let toast = document.getElementById('volLiveToast');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'volLiveToast';
-                toast.style.cssText = 'position: fixed; bottom: 24px; right: 24px; z-index: 10000; padding: 14px 22px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.15); transition: all 0.3s ease;';
-                document.body.appendChild(toast);
-            }
-            toast.style.background = (type === 'success') ? '#10B981' : '#3B82F6';
-            toast.style.color = '#FFFFFF';
-            toast.textContent = msg;
-            toast.style.display = 'block';
-            toast.style.opacity = '1';
-            clearTimeout(window.volToastTimer);
-            window.volToastTimer = setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => { toast.style.display = 'none'; }, 300);
-            }, 4000);
+            showVolunteerToast(msg, type === 'success' ? '✓' : 'ℹ️');
         }
 
         function openDisputeModal() {
@@ -1020,9 +1055,7 @@
 
     <!-- Project Footer -->
     <footer class="main-footer" style="margin-top: 48px; background: #0F172A; color: #FFFFFF; padding: 24px 20px; text-align: center; border-top: 1px solid #1E293B;">
-        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">
-            Community Micro-Volunteering & Empty Space
-        </p>
+        <p style="font-weight: 700; color: #FFFFFF; margin-bottom: 6px; font-size: 1.05rem;">ConnectSphere</p>
         <p style="margin: 0; font-size: 0.9rem; color: #94A3B8;">
             Connecting People, Helping Communities · Neighborhood Care Network
         </p>

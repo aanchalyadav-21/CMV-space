@@ -1,5 +1,5 @@
-# 🤝 Community Micro-Volunteering & Empty Space
-### Platform Documentation & Architecture
+# 🤝 ConnectSphere
+### Platform Documentation & Architecture (Community Micro-Volunteering & Empty Space)
 **Tagline:** *Connecting People, Helping Communities.*
 
 🔗 **Live Deployed Web Application:** [https://aanchalyadav-21.github.io/CMV-space/](https://aanchalyadav-21.github.io/CMV-space/)
@@ -8,7 +8,7 @@
 
 ## 🌟 Overview & Platform Mission
 
-**Community Micro-Volunteering & Empty Space** is a neighborhood-driven web platform designed to foster community mutual aid and optimize local space sharing:
+**ConnectSphere** is a neighborhood-driven web platform designed to foster community mutual aid and optimize local space sharing:
 
 1. **Community Micro-Volunteering (Primary Service):** Everyday errand and assistance requests for seniors and residents — prescription medicine pickup, grocery assistance, tutoring, tech guidance, and companion walks — fulfilled by verified neighborhood volunteers.
 2. **Community Empty Space Sharing (Secondary Service):** Discovering, scheduling, and reserving local community spaces, society clubhouses, and activity halls for educational workshops, health camps, and neighborhood gatherings.
