@@ -1,3 +1,8 @@
+# Comprehensive DBIT Community Engagement Project 1 Report Generator
+# Name: ConnectSphere: Community Micro-Volunteering & Empty Space Sharing
+# Alignment: Fully Justified (Body & Tables)
+# Page Numbering: Native Dynamic Word Fields (Page X of Y)
+
 import os
 import docx
 from docx.shared import Inches, Pt, RGBColor
@@ -9,16 +14,17 @@ from docx.oxml.ns import nsdecls, qn
 def create_full_report():
     doc = docx.Document()
     
-    # Page setup - A4
-    for section in doc.sections:
-        section.page_width = Inches(8.27)
-        section.page_height = Inches(11.69)
-        section.top_margin = Inches(0.79)     # 2.0 cm
-        section.bottom_margin = Inches(0.79)  # 2.0 cm
-        section.left_margin = Inches(0.98)    # 2.5 cm
-        section.right_margin = Inches(0.79)   # 2.0 cm
-        
-    # Styles
+    # Page setup - A4 conforming to DBIT formatting guidelines
+    # Margins: Left 2.5 cm (0.98 in), Right 2.0 cm (0.79 in), Top 2.0 cm (0.79 in), Bottom 2.0 cm (0.79 in)
+    section = doc.sections[0]
+    section.page_width = Inches(8.27)
+    section.page_height = Inches(11.69)
+    section.top_margin = Inches(0.79)
+    section.bottom_margin = Inches(0.79)
+    section.left_margin = Inches(0.98)
+    section.right_margin = Inches(0.79)
+    
+    # Base Normal Style: 12pt Times New Roman, Justified, 1.25 line spacing
     normal_style = doc.styles['Normal']
     normal_style.font.name = 'Times New Roman'
     normal_style.font.size = Pt(12)
@@ -27,6 +33,54 @@ def create_full_report():
     normal_style.paragraph_format.space_after = Pt(6)
     normal_style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
+    # Running Footer with native dynamic Word Page Numbers: "Page X of Y"
+    footer = section.footer
+    p_ftr = footer.paragraphs[0]
+    p_ftr.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+    
+    r_ftr_lbl = p_ftr.add_run("ConnectSphere  |  Course Code: 25CE3CEP01  |  Page ")
+    r_ftr_lbl.font.name = 'Times New Roman'
+    r_ftr_lbl.font.size = Pt(9.5)
+    r_ftr_lbl.font.italic = True
+    r_ftr_lbl.font.color.rgb = RGBColor(100, 116, 139)
+
+    def append_page_field(p, field_name):
+        run = p.add_run()
+        run.font.name = 'Times New Roman'
+        run.font.size = Pt(9.5)
+        run.font.bold = True
+        run.font.color.rgb = RGBColor(30, 41, 59)
+        fldChar1 = OxmlElement('w:fldChar')
+        fldChar1.set(qn('w:fldCharType'), 'begin')
+        instrText = OxmlElement('w:instrText')
+        instrText.set(qn('xml:space'), 'preserve')
+        instrText.text = field_name
+        fldChar2 = OxmlElement('w:fldChar')
+        fldChar2.set(qn('w:fldCharType'), 'separate')
+        fldChar3 = OxmlElement('w:fldChar')
+        fldChar3.set(qn('w:fldCharType'), 'end')
+        run._r.append(fldChar1)
+        run._r.append(instrText)
+        run._r.append(fldChar2)
+        run._r.append(fldChar3)
+
+    append_page_field(p_ftr, 'PAGE')
+    r_of = p_ftr.add_run(" of ")
+    r_of.font.name = 'Times New Roman'
+    r_of.font.size = Pt(9.5)
+    r_of.font.italic = True
+    r_of.font.color.rgb = RGBColor(100, 116, 139)
+    append_page_field(p_ftr, 'NUMPAGES')
+
+    # Word Compatibility Settings: Prevent expanding shift-returns
+    try:
+        settings_elm = doc.settings.element
+        compat = parse_xml(f'<w:compat {nsdecls("w")}><w:doNotExpandShiftReturn/></w:compat>')
+        settings_elm.append(compat)
+    except Exception as e:
+        print("Notice on compat:", e)
+
+    # Helper Paragraph Functions
     def add_title(text, size=16, space_before=12, space_after=12, align=WD_ALIGN_PARAGRAPH.CENTER, color=RGBColor(0,0,0)):
         p = doc.add_paragraph()
         p.alignment = align
@@ -63,25 +117,82 @@ def create_full_report():
         run.font.color.rgb = RGBColor(30, 41, 59)
         return p
 
-    def add_p(text, bold_prefix="", italic_prefix="", space_after=6):
-        p = doc.add_paragraph()
-        p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-        p.paragraph_format.space_after = Pt(space_after)
-        p.paragraph_format.line_spacing = 1.25
-        if bold_prefix:
-            r_b = p.add_run(bold_prefix)
-            r_b.bold = True
-            r_b.font.name = 'Times New Roman'
-            r_b.font.size = Pt(12)
-        if italic_prefix:
-            r_i = p.add_run(italic_prefix)
-            r_i.italic = True
-            r_i.font.name = 'Times New Roman'
-            r_i.font.size = Pt(12)
-        r = p.add_run(text)
-        r.font.name = 'Times New Roman'
-        r.font.size = Pt(12)
-        return p
+    def add_p(text, bold_prefix="", italic_prefix="", space_after=6, align=WD_ALIGN_PARAGRAPH.JUSTIFY):
+        # Split text into separate paragraphs if it contains newlines
+        # This completely eliminates awkward stretched line justification!
+        raw_lines = text.split('\n')
+        lines = [l.strip() for l in raw_lines if l.strip()]
+        if not lines:
+            p = doc.add_paragraph()
+            p.alignment = align
+            p.paragraph_format.space_after = Pt(space_after)
+            p.paragraph_format.line_spacing = 1.25
+            return p
+
+        created_p = None
+        for i, line in enumerate(lines):
+            p = doc.add_paragraph()
+            
+            # Short headings ending with ':' should be left-aligned so Word never expands them
+            is_header_lead = (line.endswith(':') and len(line) < 85) or line.startswith(('1. Likes', '2. Criticisms', '3. Questions', '4. Ideas', 'Scope Boundaries:'))
+            if is_header_lead:
+                p.alignment = WD_ALIGN_PARAGRAPH.LEFT
+            else:
+                p.alignment = align
+                
+            p.paragraph_format.space_after = Pt(space_after if i == len(lines)-1 else 3)
+            p.paragraph_format.line_spacing = 1.25
+
+            # Apply bold/italic prefix only on the first line if supplied to add_p
+            if i == 0:
+                if bold_prefix:
+                    r_b = p.add_run(bold_prefix)
+                    r_b.bold = True
+                    r_b.font.name = 'Times New Roman'
+                    r_b.font.size = Pt(12)
+                if italic_prefix:
+                    r_i = p.add_run(italic_prefix)
+                    r_i.italic = True
+                    r_i.font.name = 'Times New Roman'
+                    r_i.font.size = Pt(12)
+
+            line_to_process = line
+
+            # Check if line is a bullet item starting with '• ' or '- '
+            if line_to_process.startswith('• ') or line_to_process.startswith('- '):
+                line_to_process = line_to_process[2:].strip()
+                r_sym = p.add_run('•  ')
+                r_sym.font.name = 'Times New Roman'
+                r_sym.font.size = Pt(12)
+                r_sym.bold = True
+                p.paragraph_format.left_indent = Inches(0.25)
+                p.paragraph_format.first_line_indent = Inches(-0.25)
+
+            # Check if line has a key label before a colon (e.g. '• Purpose: ...' or '1. Presentation Layer: ...')
+            colon_pos = line_to_process.find(':')
+            if 0 < colon_pos <= 60 and not line_to_process.endswith(':'):
+                prefix = line_to_process[:colon_pos+1]
+                rest = line_to_process[colon_pos+1:]
+
+                r_pref = p.add_run(prefix)
+                r_pref.bold = True
+                r_pref.font.name = 'Times New Roman'
+                r_pref.font.size = Pt(12)
+
+                r_rest = p.add_run(rest)
+                r_rest.font.name = 'Times New Roman'
+                r_rest.font.size = Pt(12)
+            else:
+                r_main = p.add_run(line_to_process)
+                r_main.font.name = 'Times New Roman'
+                r_main.font.size = Pt(12)
+                if is_header_lead:
+                    r_main.bold = True
+
+            if created_p is None:
+                created_p = p
+
+        return created_p
 
     def add_bullet(text, bold_prefix="", space_after=4):
         p = doc.add_paragraph(style='List Bullet')
@@ -123,23 +234,31 @@ def create_full_report():
         for cell in hdr_row.cells:
             set_cell_background(cell, "F1F5F9")
             for p in cell.paragraphs:
+                p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 p.paragraph_format.space_before = Pt(4)
                 p.paragraph_format.space_after = Pt(4)
                 for r in p.runs:
                     r.bold = True
                     r.font.name = 'Times New Roman'
-                    r.font.size = Pt(10.5)
+                    r.font.size = Pt(10)
                     r.font.color.rgb = RGBColor(15, 23, 42)
                     
-        # Style content rows
+        # Style content rows: Clean left alignment for table text cells to eliminate awkward spacing
         for row in table.rows[1:]:
-            for cell in row.cells:
+            for cell_idx, cell in enumerate(row.cells):
+                col_header = table.rows[0].cells[cell_idx].text.strip() if len(table.rows[0].cells) > cell_idx else ""
                 for p in cell.paragraphs:
+                    # Center code, number, score, and percentage columns
+                    if (cell_idx == 0 and len(row.cells) >= 3) or any(k in col_header for k in ["Score", "Max", "Mean", "%", "CO", "PO", "Sr."]):
+                        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
+                    else:
+                        p.alignment = WD_ALIGN_PARAGRAPH.LEFT
                     p.paragraph_format.space_before = Pt(3)
                     p.paragraph_format.space_after = Pt(3)
+                    p.paragraph_format.line_spacing = 1.15
                     for r in p.runs:
                         r.font.name = 'Times New Roman'
-                        r.font.size = Pt(10)
+                        r.font.size = Pt(9.5)
                         
         if col_widths:
             for row in table.rows:
@@ -163,12 +282,12 @@ def create_full_report():
             r.bold = True
             r.italic = True
             r.font.name = 'Times New Roman'
-            r.font.size = Pt(10.5)
+            r.font.size = Pt(10)
             r.font.color.rgb = RGBColor(51, 65, 85)
         else:
-            print(f"Warning: Image {img_path} not found.")
+            print(f"Notice: Image {img_path} not found.")
 
-    print("Setup helper functions complete. Now generating report sections...")
+    print("Building fully justified ConnectSphere report with dynamic page numbering...")
 
     # ==========================================
     # 1. FRONT MATTER: COVER PAGE
@@ -183,7 +302,7 @@ def create_full_report():
 
     p_dept = doc.add_paragraph("Department of Computer Engineering")
     p_dept.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p_dept.paragraph_format.space_after = Pt(18)
+    p_dept.paragraph_format.space_after = Pt(16)
     for r in p_dept.runs:
         r.bold = True
         r.font.name = 'Times New Roman'
@@ -195,9 +314,8 @@ def create_full_report():
         p_logo.paragraph_format.space_after = Pt(16)
         p_logo.add_run().add_picture("extracted_images/exp4_img_1.jpg", width=Inches(1.5))
 
-    add_title("COMMUNITY MICRO-VOLUNTEERING & EMPTY SPACE SHARING (CMV-SPACE)", size=16, space_before=6, space_after=8, color=RGBColor(2, 132, 199))
-    add_p("A Hyperlocal Mutual-Aid and Community Infrastructure Sharing Platform with Offline-First State Synchronization, Verifiable Gate Access Passes, and Doorstep Verification", italic_prefix="", space_after=18)
-    doc.paragraphs[-1].alignment = WD_ALIGN_PARAGRAPH.CENTER
+    add_title("CONNECTSPHERE: COMMUNITY MICRO-VOLUNTEERING & EMPTY SPACE SHARING", size=15, space_before=6, space_after=8, color=RGBColor(2, 132, 199))
+    add_p("A Hyperlocal Mutual-Aid and Community Infrastructure Sharing Platform with Offline-First State Synchronization, Verifiable Gate Access Passes, and Doorstep PIN Verification", space_after=18, align=WD_ALIGN_PARAGRAPH.CENTER)
 
     p_sub = doc.add_paragraph("A Report Submitted in partial fulfillment of the requirements for\nCOMMUNITY ENGAGEMENT PROJECT 1\nCourse Code: 25CE3CEP01\nSemester III, Academic Year 2026-27")
     p_sub.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -248,7 +366,7 @@ def create_full_report():
     # 2. CERTIFICATE, APPROVAL, DECLARATION
     # ==========================================
     add_title("CERTIFICATE", size=16, space_before=12, space_after=14)
-    add_p('This is to certify that the Community Engagement Project 1 entitled "Community Micro-Volunteering & Empty Space Sharing (CMV-Space)" is a bona fide work carried out by the following students of Second Year Computer Engineering, Semester III, during Academic Year 2026-27, in partial fulfillment of the requirements of the course Community Engagement Project 1 (25CE3CEP01).')
+    add_p('This is to certify that the Community Engagement Project 1 entitled "ConnectSphere: Community Micro-Volunteering & Empty Space Sharing" is a bona fide work carried out by the following students of Second Year Computer Engineering, Semester III, during Academic Year 2026-27, in partial fulfillment of the requirements of the course Community Engagement Project 1 (25CE3CEP01).')
     
     table_cert = doc.add_table(rows=6, cols=3)
     table_cert.rows[0].cells[0].text = "Student Name"
@@ -271,10 +389,10 @@ def create_full_report():
     doc.add_page_break()
 
     add_title("COMMUNITY ENGAGEMENT PROJECT 1 REPORT APPROVAL", size=15, space_before=12, space_after=14)
-    add_p('This report titled "Community Micro-Volunteering & Empty Space Sharing (CMV-Space)" submitted by:')
+    add_p('This report titled "ConnectSphere: Community Micro-Volunteering & Empty Space Sharing" submitted by:')
     for idx, (name, roll, _) in enumerate(students_data):
-        add_p(f"{idx+1}. {name} (Roll No.: {roll})")
-    add_p('is approved for completion of Community Engagement Project 1 (25CE3CEP01), Semester III, Academic Year 2026-27, Department of Computer Engineering, Don Bosco Institute of Technology, Mumbai.')
+        add_p(f"{idx+1}. {name} (Roll No.: {roll})", space_after=2)
+    add_p('is approved for completion of Community Engagement Project 1 (25CE3CEP01), Semester III, Academic Year 2026-27, Department of Computer Engineering, Don Bosco Institute of Technology, Mumbai.', space_after=14)
 
     p_exam = doc.add_paragraph("\n\nExaminers:\n\n1. ___________________________________________________\n\n2. ___________________________________________________\n\nDate: ____________________\nPlace: Kurla, Mumbai")
     for r in p_exam.runs:
@@ -285,7 +403,7 @@ def create_full_report():
     doc.add_page_break()
 
     add_title("DECLARATION", size=16, space_before=12, space_after=14)
-    add_p('We hereby declare that the project report titled "Community Micro-Volunteering & Empty Space Sharing (CMV-Space)" is our original work carried out under the guidance of our Faculty Mentor. The work has not been submitted elsewhere for the award of any degree or academic credit. All sources of information, data, images, code, standards and published material used in this report have been appropriately acknowledged.')
+    add_p('We hereby declare that the project report titled "ConnectSphere: Community Micro-Volunteering & Empty Space Sharing" is our original work carried out under the guidance of our Faculty Mentor. The work has not been submitted elsewhere for the award of any degree or academic credit. All sources of information, data, images, code, standards and published material used in this report have been appropriately acknowledged.')
 
     table_dec = doc.add_table(rows=6, cols=3)
     table_dec.rows[0].cells[0].text = "Student Name"
@@ -336,7 +454,7 @@ def create_full_report():
         "(society clubhouses, parish halls, and educational rooms) remains severely underutilized due to opaque, bureaucratic "
         "reservation procedures. Existing commercial gig platforms neglect low-margin micro-tasks, lack volunteer safety "
         "verification, and completely segregate errand assistance from civic venue booking.\n\n"
-        "To resolve this, the 'Community Micro-Volunteering & Empty Space Sharing' (CMV-Space) platform was engineered as a "
+        "To resolve this, the 'ConnectSphere: Community Micro-Volunteering & Empty Space Sharing' platform was engineered as a "
         "hyperlocal, full-featured progressive web ecosystem. The methodology adopted human-centered design thinking—grounded "
         "in an empirical field survey of N = 102 community respondents across Kurla, Mumbai, paired with in-depth empathy mapping "
         "and UML behavioral modeling. The resulting architecture integrates five role-based portals (Resident, Volunteer, Space Owner, "
@@ -345,8 +463,8 @@ def create_full_report():
         "Key innovations include: (1) a secure 4-digit doorstep Safety Verification PIN (e.g., #4829) that safeguards vulnerable "
         "residents before completing medicine deliveries; (2) a dynamic SVG Gate Access Pass with verifiable QR tokens for "
         "approved community space bookings; and (3) an integrated Organizer Desk enabling NGOs to co-recruit volunteers and reserve "
-        "civic halls within a unified workflow. The system was validated through peer heuristic walkthroughs, achieving a 34/35 "
-        "usability score and 100% task completion across test scenarios. The live application is publicly deployed and operational "
+        "civic halls within a unified workflow. The system was validated through peer heuristic walkthroughs, achieving a 28/35 "
+        "usability score (80.0% benchmark on the DBIT evaluation rubric) and 100% task completion across test scenarios. The live application is publicly deployed and operational "
         "at https://aanchalyadav-21.github.io/CMV-space/, demonstrating tangible societal impact by bridging civic isolation and "
         "democratizing access to shared neighborhood resources."
     )
@@ -428,7 +546,7 @@ def create_full_report():
         ("Figure 3.3", "Priority Community Services Requested by Survey Respondents", "16"),
         ("Figure 3.4", "Respondent Willingness to Contribute Volunteer Time vs Shared Spaces", "17"),
         ("Figure 3.5", "Validation of Platform Security (PIN/Aadhaar) and Dual Architecture", "18"),
-        ("Figure 4.1", "Proposed Layered Architectural Model for the CMV-Space Platform", "21"),
+        ("Figure 4.1", "Proposed Layered Architectural Model for the ConnectSphere Platform", "21"),
         ("Figure 4.2", "UML Use Case Diagram Depicting 5 Primary System Actors and Security Kernels", "22"),
         ("Figure 4.3", "UML Activity Diagram: Hyperlocal Micro-Volunteering Errand Workflow", "24"),
         ("Figure 4.4", "UML Activity Diagram: Community Empty Space Discovery and Booking Workflow", "25"),
@@ -512,7 +630,7 @@ def create_full_report():
         "discover or reserve these spaces."
     )
     add_p(
-        "This project, Community Micro-Volunteering & Empty Space Sharing (CMV-Space), identifies this critical gap and "
+        "This project, ConnectSphere: Community Micro-Volunteering & Empty Space Sharing, identifies this critical gap and "
         "pioneers a unified, community-driven digital platform. By intertwining informal, short-duration mutual-aid volunteering "
         "with transparent, automated community hall reservations, the platform establishes a sustainable neighborhood care network."
     )
@@ -619,23 +737,23 @@ def create_full_report():
         ("[1]", "Towards design recommendations for social engagement platforms supporting volunteering targeting older people (2023)",
          "Renny S.N. Lindberg, Beat Signer, Olga De Troyer",
          "Evaluated 10 digital platforms via user interviews. Found usability, high-contrast text, transparent identity verification, and panic helplines are critical for elderly adoption.",
-         "Limited evaluation with real-time field deployments. Directly inspired CMV-Space's font sizing (A-, A, A+), helpline banner, and verified Aadhaar profiles."),
+         "Limited evaluation with real-time field deployments. Directly inspired ConnectSphere's font sizing (A-, A, A+), helpline banner, and verified Aadhaar profiles."),
         ("[2]", "Digital volunteering through a volunteering crowdsourcing platform: lessons from TuDu.org.pl (2022)",
          "Aleksandra Belina",
          "Analyzed crowdsourced volunteer micro-tasks. Demonstrated that breaking civic aid into short, flexible micro-tasks dramatically boosts youth participation.",
-         "Focused solely on virtual tasks (translation, graphic design). CMV-Space adapts micro-tasks to physical, localized neighborhood errands."),
+         "Focused solely on virtual tasks (translation, graphic design). ConnectSphere adapts micro-tasks to physical, localized neighborhood errands."),
         ("[3]", "The role of volunteer experience on performance on online volunteering platforms (2023)",
          "Gloria Urrea, Eunae Yoo",
          "Applied statistical regression on large humanitarian volunteering datasets. Proved gamified recognition (points, badges, verified hours) boosts volunteer retention by 42%.",
-         "Neglected physical safety mechanisms during task execution. Inspired CMV-Space's Volunteer Desk service hours tracker and badge recognition."),
+         "Neglected physical safety mechanisms during task execution. Inspired ConnectSphere's Volunteer Desk service hours tracker and badge recognition."),
         ("[4]", "Future workspace needs flexibility and diversity: Machine learning-driven behavioural analysis of co-working space (2023)",
          "Maoran Sun, Ramit Debnath, Ronita Bardhan, et al.",
          "Used IoT sensor occupancy logs to cluster space preferences. Concluded that multi-functional, flexible spatial layouts maximize utilization efficiency.",
-         "Confined to commercial co-working desks. CMV-Space extends space sharing to residential society clubhouses and community welfare halls."),
+         "Confined to commercial co-working desks. ConnectSphere extends space sharing to residential society clubhouses and community welfare halls."),
         ("[5]", "Spatial Inequality and Shared Accessibility in the Fifteen-Minute Community Life Circle (2026)",
          "Li Yue, Hongbo Zhao, Yehua Dennis Wei, et al.",
          "Spatial GIS accessibility modeling combined with supply-demand mismatch analysis across urban neighborhoods.",
-         "Macro-level policy analysis without an executable software platform. CMV-Space implements the localized digital platform connecting nearby residents within walking radius.")
+         "Macro-level policy analysis without an executable software platform. ConnectSphere implements the localized digital platform connecting nearby residents within walking radius.")
     ]
     for idx, (ref, title, authors, meth, gap) in enumerate(lit_data):
         row = lit_table.rows[idx+1].cells
@@ -657,24 +775,24 @@ def create_full_report():
     comp_table.rows[0].cells[1].text = "Product / System"
     comp_table.rows[0].cells[2].text = "Operational Features"
     comp_table.rows[0].cells[3].text = "Identified Missing Features"
-    comp_table.rows[0].cells[4].text = "Comparison with Proposed CMV-Space"
+    comp_table.rows[0].cells[4].text = "Comparison with Proposed ConnectSphere"
 
     comp_data = [
         ("[6]", "Be My Eyes", "Live video assistance connecting visually impaired users with global volunteers for simple reading tasks.",
          "No physical doorstep assistance, no local neighborhood task dispatch, no facility space booking.",
-         "CMV-Space operates hyperlocally for physical errands (medicine, groceries) and incorporates doorstep PIN security."),
+         "ConnectSphere operates hyperlocally for physical errands (medicine, groceries) and incorporates doorstep PIN security."),
         ("[7]", "Catchafire", "Professional skill-based volunteer matching for registered non-profit organizations.",
          "Requires high time commitments (weeks/months); ignores rapid physical micro-errands for individual citizens.",
-         "CMV-Space facilitates 15-minute everyday micro-tasks without corporate barriers."),
+         "ConnectSphere facilitates 15-minute everyday micro-tasks without corporate barriers."),
         ("[8]", "Idealist", "Global social-impact directory publishing formal internships, full-time jobs, and volunteer events.",
          "Zero live operational tracking, no security PIN verification, lacks community hall discovery.",
-         "CMV-Space provides live status lifecycles, emergency escalation, and gate entry passes."),
+         "ConnectSphere provides live status lifecycles, emergency escalation, and gate entry passes."),
         ("[9]", "Peerspace", "Commercial peer-to-peer marketplace for renting private event venues, photo studios, and halls.",
          "Exorbitant commercial rental pricing; strictly profit-driven; completely detached from volunteering.",
-         "CMV-Space democratizes unused society clubhouses for non-profit and welfare use at zero or nominal cost."),
+         "ConnectSphere democratizes unused society clubhouses for non-profit and welfare use at zero or nominal cost."),
         ("[10]", "VolunteerMatch", "Web-based portal matching volunteers with local non-profit organizations based on location and cause.",
          "Lacks real-time reactivity, no doorstep delivery verification, cannot co-book physical spaces for events.",
-         "CMV-Space uniquely bundles volunteer recruitment with civic venue reservation on a single platform.")
+         "ConnectSphere uniquely bundles volunteer recruitment with civic venue reservation on a single platform.")
     ]
     for idx, (ref, name, feats, missing, comp) in enumerate(comp_data):
         row = comp_table.rows[idx+1].cells
@@ -838,7 +956,7 @@ def create_full_report():
     fim_table = doc.add_table(rows=9, cols=3)
     fim_table.rows[0].cells[0].text = "Empirical Feedback Received"
     fim_table.rows[0].cells[1].text = "Identified User Need"
-    fim_table.rows[0].cells[2].text = "Final Engineered Implementation in CMV-Space"
+    fim_table.rows[0].cells[2].text = "Final Engineered Implementation in ConnectSphere"
 
     fim_data = [
         ("Concerns regarding volunteer theft or fraud during home deliveries.", "Security & Identity Verification", "Engineered 4-digit Safety PIN handover verification and supervisor-audited Aadhaar KYC badges."),
@@ -888,7 +1006,7 @@ def create_full_report():
     
     add_h1("4.1 Proposed System Architecture and Solution Approach")
     add_p(
-        "The architecture of the CMV-Space platform is structured around a decoupled, 3-tier progressive web model optimized "
+        "The architecture of the ConnectSphere platform is structured around a decoupled, 3-tier progressive web model optimized "
         "for high responsiveness, cross-tab reactive synchronization, and zero-dependency client deployment (Figure 4.1):\n"
         "1. Presentation Layer (UI/UX): Built with semantic HTML5, modern CSS3 variables, WCAG-compliant high-contrast themes, "
         "and client-side accessibility font scaling. Features five specialized portal views tailored to each role.\n"
@@ -901,7 +1019,8 @@ def create_full_report():
         "automatic fallback seeding to guarantee that no view renders blank."
     )
 
-    # Let's generate an architectural diagram box or visual representation
+    add_image_with_caption("charts/fig4_1_architecture.png", "Figure 4.1: Proposed Layered Architectural Model for the ConnectSphere Platform", width=Inches(5.8))
+
     add_h1("4.2 UML Modeling")
     add_p(
         "To rigorously formalize the platform's actors, functional boundaries, operational workflows, and state transitions, "
@@ -911,53 +1030,46 @@ def create_full_report():
     add_h2("4.2.1 Use Case Diagram and Actor Descriptions")
     add_p(
         "Figure 4.2 illustrates the core use case interactions between the five primary system actors and the supporting security kernels:\n"
-        "• Resident / Senior Citizen: Registers/logs in via OTP, browses community services, submits errand requests, reviews task summary, tracks live volunteer arrival, verifies safety PIN, and rates the experience.\n"
-        "• Community Volunteer: Undergoes Aadhaar KYC verification, browses available neighborhood errands within proximity, accepts/declines missions, provides live status updates, and inputs the resident's PIN upon completion.\n"
-        "• Space Provider / Society Secretary: Lists society clubhouses with capacity/pricing/rules, reviews incoming reservation requests, and approves or declines bookings, triggering gate pass generation.\n"
-        "• Community NGO Organizer: Coordinates large-scale welfare events by simultaneously bundling space bookings with volunteer recruitment drives.\n"
-        "• System Administrator: Audits KYC documents, monitors real-time task dispatches, resolves safety grievances, and enforces community guidelines.\n"
-        "• Included Security Kernels: All critical interactions mandate User Authentication, Profile Verification, Doorstep PIN Security, and Emergency SOS escalation."
+        "• Resident / User: Registers/logs in via OTP, browses community services, submits errand assistance requests, books community spaces, tracks requests and bookings, makes payments, and submits ratings and feedback.\n"
+        "• Volunteer: Undergoes verification, logs in, views available neighborhood requests, accepts or rejects errand requests, tracks task and location, completes assignments, and views personal task history and ratings.\n"
+        "• Space Owner: Registers physical spaces, manages venue specifications and amenities, defines availability schedules, reviews incoming booking requests, and approves or declines venue reservations.\n"
+        "• NGO / Society Admin: Coordinates community welfare drives, creates public events, requests volunteer assistance teams, books community spaces, manages member lists, and audits operational summary reports.\n"
+        "• System Admin: Verifies user and volunteer credentials, audits space owner listings, resolves grievances and complaints, monitors active tasks, curates platform content, generates analytical reports, and manages system settings.\n"
+        "• Included Security & Core Subsystems: Shared use case kernels include Authentication (OTP Login), User Verification (ID Verification), Secure Chat, Emergency SOS escalation, Ratings & Reviews, and Admin Monitoring & Notifications."
     )
 
-    add_image_with_caption("extracted_images/exp4/img_1_680x390.png", "Figure 4.2: UML Use Case Diagram Depicting 5 Primary System Actors and Security Kernels", width=Inches(5.8))
+    add_image_with_caption("uml_diagrams/use_case_diagram.jpg", "Figure 4.2: UML Use Case Diagram Depicting 5 Primary System Actors and Security Kernels", width=Inches(6.0))
 
     add_h2("4.2.2 Activity Diagram and Process Flow")
     add_p(
         "The operational flows of the platform are modeled across two fundamental activity workflows:\n"
-        "1. Micro-Volunteering Workflow (Figure 4.3): Traces the end-to-end journey from user login and category selection (e.g., medicine collection) "
-        "to form validation, broadcast to nearby volunteers, acceptance branching, live en-route arrival, doorstep PIN verification, and feedback submission.\n"
-        "2. Empty Space Booking Workflow (Figure 4.4): Models the parallel execution paths between Space Owners (listing, availability rules) "
-        "and Community Users (searching, filtering, request submission), followed by owner approval decision branching, automatic QR gate pass generation, "
-        "and post-usage facility rating."
+        "1. Micro-Volunteering Workflow (Figure 4.3): Traces the end-to-end journey from user authentication, role selection, service selection, and errand request submission. The system queries nearby available volunteers. If accepted, the resident receives immediate notification and live tracking begins until task completion and feedback submission. If declined, the user is notified and the request dynamically re-routes to the next nearby volunteer.\n"
+        "2. Empty Space Booking Workflow (Figure 4.4): Models parallel execution paths between Space Owners (listing venues, defining amenities, setting time-slot availability, and submitting for review) and Community Users (searching, filtering by capacity/date, and sending booking requests). Both flows converge at the owner review decision gate: approval triggers confirmed status and booking notification; rejection notifies the user and prompts alternative venue discovery."
     )
 
-    add_image_with_caption("extracted_images/exp4/img_2_680x436.png", "Figure 4.3: UML Activity Diagram: Hyperlocal Micro-Volunteering Errand Workflow", width=Inches(5.2))
-    add_image_with_caption("extracted_images/exp4/img_3_663x396.png", "Figure 4.4: UML Activity Diagram: Community Empty Space Discovery and Booking Workflow", width=Inches(5.2))
+    add_image_with_caption("uml_diagrams/activity_micro_volunteering.png", "Figure 4.3: UML Activity Diagram: Hyperlocal Micro-Volunteering Errand Workflow", width=Inches(3.3))
+    add_image_with_caption("uml_diagrams/activity_space_booking.jpg", "Figure 4.4: UML Activity Diagram: Community Empty Space Discovery and Booking Workflow", width=Inches(3.8))
 
     add_h2("4.2.3 State Diagram and Transitions")
     add_p(
         "The dynamic state lifecycles of system entities are modeled using finite state machine diagrams:\n"
-        "1. Micro-Volunteering Task Lifecycle (Figure 4.5): Request Created → Waiting for Volunteer → Volunteer Assigned → "
-        "Live Location Active → Volunteer Arrived → Task in Progress → Task Completed → Location Tracking Off → Rating & Feedback → Final State. "
-        "Includes a timeout cancellation branch and a dispute escalation path (Complaint Submitted → Under Investigation → Resolved).\n"
-        "2. Community Space Reservation Lifecycle (Figure 4.6): User Login → Browse Spaces → View Details → Submit Booking Request → "
-        "Booking Pending → Approval Decision Branch: If Approved → Booking Confirmed (QR Gate Code Issued) → Check-in Scan → Space in Use → "
-        "Checkout Scan → Booking Completed → Review. If Rejected → Booking Rejected (User Notified, Token Inactivated)."
+        "1. Micro-Volunteering Task Lifecycle (Figure 4.5): Beginning from the Initial State, the errand moves to Request Created and enters Waiting for Volunteer. From here, it can transition via Timeout/No Response to Request Cancelled, via User Cancellation to Final State, or upon volunteer acceptance to Volunteer Assigned. It subsequently progresses through Live Location Active, Volunteer Arrived, and Task in Progress. Upon completion, Location Tracking turns off and Rating/Feedback is recorded. If an issue arises during task execution, an Issue/Complaint state triggers Complaint Submission, Investigation, and Administrative Resolution (Warning/Suspension) before terminating at the Final State.\n"
+        "2. Community Space Reservation Lifecycle (Figure 4.6): Initiating from User Login, the user browses and views space details before submitting a booking request, placing the booking in Booking Pending (awaiting owner review). If the owner rejects, the state transitions to Booking Rejected with user notification to re-browse. If approved, the state advances to Booking Confirmed, dynamically generating the QR entry code. On event day, the pass transitions to Check-in (QR scan), Space in Use, Checkout (QR scan), and Booking Completed, culminating in Rate and Provide Feedback."
     )
 
-    add_image_with_caption("extracted_images/exp4/img_4_757x423.png", "Figure 4.5: UML State Machine Diagram: Micro-Volunteering Errand Lifecycle", width=Inches(5.5))
-    add_image_with_caption("extracted_images/exp4/img_5_718x415.png", "Figure 4.6: UML State Machine Diagram: Community Space Pass Reservation & QR Lifecycle", width=Inches(5.5))
+    add_image_with_caption("uml_diagrams/state_errand_lifecycle.png", "Figure 4.5: UML State Machine Diagram: Micro-Volunteering Errand Lifecycle", width=Inches(2.9))
+    add_image_with_caption("uml_diagrams/state_space_booking.png", "Figure 4.6: UML State Machine Diagram: Community Space Pass Reservation & QR Lifecycle", width=Inches(2.4))
 
     add_h1("4.3 Project Timeline and Work Breakdown")
     add_p(
-        "The project execution spanned July 2026 to November 2026 across four structured developmental phases (Figure 4.7):\n"
-        "• Phase 1 — Problem Selection & Field Survey (July – Aug 2026): Topic finalization, design thinking empathy mapping, and community survey execution (N = 102).\n"
-        "• Phase 2 — System Modeling & Architecture (Aug – Sept 2026): UML modeling (Use Case, Activity, State), architectural specification, and database schema formulation.\n"
-        "• Phase 3 — Prototype Development & Integration (Sept – Oct 2026): Development of responsive multi-page web application, BroadcastChannel cross-tab synchronization, SVG QR code generation, and PIN security logic.\n"
-        "• Phase 4 — Testing, Peer Evaluation & Deployment (Oct – Nov 2026): Heuristic usability evaluation, bug fixes, GitHub repository hosting, and documentation preparation."
+        "The project execution spanned July 2026 to November 2026 across structured developmental phases (Figure 4.7):\n"
+        "• Phase 1 — Problem Ideation & Field Survey (July – Aug 2026): Topic finalization, design thinking empathy mapping, and community survey execution (N = 102).\n"
+        "• Phase 2 — UML Modeling & System Architecture (Aug – Sept 2026): UML modeling (Use Case, Activity, State), architectural specification, and database schema formulation.\n"
+        "• Phase 3 — Core UI/UX & Responsive Prototyping (Sept – Oct 2026): Development of responsive multi-page web application, BroadcastChannel cross-tab synchronization, SVG QR code generation, and PIN security logic.\n"
+        "• Phase 4 — Testing, Usability Walkthrough & Deployment (Oct – Nov 2026): Usability evaluation (28/35 heuristic score on DBIT 35-point rubric), peer feedback iterations, GitHub Pages deployment, and documentation."
     )
 
-    add_image_with_caption("extracted_images/exp4/img_7_726x395.png", "Figure 4.7: Project Timeline Gantt Chart and Work Breakdown Structure (July - November 2026)", width=Inches(5.8))
+    add_image_with_caption("charts/fig4_7_gantt_chart.png", "Figure 4.7: Project Timeline Gantt Chart and Work Breakdown Structure (July - November 2026)", width=Inches(6.0))
 
     doc.add_page_break()
 
@@ -966,7 +1078,7 @@ def create_full_report():
     # ==========================================
     add_title("CHAPTER 5\nPROTOTYPE IMPLEMENTATION AND PROOF OF CONCEPT", size=16, space_before=12, space_after=14)
     
-    add_h1("5.1 Prototype Development Environment and Software Tools Selected")
+    add_h1("5.1 Development Environment and Software Tools Selected")
     add_p(
         "To deliver a robust, high-fidelity proof of concept (PoC), the team selected full-stack client-side web technologies "
         "(HTML5, CSS3, JavaScript ES6) rather than static mockup tools (Figma/Canva). This decision was justified by several technical factors:\n"
@@ -1094,47 +1206,58 @@ def create_full_report():
     # ==========================================
     add_title("CHAPTER 6\nUSER TESTING, PEER REVIEW, AND DESIGN EVALUATION", size=16, space_before=12, space_after=14)
     
-    add_h1("6.1 Testing Methodology and Task Scenarios")
+    add_h1("6.1 Testing Methodology and Primary Task Scenario")
     add_p(
-        "To rigorously evaluate the functional usability, visual clarity, navigation flow, and safety reliability of the "
-        "implemented prototype, structured peer walkthrough testing sessions were conducted. Five independent engineering peer "
-        "evaluators were assigned realistic operational task scenarios:\n"
-        "• Scenario A (Senior Resident Journey): Log in as resident Ramesh Patel, navigate to Medicine Pickup, fill out an urgent prescription errand for Flat 402, review summary details, submit, and verify the 4-digit Safety PIN on the live tracking screen.\n"
-        "• Scenario B (Space Booking & Approval Flow): From the Resident Dashboard, browse available spaces, select Shanti Niketan Society Clubhouse for a Senior Breathing Yoga Circle, and submit a reservation request.\n"
-        "• Scenario C (Cross-Tab Reactivity Test): In Tab 2, log in as Space Owner (Marian Trust), open the incoming requests queue, and approve the booking. Verify that Tab 1's pass slip instantly transforms from 'Pending' (Yellow) to 'Confirmed' (Green) with an active QR code.\n"
-        "• Scenario D (Volunteer Field Execution): Log in as Volunteer Karan Verma, accept an available errand dispatch, view delivery notes, and complete the mission by inputting the resident's security PIN."
+        "To rigorously evaluate the functional usability, visual clarity, navigation flow, and design consistency of the "
+        "developed web prototype, structured peer walkthrough testing was conducted during Experiment 6 under the "
+        "Community Engagement Project 1 curriculum (Course Code: 25CE3CEP01, AY 2026-27).\n\n"
+        "• Evaluated Group: Group No. C-04 (Class: COMP C, Batch: C)\n"
+        "• Student Investigators: Aanchal Yadav (Roll No. 54), Ansley Rayen (Roll No. 45), Simone Rodrigues (Roll No. 46), "
+        "Kritika Singh (Roll No. 56), Disha Shetty (Roll No. 50).\n"
+        "• Prototype Evaluated: Community Micro-Volunteering & Empty Space (ConnectSphere).\n"
+        "• Prototyping Stack: HTML / CSS / JavaScript.\n"
+        "• Reviewer Group: Group No. C-05 (Reviewer Group Lead Signature: Shreyash).\n"
+        "• Faculty Evaluator: Prof. Snehal (Reviewed & Signed: 26/10/26).\n"
+        "• Primary Task Scenario Given to Users: \"Smooth flow from login (role-based) to task completion\".\n\n"
+        "Evaluators from Reviewer Group C-05 executed an end-to-end user journey simulating typical residential interactions: "
+        "logging into the platform, selecting designated user roles, submitting an errand assistance request, reviewing task summary, "
+        "monitoring live status with the 4-digit doorstep Safety PIN, booking a community space with owner approval, and verifying "
+        "the final confirmation slip and SVG QR gate pass."
     )
 
     add_h1("6.2 Usability Walkthrough Evaluation (35-Point Rubric)")
     add_p(
-        "Peer evaluators scored the prototype across seven standardized human-computer interaction (HCI) heuristic parameters "
-        "on a 5-point scale (Total: 35 points). The aggregated quantitative findings are presented in Table 6.1."
+        "The quantitative evaluation was formally administered using DBIT's standardized Part A: Usability & Visual Walkthrough "
+        "Rubric. Reviewer Group C-05 assessed seven core HCI heuristic parameters on a 5-point Likert scale (1 = Strongly Disagree, "
+        "2 = Disagree, 3 = Neutral, 4 = Agree, 5 = Strongly Agree), yielding a total possible score of 35 points. "
+        "The exact scores and evaluative findings recorded during the laboratory session are presented in Table 6.1."
     )
 
-    rubric_table = doc.add_table(rows=8, cols=4)
-    rubric_table.rows[0].cells[0].text = "Heuristic Evaluation Parameter"
-    rubric_table.rows[0].cells[1].text = "Max Score"
-    rubric_table.rows[0].cells[2].text = "Mean Score"
-    rubric_table.rows[0].cells[3].text = "Evaluator Observations & Findings"
+    rubric_table = doc.add_table(rows=9, cols=4)
+    rubric_table.rows[0].cells[0].text = "Sr. No."
+    rubric_table.rows[0].cells[1].text = "Evaluation Parameter & Rubric Checklist Prompt"
+    rubric_table.rows[0].cells[2].text = "Score (1–5)"
+    rubric_table.rows[0].cells[3].text = "Evaluator Assessment & Observation"
 
     rubric_data = [
-        ("1. Visual Clarity & Senior Readability", "5.0", "4.9", "Large typography, prominent icons, uncluttered cards, and accessibility font size adjusters (A-, A, A+) provided exceptional readability."),
-        ("2. Button Affordance & Call-to-Action", "5.0", "4.8", "Primary CTA buttons (e.g., 'Proceed to Review Request →') feature distinct color coding, drop shadows, and clear forward direction indicators."),
-        ("3. Navigation Flow & Dead-End Prevention", "5.0", "5.0", "100% of screens provide breadcrumbs or 'Return to Dashboard' links. Evaluators experienced zero navigation traps or broken loops."),
-        ("4. Contrast & WCAG Compliance", "5.0", "4.8", "Deep blue headers (#0369A1), emerald success badges (#10B981), and amber warnings (#F59E0B) strictly adhere to WCAG AA contrast standards."),
-        ("5. Cross-Screen Design Consistency", "5.0", "4.9", "Uniform top helpline bar, consistent card corner radii, and synchronized color palettes maintained across all 12 operational screens."),
-        ("6. Safety Verification Robustness", "5.0", "4.8", "The 4-digit doorstep PIN handover and Aadhaar KYC badge system received unanimous praise for preventing impersonation."),
-        ("7. Real-Time Responsiveness & Sync", "5.0", "4.8", "BroadcastChannel cross-tab synchronization executed in under 50 ms without requiring manual page reloads.")
+        ("1", "First Impression & Clarity: On the landing screen, is it instantly clear what community problem this product addresses?", "4", "Agree. The landing page clearly articulates the dual neighborhood mandate of hyperlocal errand assistance and civic venue sharing."),
+        ("2", "Button Affordance: Are interactive buttons and clickable cards visually distinct from static elements and banners?", "3", "Neutral. Reviewers noted that certain profile cards contained multiple buttons performing duplicate tasks, creating visual ambiguity."),
+        ("3", "Forward Navigation Flow: Does clicking primary CTA buttons advance you smoothly to the expected next screen without dead ends?", "4", "Agree. Forward progression from service selection to form input, review screen, and live status tracker operated smoothly without dead ends."),
+        ("4", "Typography & Legibility: Are all headings, body text, and labels easy to read with good contrast against the background?", "4.5", "Strongly Agree / High Distinction. Clear typographic hierarchy, high-contrast headings, and accessible label sizing ensured excellent readability."),
+        ("5", "Design System Consistency: Are visual components (fonts, colors, button styles, corner radii) uniform across all screens?", "3.5", "Satisfactory / Above Average. Card corner radii and typography were uniform, but the color palette chosen was noted as visually overwhelming on specific pages."),
+        ("6", "Clarity of Language: Are labels, buttons, and instructions free from confusing technical jargon and easy for everyday users to grasp?", "4", "Agree. Action-oriented terms such as 'Senior Assistance', 'Medicine Pickup', and 'Book Space' were intuitive and free of developer jargon."),
+        ("7", "Task Completion Feedback: On the final screen, is it clearly confirmed that the task or action was completed successfully?", "5", "Strongly Agree (Perfect Score). The live operational tracker with the 4-digit doorstep Safety PIN (#4829) and instant SVG QR pass provided unambiguous confirmation."),
+        ("Total", "TOTAL USABILITY SCORE (Sum of Parameters 1 to 7)", "28 / 35", "Overall Usability Benchmark: 80.0% (Strong Performance across Core User Journeys).")
     ]
-    for idx, (param, max_s, mean_s, obs) in enumerate(rubric_data):
+    for idx, (sr, param, score, obs) in enumerate(rubric_data):
         row = rubric_table.rows[idx+1].cells
-        row[0].text = param
-        row[1].text = max_s
-        row[2].text = mean_s
+        row[0].text = sr
+        row[1].text = param
+        row[2].text = score
         row[3].text = obs
-    set_table_styling(rubric_table, [Inches(2.2), Inches(0.8), Inches(0.9), Inches(3.1)])
+    set_table_styling(rubric_table, [Inches(0.6), Inches(2.9), Inches(0.9), Inches(2.6)])
 
-    p_tot = doc.add_paragraph("Overall Usability Score: 34.0 / 35.0 (97.1% Performance Benchmark). All five evaluators successfully completed 100% of assigned task scenarios without external guidance.")
+    p_tot = doc.add_paragraph("Quantitative Summary: The prototype achieved an overall score of 28.0 / 35.0 (80.0%). The system excelled particularly in Task Completion Feedback (5/5) and Typography & Legibility (4.5/5), while identifying button affordance (3/5) and color palette calibration (3.5/5) as key areas for targeted refinement.")
     p_tot.paragraph_format.space_before = Pt(6)
     p_tot.paragraph_format.space_after = Pt(12)
     for r in p_tot.runs:
@@ -1144,21 +1267,52 @@ def create_full_report():
 
     add_h1("6.3 Peer Constructive Feedback Analysis")
     add_p(
-        "Qualitative observations gathered during the walkthrough sessions were categorized into Specific Likes, Criticisms, "
-        "and Implemented Improvements (Table 6.2)."
+        "Qualitative feedback was formally recorded in Part B: Peer Constructive Feedback by Reviewer Group C-05 (signed by Shreyash) "
+        "and supplemented by Faculty Evaluation recommendations (dated 26/10/26). The observations are categorized into Specific Likes, "
+        "Criticisms, Unclear Aspects, and Concrete Improvement Ideas, followed by the engineered rectifications applied in the final release."
+    )
+
+    add_h2("6.3.1 Qualitative Observations Collected from Peer Reviewers")
+    add_p(
+        "1. Likes (What worked well):\n"
+        "• Activity Screen: Reviewers highlighted the live activity screen as a standout UI accomplishment, praising its real-time operational status updates, step progress visualization, and transparent errand tracking.\n"
+        "• Dashboard: The centralized role-based dashboard was commended for clean structural layout, intuitive service cards, and seamless entry into micro-volunteering and space reservation workflows.\n\n"
+        "2. Criticisms (Points of friction or confusion):\n"
+        "• Duplicate Button Controls: 'The screen consists of multiple buttons doing the same task.' Reviewers observed redundant action buttons on user and profile cards that caused hesitation regarding which button to click.\n"
+        "• Overwhelming Color Palette: 'The color palette chose looks overwhelming.' The initial color scheme featured multiple competing vibrant colors across adjacent elements, causing visual fatigue.\n\n"
+        "3. Questions (Unclear aspects):\n"
+        "• 'Nothing.' Reviewer Group C-05 confirmed that the interface left zero unanswered questions during interaction; the operational pathways, role separation, and functional steps were clear and self-contained.\n\n"
+        "4. Ideas for Design Improvement (Peer Suggestions):\n"
+        "• Text Density Reduction: 'Reduce the amount of text onto each screen.' Trimming descriptive body paragraphs to ensure quick scanning, especially for senior citizen usability.\n"
+        "• Color & Layout Harmonization: 'Can use good colour combinations for layout & remove the extra buttons doing the same task.' Streamlining duplicate controls into a unified primary CTA and adopting a harmonious, restrained color palette."
+    )
+
+    add_h2("6.3.2 Faculty Feedback and Key Recommendations")
+    add_p(
+        "Faculty Reviewer (Prof. Snehal, Evaluated: 26/10/26) provided authoritative academic feedback:\n"
+        "\"Redundant buttons on profiles. & interface is a bit bulky. Overall design is consistent. Title needs work. Overall, good work for integrating two solutions in one.\"\n\n"
+        "The faculty commended the successful conceptual and technical integration of two complementary societal solutions—hyperlocal "
+        "micro-volunteering mutual aid and community empty space sharing—into a single unified ecosystem. Concurrently, three specific "
+        "directives were issued: (1) eliminate redundant profile buttons; (2) reduce interface bulkiness; and (3) formalize the project title."
+    )
+
+    add_h2("6.3.3 Feedback-Driven Design Rectifications Implemented")
+    add_p(
+        "To directly address all peer criticisms and faculty directives, the engineering team executed four concrete architectural "
+        "and visual iterations in the final deployed version of ConnectSphere (Table 6.2)."
     )
 
     peer_fb_table = doc.add_table(rows=5, cols=4)
-    peer_fb_table.rows[0].cells[0].text = "Category"
-    peer_fb_table.rows[0].cells[1].text = "Specific Peer Feedback"
-    peer_fb_table.rows[0].cells[2].text = "Identified Friction Point"
-    peer_fb_table.rows[0].cells[3].text = "Architectural Rectification Applied"
+    peer_fb_table.rows[0].cells[0].text = "Source & Category"
+    peer_fb_table.rows[0].cells[1].text = "Identified Observation / Friction"
+    peer_fb_table.rows[0].cells[2].text = "Root Cause Analysis"
+    peer_fb_table.rows[0].cells[3].text = "Engineered Rectification Applied in ConnectSphere"
 
     peer_fb_data = [
-        ("Specific Likes", "The 4-digit Handover PIN on confirmation.html and the SVG QR pass slip on pass.html were highlighted as standout innovations.", "None (Positive reinforcement).", "Maintained as foundational safety and verification components."),
-        ("Criticism / Bug", "Opening Space Owner on Tab 2 previously caused Tab 1 to switch user identity from Ramesh Patel to Marian Trust.", "Session storage conflict across shared browser sessions.", "Refactored session management into isolated sessionStorage keys so each tab retains independent identity."),
-        ("Criticism / Bug", "Approving a booking on Tab 2 did not immediately update the pass slip on Tab 1 unless the page was refreshed.", "Asynchronous state lag across detached windows.", "Implemented HTML5 BroadcastChannel ('reach_sync') listener paired with window.onstorage and 500 ms fallback polling."),
-        ("Refinement Idea", "Header navigation displayed 'Reach' in some sub-pages instead of the full project title.", "Branding inconsistency.", "Standardized logo branding across all HTML files to '🤝 Community Micro-Volunteering & Empty Space'.")
+        ("Peer Criticism (C-05) & Faculty Note", "The screen consists of multiple buttons doing the same task; redundant buttons on profiles.", "Duplicate CTA buttons existed on profile views and card headers performing identical navigation actions.", "Pruned all redundant button triggers. Each card and profile view was refactored to feature a single, high-affordance primary action button with distinct visual hierarchy."),
+        ("Peer Criticism (C-05)", "The color palette chose looks overwhelming.", "Uncoordinated high-saturation accent colors competed for visual attention across adjacent dashboard cards.", "Refactored the CSS design system using the 60-30-10 color rule: 60% neutral background (#f8fafc), 30% slate structural cards (#ffffff with #334155 text), and 10% focused accent colors (emerald #10b981 for confirmation, navy #0369a1 for navigation)."),
+        ("Peer Suggestion & Faculty Note", "Reduce amount of text onto each screen; interface is a bit bulky.", "Lengthy instructional paragraphs increased cognitive load for elderly residents.", "Streamlined text density across all 12 screens. Replaced multi-line instructions with concise bullet summaries, modal help tooltips, and progressive disclosure toggles."),
+        ("Faculty Recommendation", "Title needs work; overall good work for integrating two solutions in one.", "Preliminary working title 'CMV-Space' was an ambiguous developer acronym.", "Formalized the project branding across all screens, documentation, and repository to 'ConnectSphere: Community Micro-Volunteering & Empty Space Sharing'.")
     ]
     for idx, (cat, fb, fric, rect) in enumerate(peer_fb_data):
         row = peer_fb_table.rows[idx+1].cells
@@ -1166,7 +1320,7 @@ def create_full_report():
         row[1].text = fb
         row[2].text = fric
         row[3].text = rect
-    set_table_styling(peer_fb_table, [Inches(1.2), Inches(2.2), Inches(1.8), Inches(2.0)])
+    set_table_styling(peer_fb_table, [Inches(1.4), Inches(1.8), Inches(1.8), Inches(2.0)])
 
     doc.add_page_break()
 
@@ -1177,7 +1331,7 @@ def create_full_report():
     
     add_h1("7.1 Community Impact and Societal Value Created")
     add_p(
-        "The Community Micro-Volunteering & Empty Space Sharing (CMV-Space) project successfully demonstrates that human-centered "
+        "The ConnectSphere: Community Micro-Volunteering & Empty Space Sharing project successfully demonstrates that human-centered "
         "software engineering can directly alleviate urban social isolation and resource misallocation. By establishing an "
         "accessible digital bridge between vulnerable senior citizens, energetic student volunteers, housing society committees, "
         "and non-profit organizers, the platform achieves substantial societal impact:\n"
@@ -1207,7 +1361,7 @@ def create_full_report():
         "and doorstep PIN notifications directly to basic senior feature phones without requiring smartphone app installation. Incorporate "
         "Web Speech API for multilingual voice-based task submission in Marathi, Hindi, and English.\n"
         "• Phase 4 — Government & Municipal Corporation Collaboration: Partner with local municipal ward offices (BMC) and Senior "
-        "Citizen Citizen Welfare Associations to integrate verified voter ID/Aadhaar DigiLocker verification, institutionalizing the platform "
+        "Citizen Welfare Associations to integrate verified voter ID/Aadhaar DigiLocker verification, institutionalizing the platform "
         "as an official civic mutual-aid infrastructure."
     )
     add_p(
@@ -1291,7 +1445,7 @@ def create_full_report():
          "• Structured field survey analysis report (charts and percentage distributions from N = 102 respondents)\n• Formulated 1-2 sentence validated Problem Statement and Feature Justification Matrix",
          "Sections 3.3, 3.4, and Appendix A"),
         ("CO5: Evaluate functionality, sustainability, and societal impact using technical criteria. (Evaluate - Metacognitive)",
-         "• Completed 35-point Usability & Visual Walkthrough rubric across 7 heuristic parameters (Scored 34.0/35.0)\n• Structured Peer Constructive Feedback report",
+         "• Completed 35-point Usability & Visual Walkthrough rubric across 7 heuristic parameters (Scored 28.0/35.0 on DBIT rubric)\n• Structured Peer Constructive Feedback report from Group C-05 and Faculty Review",
          "Sections 6.2 and 6.3"),
         ("CO6: Design and validate an innovative, sustainable, and socially relevant solution. (Create - Metacognitive Knowledge)",
          "• Interactive 5-screen primary user journey + 7 extended operational desks\n• Version-controlled GitHub repository and live public deployment on GitHub Pages (https://aanchalyadav-21.github.io/CMV-space/)",
@@ -1333,15 +1487,27 @@ def create_full_report():
         "• CO3 maps to PO1-PO5, PO8-PO11, PSO1-PSO3: Applies creative modeling tools (UML Use Case, Activity, State diagrams) and project timeline management.\n"
         "• CO4 maps to PO1-PO5, PO8-PO11, PSO1-PSO3: Conducts rigorous empirical data analysis on N = 102 respondents to formulate the validated Problem Statement.\n"
         "• CO5 maps to PO1-PO11, PSO1-PSO3: Evaluates software usability against a 35-point heuristic rubric and addresses peer constructive feedback.\n"
-        "• CO6 maps to PO1-PO11, PSO1-PSO3: Synthesizes design into a working, deployed, high-impact web application (CMV-Space) serving real community needs."
+        "• CO6 maps to PO1-PO11, PSO1-PSO3: Synthesizes design into a working, deployed, high-impact web application (ConnectSphere) serving real community needs."
     )
 
-    out_file = "Community_Engagement_Project_1_Report.docx"
-    doc.save(out_file)
-    print(f"\n=======================================================")
-    print(f"SUCCESS! Complete Report saved as: {out_file}")
-    print(f"File size: {os.path.getsize(out_file):,} bytes")
-    print(f"=======================================================\n")
+    target_files = [
+        "ConnectSphere_Final_Submission_Report.docx",
+        "Community_Engagement_Project_1_Report.docx"
+    ]
+    saved = []
+    for f in target_files:
+        try:
+            doc.save(f)
+            saved.append(f)
+            print(f"Successfully saved: {f} ({os.path.getsize(f):,} bytes)")
+        except PermissionError:
+            print(f"File currently locked (open in Word): {f}")
+    
+    if not saved:
+        fallback = f"ConnectSphere_Report_{int(time.time())}.docx"
+        doc.save(fallback)
+        saved.append(fallback)
+        print(f"Saved to fallback file: {fallback}")
 
 if __name__ == "__main__":
     create_full_report()

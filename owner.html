@@ -260,9 +260,6 @@
             sessionStorage.setItem('reach_auth_active', 'true');
             sessionStorage.setItem('reach_auth_role', 'owner');
             sessionStorage.setItem('reach_auth_user', JSON.stringify(DEFAULT_PROFILES.owner));
-            if (!localStorage.getItem('reach_auth_active')) {
-                localStorage.setItem('reach_auth_active', 'true');
-            }
             if (typeof renderDynamicNavigation === 'function') renderDynamicNavigation();
 
             const gate = document.getElementById('ownerAuthGate');

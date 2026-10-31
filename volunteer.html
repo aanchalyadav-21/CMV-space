@@ -1109,13 +1109,10 @@
         }
 
         function checkVolAuth() {
-            // Isolate volunteer role to this browser tab via sessionStorage
+            // Isolate volunteer role to this browser tab via sessionStorage only
             sessionStorage.setItem('reach_auth_active', 'true');
             sessionStorage.setItem('reach_auth_role', 'volunteer');
             sessionStorage.setItem('reach_auth_user', JSON.stringify(DEFAULT_PROFILES.volunteer));
-            if (!localStorage.getItem('reach_auth_active')) {
-                localStorage.setItem('reach_auth_active', 'true');
-            }
             if (typeof renderDynamicNavigation === 'function') renderDynamicNavigation();
 
             const gate = document.getElementById('volAuthGate');

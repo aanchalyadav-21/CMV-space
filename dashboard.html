@@ -540,14 +540,10 @@
                     sessionStorage.setItem('reach_auth_user', JSON.stringify(prof));
                 }
                 sessionStorage.setItem('reach_auth_active', 'true');
-            } else if (!sessionStorage.getItem('reach_auth_role')) {
-                // Initialize this tab from AuthSession or fallback
-                const initialRole = AuthSession.getCurrentRole() || 'member';
-                sessionStorage.setItem('reach_auth_role', initialRole);
-                const prof = DEFAULT_PROFILES[initialRole];
-                if (prof) {
-                    sessionStorage.setItem('reach_auth_user', JSON.stringify(prof));
-                }
+            } else if (!AuthSession.isLoggedIn()) {
+                // If not signed in and no role parameter provided, redirect to home sign in
+                window.location.replace('index.html#signInBox');
+                return;
             }
 
             // Strictly read this tab's isolated role so another tab cannot switch this tab's view

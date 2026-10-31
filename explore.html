@@ -548,7 +548,7 @@
 
         function initUserBadge() {
             const isLogged = (window.AuthSession && typeof AuthSession.isLoggedIn === 'function') ? AuthSession.isLoggedIn() : false;
-            const currentRole = isLogged ? (localStorage.getItem('reach_auth_role') || 'member') : 'guest';
+            const currentRole = isLogged ? (sessionStorage.getItem('reach_auth_role') || 'member') : 'guest';
             const user = isLogged ? AuthSession.getCurrentUser() : null;
             
             const badge = document.getElementById('activeUserBadge');
@@ -651,7 +651,7 @@
             const sortMode = document.getElementById('taskSortSelect').value;
 
             // Check current active role
-            const currentRole = localStorage.getItem('reach_auth_role') || 'member';
+            const currentRole = sessionStorage.getItem('reach_auth_role') || 'member';
             const currentUser = (window.AuthSession && typeof AuthSession.getCurrentUser === 'function') 
                 ? AuthSession.getCurrentUser() 
                 : null;
@@ -854,7 +854,7 @@
 
         // Direct Task Acceptance Flow (Volunteer Only)
         function handleDirectAccept(taskId) {
-            const currentRole = localStorage.getItem('reach_auth_role') || 'member';
+            const currentRole = sessionStorage.getItem('reach_auth_role') || 'member';
             if (currentRole !== 'volunteer') {
                 alert('Only verified volunteers can accept errand requests. Please sign in with a Volunteer account.');
                 return;
@@ -914,7 +914,7 @@
             const task = tasks.find(t => t.id === taskId);
             if (!task) return;
 
-            const currentRole = localStorage.getItem('reach_auth_role') || 'member';
+            const currentRole = sessionStorage.getItem('reach_auth_role') || 'member';
             const isVolunteer = currentRole === 'volunteer';
             const isWaiting = task.status === 'Waiting for Volunteer' || !task.assignedVolunteer;
 

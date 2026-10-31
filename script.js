@@ -509,29 +509,35 @@ window.ReachData = {
     setCurrentUserRole: (role) => AuthSession.switchRole(role)
 };
 
+// Clean up any stale legacy auto-login tokens from localStorage
+try {
+    localStorage.removeItem('reach_auth_active');
+    localStorage.removeItem('reach_auth_role');
+    localStorage.removeItem('reach_auth_user');
+    localStorage.removeItem('reach_user_session');
+} catch (e) {}
+
 // ==========================================================================
 // Authentication & Session Management
 // ==========================================================================
 const AuthSession = {
     isLoggedIn() {
-        const tabActive = sessionStorage.getItem('reach_auth_active');
-        if (tabActive !== null) {
-            return tabActive === 'true';
-        }
-        return localStorage.getItem('reach_auth_active') === 'true';
+        // Strictly check this active browser session: no auto-login on fresh page open!
+        return sessionStorage.getItem('reach_auth_active') === 'true';
     },
 
     getCurrentRole() {
         if (!this.isLoggedIn()) return null;
-        return sessionStorage.getItem('reach_auth_role') || localStorage.getItem('reach_auth_role') || 'member';
+        return sessionStorage.getItem('reach_auth_role') || null;
     },
 
     getCurrentUser() {
         if (!this.isLoggedIn()) {
             return null; // Guest / unauthenticated user: strictly null!
         }
-        const role = this.getCurrentRole() || 'member';
-        const stored = sessionStorage.getItem('reach_auth_user') || localStorage.getItem('reach_auth_user');
+        const role = this.getCurrentRole();
+        if (!role) return null;
+        const stored = sessionStorage.getItem('reach_auth_user');
         if (stored) {
             try {
                 const u = JSON.parse(stored);
@@ -542,10 +548,8 @@ const AuthSession = {
     },
 
     login(role, phone, name) {
-        localStorage.setItem('reach_auth_active', 'true');
         sessionStorage.setItem('reach_auth_active', 'true');
         sessionStorage.setItem('reach_auth_role', role);
-        localStorage.setItem('reach_auth_role', role);
         const base = DEFAULT_PROFILES[role] || DEFAULT_PROFILES.member;
         const user = {
             ...base,
@@ -553,14 +557,13 @@ const AuthSession = {
             name: name || base.name
         };
         sessionStorage.setItem('reach_auth_user', JSON.stringify(user));
-        localStorage.setItem('reach_auth_user', JSON.stringify(user));
         return user;
     },
 
     register(userData) {
-        localStorage.setItem('reach_auth_active', 'true');
+        sessionStorage.setItem('reach_auth_active', 'true');
         const role = userData.role || 'member';
-        localStorage.setItem('reach_auth_role', role);
+        sessionStorage.setItem('reach_auth_role', role);
         const base = DEFAULT_PROFILES[role] || DEFAULT_PROFILES.member;
 
         const idType = userData.idType || 'Aadhaar Card';
@@ -577,7 +580,7 @@ const AuthSession = {
             idProofFile: userData.idProofFile || 'aadhaar_card_verified.pdf',
             verified: role === 'volunteer' ? false : true
         };
-        localStorage.setItem('reach_auth_user', JSON.stringify(user));
+        sessionStorage.setItem('reach_auth_user', JSON.stringify(user));
 
         // Add verification entry into KYC Queue for Admin console
         const verifs = AppStore.getVerifications();
@@ -611,19 +614,25 @@ const AuthSession = {
     },
 
     switchRole(role) {
-        localStorage.setItem('reach_auth_active', 'true');
-        localStorage.setItem('reach_auth_role', role);
+        sessionStorage.setItem('reach_auth_active', 'true');
+        sessionStorage.setItem('reach_auth_role', role);
         const base = DEFAULT_PROFILES[role] || DEFAULT_PROFILES.member;
-        localStorage.setItem('reach_auth_user', JSON.stringify(base));
+        sessionStorage.setItem('reach_auth_user', JSON.stringify(base));
         return base;
     },
 
     logout() {
-        // Tab-isolated logout: sign out this specific tab without disturbing other tabs
-        sessionStorage.setItem('reach_auth_active', 'false');
+        sessionStorage.removeItem('reach_auth_active');
         sessionStorage.removeItem('reach_auth_user');
         sessionStorage.removeItem('reach_auth_role');
         sessionStorage.removeItem('reach_user_session');
+
+        try {
+            localStorage.removeItem('reach_auth_active');
+            localStorage.removeItem('reach_auth_user');
+            localStorage.removeItem('reach_auth_role');
+            localStorage.removeItem('reach_user_session');
+        } catch(e) {}
 
         // Immediate DOM cleanup so UI updates instantly
         const welcome = document.getElementById('signedInWelcomeBox');
@@ -634,8 +643,8 @@ const AuthSession = {
         const rolePill = document.getElementById('roleSwitcherPill');
         if (rolePill) rolePill.remove();
 
-        // Redirect only this tab to index.html with signed_out flag
-        window.location.replace('index.html?signed_out=' + Date.now());
+        // Redirect only this tab to index.html
+        window.location.replace('index.html');
     },
 
     showAuthModal(options = {}) {
