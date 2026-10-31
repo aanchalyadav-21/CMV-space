@@ -476,8 +476,16 @@
             if (!task && acceptedId) {
                 task = tasks.find(t => t.id === acceptedId) || reqList.find(r => r.id === acceptedId);
             }
+            // Prioritize active or recent user task before blind fallback
+            if (!task) {
+                const user = (window.AuthSession && AuthSession.getCurrentUser()) || null;
+                if (user) {
+                    task = tasks.find(t => (t.requester === user.name || t.requesterPhone === user.phone) && t.status !== 'Task Completed');
+                }
+            }
             if (!task && tasks.length > 0) {
-                task = tasks[0];
+                // Pick latest non-completed task if possible
+                task = tasks.find(t => t.status !== 'Task Completed') || tasks[0];
             }
                 // HELP / MICRO-VOLUNTEERING TASK
                 if (task) {
@@ -494,7 +502,8 @@
 
                     document.getElementById('valRefId').textContent = '#' + task.id;
                     if (task.category || task.title) {
-                        document.getElementById('valCategory').textContent = task.title || task.category;
+                        const icon = window.getTaskIcon ? getTaskIcon(task.category) : '';
+                        document.getElementById('valCategory').textContent = (icon ? icon + ' ' : '') + (task.title || task.category);
                     }
                     if (task.safetyPin || task.otpCode) {
                         document.getElementById('valPin').textContent = task.safetyPin || task.otpCode;
@@ -510,10 +519,28 @@
                     const lastConfirmedStatus = matchesLastConfirmed && currentItem.status ? currentItem.status.toLowerCase() : '';
                     const hasVolunteer = !isDismissed && !!(task.assignedVolunteer || (matchesLastConfirmed && currentItem.assignedVolunteer) || (matchesActiveMission && activeMission.volunteerName));
                     
-                    const isCompleted = !isDismissed && (status.includes('completed') || missionStatus === 'completed' || lastConfirmedStatus.includes('completed'));
-                    const isInProgress = !isDismissed && (status.includes('progress') || missionStatus === 'in_progress' || lastConfirmedStatus.includes('progress'));
-                    const isArrived = !isDismissed && (status.includes('arrived') || missionStatus === 'volunteer_arrived' || lastConfirmedStatus.includes('arrived'));
-                    const isAccepted = !isDismissed && hasVolunteer && (status.includes('live') || status.includes('location_active') || status.includes('assigned') || status.includes('accept') || missionStatus === 'location_active');
+                    const isCompleted = !isDismissed && (
+                        status.includes('completed') || 
+                        (matchesActiveMission && missionStatus === 'completed') || 
+                        (matchesLastConfirmed && lastConfirmedStatus.includes('completed'))
+                    );
+                    const isInProgress = !isDismissed && (
+                        status.includes('progress') || 
+                        (matchesActiveMission && missionStatus === 'in_progress') || 
+                        (matchesLastConfirmed && lastConfirmedStatus.includes('progress'))
+                    );
+                    const isArrived = !isDismissed && (
+                        status.includes('arrived') || 
+                        (matchesActiveMission && missionStatus === 'volunteer_arrived') || 
+                        (matchesLastConfirmed && lastConfirmedStatus.includes('arrived'))
+                    );
+                    const isAccepted = !isDismissed && hasVolunteer && (
+                        status.includes('live') || 
+                        status.includes('location_active') || 
+                        status.includes('assigned') || 
+                        status.includes('accept') || 
+                        (matchesActiveMission && missionStatus === 'location_active')
+                    );
 
                     if (isCompleted) {
                         const feedbackKey = 'reach_feedback_done_' + (task.id || 'default');

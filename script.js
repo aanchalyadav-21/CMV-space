@@ -162,9 +162,9 @@ const SEED_TASKS = [
         id: 'TSK-105',
         category: 'Groceries',
         title: 'Weekly Vegetables & Dairy Pack',
-        requester: 'Ramesh Patel',
-        requesterPhone: '+91 98765 43210',
-        location: 'Flat 402, Shanti Niketan, Sector 4',
+        requester: 'Sushila Shah (Senior Resident)',
+        requesterPhone: '+91 98200 54321',
+        location: 'Building 12, Nehru Nagar, Sector 4',
         time: 'Today, 5:30 PM',
         urgency: 'Today',
         skillsNeeded: 'Local Market Produce Selection',
@@ -174,6 +174,25 @@ const SEED_TASKS = [
         etaMinutes: null,
         notes: 'Need 1 crate eggs, 2L toned milk, and fresh vegetables from local dairy.',
         createdAt: 'Today, 09:30 AM',
+        rating: null,
+        feedback: null
+    },
+    {
+        id: 'TSK-106',
+        category: 'Clinic Companion',
+        title: 'Routine Health Checkup & Clinic Escort',
+        requester: 'Ramesh Patel',
+        requesterPhone: '+91 98765 43210',
+        location: 'Flat 402, Shanti Niketan to Lifeline Clinic, Sector 4',
+        time: 'Today, 11:30 AM',
+        urgency: 'Today (Urgent)',
+        skillsNeeded: 'Walking Assistance & Clinic Escort',
+        status: 'Waiting for Volunteer',
+        assignedVolunteer: null,
+        safetyPin: '4829',
+        etaMinutes: null,
+        notes: 'Need a kind volunteer to accompany senior resident for routine blood pressure and clinic visit.',
+        createdAt: 'Today, 10:15 AM',
         rating: null,
         feedback: null
     }
@@ -364,6 +383,17 @@ const SEED_COMPLAINTS = [
     }
 ];
 
+// Global Task Icon Helper
+window.getTaskIcon = function(cat) {
+    const c = (cat || '').toLowerCase();
+    if (c.includes('clinic') || c.includes('doctor') || c.includes('health') || c.includes('escort') || c.includes('walk')) return '🩺';
+    if (c.includes('med')) return '💊';
+    if (c.includes('groc') || c.includes('vegetable') || c.includes('dairy') || c.includes('fruit')) return '🛒';
+    if (c.includes('tutor') || c.includes('math') || c.includes('study') || c.includes('teach')) return '📚';
+    if (c.includes('digit') || c.includes('phone') || c.includes('tech') || c.includes('app')) return '📱';
+    return '🤝';
+};
+
 // ==========================================================================
 // Central Reactive Storage Engine (AppStore / ReachData)
 // ==========================================================================
@@ -375,9 +405,18 @@ const AppStore = {
             try {
                 const stored = JSON.parse(localStorage.getItem('reach_tasks') || '[]');
                 let modified = false;
-                if (!stored.some(t => t.id === 'TSK-105')) {
-                    const t105 = SEED_TASKS.find(x => x.id === 'TSK-105');
-                    if (t105) { stored.push(t105); modified = true; }
+                // Migrate legacy Ramesh Patel grocery task to Sushila Shah if still present
+                stored.forEach(t => {
+                    if (t.id === 'TSK-105' && t.requester === 'Ramesh Patel') {
+                        t.requester = 'Sushila Shah (Senior Resident)';
+                        t.requesterPhone = '+91 98200 54321';
+                        t.location = 'Building 12, Nehru Nagar, Sector 4';
+                        modified = true;
+                    }
+                });
+                if (!stored.some(t => t.id === 'TSK-106')) {
+                    const t106 = SEED_TASKS.find(x => x.id === 'TSK-106');
+                    if (t106) { stored.unshift(t106); modified = true; }
                 }
                 const t101 = stored.find(x => x.id === 'TSK-101');
                 if (t101 && (t101.status === 'Live Tracking Active' || t101.status === 'Live Location Active') && !localStorage.getItem('reach_accepted_task_id')) {
@@ -471,7 +510,7 @@ window.ReachData = {
             rating: t.rating,
             feedback: t.feedback,
             createdAt: t.createdAt || 'Just now',
-            icon: (t.category || '').includes('Medicine') ? '💊' : (t.category || '').includes('Grocer') ? '🛒' : (t.category || '').includes('Tutor') ? '📚' : '🤝'
+            icon: (window.getTaskIcon ? window.getTaskIcon(t.category) : '🤝')
         }));
     },
     updateRequestStatus: (id, newStatus, extraData = {}) => {

@@ -613,7 +613,23 @@
             const bookings = AppStore.getBookings();
             const user = AuthSession.getCurrentUser() || DEFAULT_PROFILES.member;
 
-            const myTasks = tasks.filter(t => t.requester === user.name || t.requesterPhone === user.phone);
+            const lastConfirmed = JSON.parse(localStorage.getItem('reach_last_confirmed') || '{}');
+            let myTasks = tasks.filter(t => 
+                (user && (t.requester === user.name || t.requesterPhone === user.phone || t.requester === 'Resident' || t.requester === 'Resident Member')) ||
+                (lastConfirmed && lastConfirmed.id === t.id)
+            );
+            // Ensure unique items
+            myTasks = myTasks.filter((t, idx, arr) => arr.findIndex(x => x.id === t.id) === idx);
+            // Prioritize lastConfirmed task or active/uncompleted tasks at the top
+            myTasks.sort((a, b) => {
+                if (lastConfirmed && a.id === lastConfirmed.id) return -1;
+                if (lastConfirmed && b.id === lastConfirmed.id) return 1;
+                const aDone = (a.status || '').includes('Completed');
+                const bDone = (b.status || '').includes('Completed');
+                if (!aDone && bDone) return -1;
+                if (aDone && !bDone) return 1;
+                return 0;
+            });
             const myBookings = bookings.filter(b => b.userName === user.name || b.userPhone === user.phone || b.requester === user.name);
 
             if (myTasks.length === 0 && myBookings.length === 0) {
@@ -660,7 +676,7 @@
                     <div class="clean-item-row">
                         <div>
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <span style="font-size: 1.15rem;">${t.category.includes('Medicine') ? '💊' : (t.category.includes('Groceries') ? '🛒' : '🤝')}</span>
+                                <span style="font-size: 1.15rem;">${window.getTaskIcon ? getTaskIcon(t.category) : '🤝'}</span>
                                 <strong style="color: #0F172A; font-size: 1.02rem;">${t.category}: ${t.title}</strong>
                             </div>
                             <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
@@ -719,7 +735,7 @@
                     <div class="clean-item-row" style="${isDismissed ? 'background: #FEF2F2; border-color: #FECACA;' : ''}">
                         <div style="flex: 1; min-width: 240px;">
                             <strong style="color: #0F172A; font-size: 1.05rem;">
-                                ${(t.category || '').includes('Medicine') ? '💊' : '🛒'} ${t.title}
+                                ${(window.getTaskIcon ? getTaskIcon(t.category) : '🤝')} ${t.title}
                             </strong>
                             <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
                                 👤 ${t.requester} • 📍 ${t.location} • ⏰ ${t.time}
@@ -901,7 +917,7 @@
             }
 
             card.style.display = 'block';
-            document.getElementById('dashMissionTitle').textContent = (task.category && task.category.includes('Medicine') ? '💊 ' : '🛒 ') + (task.title || task.category);
+            document.getElementById('dashMissionTitle').textContent = ((window.getTaskIcon ? getTaskIcon(task.category) : '🤝') + ' ') + (task.title || task.category);
             document.getElementById('dashMissionSenior').innerHTML = `Senior: <strong>${task.requester || 'Senior Resident'} (${task.requesterPhone || '+91 98765 43210'})</strong> • 📍 ${task.location}`;
 
             const pinHint = document.getElementById('dashPinHint');

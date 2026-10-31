@@ -270,7 +270,7 @@
                 <div class="review-row">
                     <span class="review-label">Task Category:</span>
                     <span class="review-value" style="color: var(--primary); font-size: 1.1rem;">
-                        🛒 ${d.category || 'General Help'}
+                        ${(window.getTaskIcon ? window.getTaskIcon(d.category) : ((d.category || '').toLowerCase().includes('clinic') ? '🩺' : '🤝'))} ${d.category || 'General Help'}
                     </span>
                 </div>
                 <div class="review-row">
@@ -363,7 +363,7 @@
 
             const newTask = {
                 id: newId,
-                category: currentDraft.category || 'Medicine Pickup',
+                category: currentDraft.category || 'Clinic Companion',
                 title: currentDraft.title || 'Everyday Errand Assistance',
                 requester: user ? user.name : (currentDraft.requester || 'Resident Member'),
                 requesterPhone: user ? user.phone : (currentDraft.requesterPhone || '+91 98765 43210'),
@@ -396,7 +396,7 @@
                     time: newTask.time,
                     urgency: newTask.urgency,
                     notes: newTask.notes || newTask.title,
-                    icon: (newTask.category || '').includes('Medicine') ? '💊' : ((newTask.category || '').includes('Grocer') ? '🛒' : '🤝'),
+                    icon: (window.getTaskIcon ? window.getTaskIcon(newTask.category) : '🤝'),
                     status: 'waiting_volunteer',
                     safetyPin: newTask.safetyPin
                 });
@@ -407,12 +407,16 @@
                 id: newId,
                 type: 'help',
                 title: newTask.title,
+                category: newTask.category,
                 status: 'Waiting for Volunteer'
             }));
 
-            // Clear draft
+            // Clear draft and stale volunteer session keys
             localStorage.removeItem('reach_pending_request');
             localStorage.removeItem('reach_active_draft');
+            localStorage.removeItem('reach_accepted_task_id');
+            localStorage.removeItem('reach_active_volunteer_mission');
+            localStorage.removeItem('reach_vol_active_mission_done');
 
             // Broadcast real-time ping so open Volunteer Hub displays this immediately
             localStorage.setItem('reach_sync_ping', Date.now().toString());

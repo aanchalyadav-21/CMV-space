@@ -554,7 +554,7 @@
                             ${declined.map(d => `
                                 <div style="display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; padding: 10px 14px; border-radius: 8px; border: 1px solid #FCA5A5;">
                                     <div>
-                                        <strong style="color: #0F172A; font-size: 0.95rem;">${(d.category || '').includes('Medicine') ? '💊' : '🛒'} ${d.title}</strong>
+                                        <strong style="color: #0F172A; font-size: 0.95rem;">${(window.getTaskIcon ? getTaskIcon(d.category) : '🤝')} ${d.title}</strong>
                                         <div style="font-size: 0.82rem; color: #64748B;">👤 ${d.requester} • 📍 ${d.location}</div>
                                     </div>
                                     <div style="display: flex; gap: 8px; align-items: center;">
@@ -576,7 +576,7 @@
             historyContainer.innerHTML = history.map(item => `
                 <div style="border-bottom: 1px solid var(--border-color); padding: 14px 0;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                        <strong style="color: var(--primary-color); font-size: 1.05rem;">${item.icon || '🛒'} ${item.category}</strong>
+                        <strong style="color: var(--primary-color); font-size: 1.05rem;">${item.icon || (window.getTaskIcon ? getTaskIcon(item.category) : '🤝')} ${item.category}</strong>
                         <span class="badge badge-success">✓ Completed</span>
                     </div>
                     <div style="font-size: 0.9rem; color: var(--text-secondary);">

@@ -252,7 +252,7 @@
                         <div class="activity-item-card">
                             <div>
                                 <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                                    <strong style="color: var(--primary); font-size: 1.15rem;">🛒 ${t.category}: ${t.title}</strong>
+                                    <strong style="color: var(--primary); font-size: 1.15rem;">${window.getTaskIcon ? getTaskIcon(t.category) : '🤝'} ${t.category}: ${t.title}</strong>
                                     <span class="badge ${t.status === 'Waiting for Volunteer' ? 'badge-pending' : 'badge-success'}">${t.status}</span>
                                 </div>
                                 <p style="margin: 0; font-size: 0.92rem; color: var(--text-main);">${t.notes || 'Everyday neighborhood errand assistance'}</p>
