@@ -148,6 +148,20 @@
 
         <!-- TAB 2: ACTIVE MISSION & GPS TRACKER -->
         <div id="tab-active" style="display: none;">
+            <!-- Multi-Mission Switcher Bar (when volunteer accepts 2 or more missions) -->
+            <div id="multiMissionSwitcher" style="display: none; background: #FFFFFF; border: 1.5px solid #10B981; border-radius: 12px; padding: 14px 18px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 1.3rem;">🛵</span>
+                        <strong style="font-size: 1rem; color: #065F46;">
+                            Active Missions In Progress (<span id="multiMissionCount">0</span>)
+                        </strong>
+                    </div>
+                    <span style="font-size: 0.82rem; color: #64748B;">You have multiple missions accepted. Click any mission to switch live tracker:</span>
+                </div>
+                <div id="multiMissionPills" style="display: flex; gap: 10px; flex-wrap: wrap;"></div>
+            </div>
+
             <!-- Empty state when no mission is active -->
             <div class="card" id="noActiveMissionCard" style="display: none; text-align: center; padding: 48px 20px; border-color: var(--border-color);">
                 <span style="font-size: 3rem;">🛵</span>
@@ -438,17 +452,14 @@
         }
 
         function renderStateFlowProgress(currentStage) {
-            // Steps 1..6: sn1..sn6, connectors sc1..sc5
-            const stageOrder = {
-                'assigned': 2,
-                'location_active': 3,
-                'en_route': 3,
-                'volunteer_arrived': 4,
-                'arrived': 4,
-                'in_progress': 5,
-                'completed': 6
-            };
-            const currentStep = stageOrder[currentStage] || 3;
+            const s = (currentStage || '').toLowerCase();
+            let currentStep = 3;
+            if (s.includes('completed')) currentStep = 6;
+            else if (s.includes('progress')) currentStep = 5;
+            else if (s.includes('arrived')) currentStep = 4;
+            else if (s.includes('active') || s.includes('en route') || s.includes('live')) currentStep = 3;
+            else if (s.includes('assigned') || s.includes('accept')) currentStep = 2;
+            else if (s.includes('wait') || s.includes('created')) currentStep = 1;
 
             for (let i = 1; i <= 6; i++) {
                 const node = document.getElementById('sn' + i);
@@ -594,28 +605,206 @@
             syncActiveMissionUI();
         }
 
+        // GPS live tracking state
+        const gpsProgressMap = {};
+        window.activeGpsTaskId = null;
+        window.liveGpsTimer = null;
+
+        function startLiveGpsTracking(taskId) {
+            if (window.activeGpsTaskId === taskId && window.liveGpsTimer) {
+                return; // Already actively tracking this task
+            }
+            if (window.liveGpsTimer) {
+                clearInterval(window.liveGpsTimer);
+                window.liveGpsTimer = null;
+            }
+            window.activeGpsTaskId = taskId;
+
+            if (typeof gpsProgressMap[taskId] !== 'number') {
+                gpsProgressMap[taskId] = 0;
+            }
+
+            const waypoints = [
+                { left: 110, top: 120, dist: '380 meters away • ~4 mins ETA', pct: 15 },
+                { left: 190, top: 120, dist: '290 meters away • ~3 mins ETA', pct: 32 },
+                { left: 280, top: 120, dist: '190 meters away • ~2 mins ETA', pct: 52 },
+                { left: 370, top: 120, dist: '100 meters away • ~1 min ETA', pct: 72 },
+                { left: 440, top: 130, dist: '25 meters away • Arriving shortly', pct: 86 },
+                { left: 480, top: 145, dist: 'Volunteer arrived at member residence', pct: 92 }
+            ];
+
+            function applyStep(idx) {
+                const step = waypoints[idx] || waypoints[0];
+                const marker = document.getElementById('simVolMarker');
+                const etaText = document.getElementById('simEtaText');
+                const badge = document.getElementById('missionStateBadge');
+
+                if (marker) {
+                    marker.style.left = step.left + 'px';
+                    marker.style.top = step.top + 'px';
+                }
+                if (etaText) {
+                    etaText.innerHTML = `<strong>${step.dist}</strong> <span style="display:inline-block; margin-left:8px; font-size:0.8rem; background:#DCFCE7; color:#15803D; padding:2px 8px; border-radius:10px; font-weight:700;">🟢 Live GPS Active</span>`;
+                }
+                if (badge) {
+                    badge.textContent = 'Live Location Active (En Route • 25 km/h)';
+                    badge.style.background = '#DCFCE7';
+                    badge.style.color = '#166534';
+                }
+
+                const broadcastPayload = {
+                    taskId: taskId,
+                    leftPercent: step.pct,
+                    etaText: `🛵 Karan Verma is en route on motorbike (${step.dist})`,
+                    stepIdx: idx
+                };
+                localStorage.setItem('reach_live_gps_' + taskId, JSON.stringify(broadcastPayload));
+                broadcastSync('gps_tick', broadcastPayload);
+
+                if (idx >= waypoints.length - 1) {
+                    clearInterval(window.liveGpsTimer);
+                    window.liveGpsTimer = null;
+                    advanceWorkflow('arrived');
+                }
+            }
+
+            applyStep(gpsProgressMap[taskId]);
+
+            window.liveGpsTimer = setInterval(() => {
+                const tasks = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
+                const cur = tasks.find(t => t.id === taskId);
+                if (!cur || cur.status !== 'Live Location Active') {
+                    clearInterval(window.liveGpsTimer);
+                    window.liveGpsTimer = null;
+                    return;
+                }
+
+                if (gpsProgressMap[taskId] < waypoints.length - 1) {
+                    gpsProgressMap[taskId]++;
+                    applyStep(gpsProgressMap[taskId]);
+                } else {
+                    clearInterval(window.liveGpsTimer);
+                    window.liveGpsTimer = null;
+                }
+            }, 2500);
+        }
+
+        function switchActiveMission(id) {
+            localStorage.setItem('reach_accepted_task_id', id);
+            const tasks = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
+            const t = tasks.find(x => x.id === id);
+            if (t) {
+                let st = 'location_active';
+                const s = (t.status || '').toLowerCase();
+                if (s.includes('completed')) st = 'completed';
+                else if (s.includes('progress')) st = 'in_progress';
+                else if (s.includes('arrived')) st = 'volunteer_arrived';
+
+                localStorage.setItem('reach_active_volunteer_mission', JSON.stringify({
+                    taskId: t.id,
+                    status: st,
+                    volunteerName: 'Karan Verma',
+                    volunteerPhone: '+91 98765 43211',
+                    timestamp: Date.now()
+                }));
+            }
+            if (window.liveGpsTimer) {
+                clearInterval(window.liveGpsTimer);
+                window.liveGpsTimer = null;
+                window.activeGpsTaskId = null;
+            }
+            syncActiveMissionUI();
+        }
+
         function syncActiveMissionUI() {
-            const missionStr = localStorage.getItem('reach_active_volunteer_mission');
-            const acceptedId = localStorage.getItem('reach_accepted_task_id');
-            const lastStr = localStorage.getItem('reach_last_confirmed');
-            
-            let status = 'location_active';
-            if (missionStr) {
-                try {
-                    const m = JSON.parse(missionStr);
-                    if (m && m.status) status = m.status;
-                } catch(e) {}
-            } else if (lastStr) {
-                try {
-                    const l = JSON.parse(lastStr);
-                    if (l && l.status) {
-                        const s = l.status.toLowerCase();
-                        if (s.includes('completed')) status = 'completed';
-                        else if (s.includes('progress')) status = 'in_progress';
-                        else if (s.includes('arrived')) status = 'volunteer_arrived';
-                        else if (s.includes('active') || s.includes('en route') || s.includes('assigned')) status = 'location_active';
+            const tasks = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
+            const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+
+            // Identify all active missions assigned to volunteer Karan Verma
+            const myActiveMissions = tasks.filter(t => {
+                if (dismissed.includes(t.id)) return false;
+                if (t.status === 'Task Completed' || t.status === 'Final State') return false;
+                const isAssigned = !!(t.assignedVolunteer && (
+                    t.assignedVolunteer.name === 'Karan Verma' ||
+                    t.assignedVolunteer === 'Karan Verma' ||
+                    (typeof t.assignedVolunteer === 'object' && t.assignedVolunteer.name)
+                ));
+                const isAcceptedKey = localStorage.getItem('reach_accepted_task_id') === t.id && t.status !== 'Waiting for Volunteer';
+                return isAssigned || isAcceptedKey;
+            });
+
+            const badgeCount = document.getElementById('badgeActiveCount');
+            const activeMissionCard = document.getElementById('activeMissionCard');
+            const noActiveMissionCard = document.getElementById('noActiveMissionCard');
+            const multiSwitcher = document.getElementById('multiMissionSwitcher');
+
+            if (myActiveMissions.length === 0) {
+                if (activeMissionCard) activeMissionCard.style.display = 'none';
+                if (noActiveMissionCard) noActiveMissionCard.style.display = 'block';
+                if (multiSwitcher) multiSwitcher.style.display = 'none';
+                if (badgeCount) badgeCount.textContent = '0';
+                if (window.liveGpsTimer) {
+                    clearInterval(window.liveGpsTimer);
+                    window.liveGpsTimer = null;
+                    window.activeGpsTaskId = null;
+                }
+                return;
+            }
+
+            if (activeMissionCard) activeMissionCard.style.display = 'block';
+            if (noActiveMissionCard) noActiveMissionCard.style.display = 'none';
+            if (badgeCount) badgeCount.textContent = myActiveMissions.length.toString();
+
+            // Determine which mission to display
+            let acceptedId = localStorage.getItem('reach_accepted_task_id');
+            let activeTask = myActiveMissions.find(t => t.id === acceptedId) || myActiveMissions[0];
+            if (activeTask && acceptedId !== activeTask.id) {
+                localStorage.setItem('reach_accepted_task_id', activeTask.id);
+                acceptedId = activeTask.id;
+            }
+
+            // Render Multi-Mission Switcher if more than 1 active mission
+            if (multiSwitcher) {
+                if (myActiveMissions.length > 1) {
+                    multiSwitcher.style.display = 'block';
+                    const countEl = document.getElementById('multiMissionCount');
+                    if (countEl) countEl.textContent = myActiveMissions.length;
+                    const pillsEl = document.getElementById('multiMissionPills');
+                    if (pillsEl) {
+                        pillsEl.innerHTML = myActiveMissions.map(m => {
+                            const isCur = m.id === activeTask.id;
+                            const ic = window.getTaskIcon ? getTaskIcon(m.category) : '🛵';
+                            let stagePill = '🛵 En Route';
+                            const s = (m.status || '').toLowerCase();
+                            if (s.includes('arrived')) stagePill = '🟢 Arrived';
+                            else if (s.includes('progress')) stagePill = '⚡ In Progress';
+                            return `
+                                <button type="button" onclick="switchActiveMission('${m.id}')" style="display: inline-flex; align-items: center; gap: 8px; padding: 7px 15px; border-radius: 20px; font-weight: 700; font-size: 0.88rem; cursor: pointer; transition: all 0.2s; border: 2px solid ${isCur ? '#059669' : '#CBD5E1'}; background: ${isCur ? '#ECFDF5' : '#FFFFFF'}; color: ${isCur ? '#065F46' : '#334155'};"><span style="font-size:1.1rem;">${ic}</span><span>#${m.id}: ${m.title || m.category}</span><span style="font-size: 0.78rem; background: ${isCur ? '#10B981' : '#E2E8F0'}; color: ${isCur ? '#FFFFFF' : '#475569'}; padding: 2px 8px; border-radius: 10px;">${stagePill}</span></button>
+                            `;
+                        }).join('');
                     }
-                } catch(e) {}
+                } else {
+                    multiSwitcher.style.display = 'none';
+                }
+            }
+
+            // Populate activeTask details into Active Mission card
+            const titleEl = document.getElementById('activeMissionTitle');
+            if (titleEl) titleEl.textContent = (window.getTaskIcon ? getTaskIcon(activeTask.category) + ' ' : '') + (activeTask.title || activeTask.category || 'Senior Errand Assistance');
+            const idEl = document.getElementById('activeMissionId');
+            if (idEl) idEl.textContent = '#' + activeTask.id;
+            const nameEl = document.getElementById('actSeniorName');
+            if (nameEl) nameEl.textContent = activeTask.requester || activeTask.userName || 'Senior Resident';
+            const phoneEl = document.getElementById('actSeniorPhone');
+            if (phoneEl) phoneEl.textContent = activeTask.requesterPhone || activeTask.phone || '+91 98765 43210';
+            const addrEl = document.getElementById('actSeniorAddress');
+            if (addrEl) addrEl.textContent = activeTask.location || activeTask.address || 'Sector 4';
+            const notesEl = document.getElementById('actSeniorNotes');
+            if (notesEl) notesEl.textContent = activeTask.notes || activeTask.skillsNeeded || activeTask.title || 'Everyday assistance';
+
+            const enteredPin = document.getElementById('enteredPin');
+            if (enteredPin && (activeTask.safetyPin || activeTask.otpCode)) {
+                enteredPin.value = activeTask.safetyPin || activeTask.otpCode;
             }
 
             const marker = document.getElementById('simVolMarker');
@@ -624,72 +813,14 @@
             const btnArrive = document.getElementById('btnSimArrive');
             const btnStart = document.getElementById('btnSimStart');
             const btnComplete = document.getElementById('btnSimComplete');
-            const badgeCount = document.getElementById('badgeActiveCount');
-            const activeMissionCard = document.getElementById('activeMissionCard');
-            const noActiveMissionCard = document.getElementById('noActiveMissionCard');
 
-            // Dynamically populate Active Mission card details
-            const tasks = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
-            const reqList = (window.ReachData && typeof ReachData.getRequests === 'function') ? ReachData.getRequests() : [];
-            const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            const s = (activeTask.status || '').toLowerCase();
+            renderStateFlowProgress(s);
 
-            let activeTask = null;
-            if (acceptedId && !dismissed.includes(acceptedId)) {
-                activeTask = tasks.find(t => t.id === acceptedId) || reqList.find(r => r.id === acceptedId);
-            }
-            if (!activeTask && missionStr) {
-                try {
-                    const m = JSON.parse(missionStr);
-                    if (m && (m.taskId || m.id)) {
-                        const mid = m.taskId || m.id;
-                        if (!dismissed.includes(mid)) {
-                            activeTask = tasks.find(t => t.id === mid) || reqList.find(r => r.id === mid);
-                        }
-                    }
-                } catch(e) {}
-            }
-
-            // If there is no explicitly accepted task, hide active mission card and display empty state
-            if (!activeTask || activeTask.status === 'Waiting for Volunteer' || !activeTask.assignedVolunteer || dismissed.includes(activeTask.id)) {
-                if (activeMissionCard) activeMissionCard.style.display = 'none';
-                if (noActiveMissionCard) noActiveMissionCard.style.display = 'block';
-                if (badgeCount) badgeCount.textContent = '0';
-                return;
-            }
-
-            if (activeMissionCard) activeMissionCard.style.display = 'block';
-            if (noActiveMissionCard) noActiveMissionCard.style.display = 'none';
-
-            if (activeTask) {
-                const titleEl = document.getElementById('activeMissionTitle');
-                if (titleEl) titleEl.textContent = activeTask.title || activeTask.category || 'Senior Errand Assistance';
-                const idEl = document.getElementById('activeMissionId');
-                if (idEl) idEl.textContent = '#' + activeTask.id;
-                const nameEl = document.getElementById('actSeniorName');
-                if (nameEl) nameEl.textContent = activeTask.requester || activeTask.userName || 'Ramesh Patel (Age 68)';
-                const phoneEl = document.getElementById('actSeniorPhone');
-                if (phoneEl) phoneEl.textContent = activeTask.requesterPhone || activeTask.phone || '+91 98765 43210';
-                const addrEl = document.getElementById('actSeniorAddress');
-                if (addrEl) addrEl.textContent = activeTask.location || activeTask.address || 'Flat 402, Shanti Niketan, Sector 4';
-                const notesEl = document.getElementById('actSeniorNotes');
-                if (notesEl) notesEl.textContent = activeTask.notes || activeTask.title || 'Everyday assistance';
-
-                const enteredPin = document.getElementById('enteredPin');
-                if (enteredPin && (activeTask.safetyPin || activeTask.otpCode)) {
-                    enteredPin.value = activeTask.safetyPin || activeTask.otpCode;
-                }
-            }
-
-            if (badgeCount) {
-                badgeCount.textContent = status !== 'completed' ? '1' : '0';
-            }
-
-            // Synchronize all 6 workflow step circles and connectors (all completed steps are green with ✓)
-            renderStateFlowProgress(status);
-
-            if (status === 'volunteer_arrived' || status === 'arrived') {
+            if (s.includes('arrived')) {
+                if (window.liveGpsTimer) { clearInterval(window.liveGpsTimer); window.liveGpsTimer = null; }
                 if (marker) { marker.style.top = '145px'; marker.style.left = '480px'; }
-                if (etaText) etaText.textContent = "Volunteer has arrived at senior resident's residence!";
+                if (etaText) etaText.innerHTML = "<strong>Volunteer has arrived at senior resident's residence!</strong>";
                 if (badge) {
                     badge.textContent = '🟢 Arrived at Location';
                     badge.style.background = '#DCFCE7';
@@ -698,9 +829,10 @@
                 if (btnArrive) btnArrive.style.display = 'none';
                 if (btnStart) btnStart.style.display = 'inline-flex';
                 if (btnComplete) btnComplete.style.display = 'none';
-            } else if (status === 'in_progress') {
+            } else if (s.includes('progress')) {
+                if (window.liveGpsTimer) { clearInterval(window.liveGpsTimer); window.liveGpsTimer = null; }
                 if (marker) { marker.style.top = '145px'; marker.style.left = '480px'; }
-                if (etaText) etaText.textContent = "Task in progress. Assisting senior resident.";
+                if (etaText) etaText.innerHTML = "<strong>Task in progress. Assisting senior resident.</strong>";
                 if (badge) {
                     badge.textContent = '⚡ Task in Progress';
                     badge.style.background = '#FEF3C7';
@@ -709,9 +841,10 @@
                 if (btnArrive) btnArrive.style.display = 'none';
                 if (btnStart) btnStart.style.display = 'none';
                 if (btnComplete) btnComplete.style.display = 'inline-flex';
-            } else if (status === 'completed') {
+            } else if (s.includes('completed')) {
+                if (window.liveGpsTimer) { clearInterval(window.liveGpsTimer); window.liveGpsTimer = null; }
                 if (marker) { marker.style.top = '145px'; marker.style.left = '480px'; }
-                if (etaText) etaText.textContent = "Mission Completed! Location tracking off.";
+                if (etaText) etaText.innerHTML = "<strong>Mission Completed! Location tracking off.</strong>";
                 if (badge) {
                     badge.textContent = '✅ Task Completed';
                     badge.style.background = '#DCFCE7';
@@ -720,17 +853,12 @@
                 if (btnArrive) btnArrive.style.display = 'none';
                 if (btnStart) btnStart.style.display = 'none';
                 if (btnComplete) btnComplete.style.display = 'none';
-            } else if (acceptedId || status === 'location_active') {
-                if (marker) { marker.style.top = '120px'; marker.style.left = '160px'; }
-                if (etaText) etaText.textContent = "380 meters away • ~4 mins ETA";
-                if (badge) {
-                    badge.textContent = 'Live Location Active (En Route)';
-                    badge.style.background = '#DCFCE7';
-                    badge.style.color = '#166534';
-                }
+            } else {
+                // Live Location Active (En Route) -> Run Live GPS Tracker Simulation
                 if (btnArrive) btnArrive.style.display = 'inline-flex';
                 if (btnStart) btnStart.style.display = 'none';
                 if (btnComplete) btnComplete.style.display = 'none';
+                startLiveGpsTracking(activeTask.id);
             }
         }
 
@@ -764,6 +892,9 @@
                 rating: 4.9,
                 avatar: '🦸‍♂️'
             };
+
+            // Clear any stale completed state
+            localStorage.removeItem('reach_vol_active_mission_done');
 
             // 1. Update ReachData (reach_requests_db)
             if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
@@ -800,10 +931,12 @@
             if (lastStr) {
                 try {
                     const item = JSON.parse(lastStr);
-                    item.status = 'Live Location Active';
-                    item.assignedVolunteer = 'Karan Verma';
-                    item.assignedVolunteerPhone = '+91 98765 43211';
-                    localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                    if (item.id === id) {
+                        item.status = 'Live Location Active';
+                        item.assignedVolunteer = 'Karan Verma';
+                        item.assignedVolunteerPhone = '+91 98765 43211';
+                        localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
+                    }
                 } catch (e) {}
             } else {
                 localStorage.setItem('reach_last_confirmed', JSON.stringify({
@@ -826,14 +959,13 @@
                 timestamp: Date.now()
             }));
 
-            // Update Active tab header with current mission ID
-            const actIdEl = document.getElementById('activeMissionId');
-            if (actIdEl) actIdEl.textContent = '#' + id;
+            // Reset GPS progress for this task to 0 so it starts moving from the start
+            gpsProgressMap[id] = 0;
 
             // Broadcast real-time change to resident confirmation page
             broadcastSync('accept_task', { id });
 
-            showVolunteerToast(`Mission ${id} Accepted! Live GPS tracker activated.`, '🛵');
+            showVolunteerToast(`Mission #${id} Accepted! Live GPS Tracker Started.`, '🛵');
             loadVolunteerData();
             showTab('active');
         }
@@ -1078,8 +1210,30 @@
 
             broadcastSync('task_completed', { currentActiveId, pin });
             alert('Mission Completed Successfully! Verified with Senior Citizen PIN (' + pin + '). 1.5 Community Service Hours logged.');
-            loadVolunteerData();
-            showTab('history');
+
+            // Check if there are other remaining active missions
+            const tasksAfter = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
+            const dismissedList = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            const remainingMissions = tasksAfter.filter(t => 
+                t.id !== currentActiveId &&
+                !dismissedList.includes(t.id) &&
+                t.status !== 'Task Completed' &&
+                t.status !== 'Final State' &&
+                t.assignedVolunteer &&
+                (t.assignedVolunteer.name === 'Karan Verma' || t.assignedVolunteer === 'Karan Verma' || (typeof t.assignedVolunteer === 'object' && t.assignedVolunteer.name))
+            );
+
+            if (remainingMissions.length > 0) {
+                // Switch immediately to the next remaining active mission!
+                switchActiveMission(remainingMissions[0].id);
+                loadVolunteerData();
+                showTab('active');
+            } else {
+                localStorage.removeItem('reach_accepted_task_id');
+                localStorage.setItem('reach_vol_active_mission_done', 'true');
+                loadVolunteerData();
+                showTab('history');
+            }
         }
 
         function showVolunteerStatusToast(msg, type = 'success') {

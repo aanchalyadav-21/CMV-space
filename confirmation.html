@@ -640,8 +640,16 @@
                         document.getElementById('badgeStatus').textContent = `🟢 Status: Volunteer Assigned & En Route (${volName})`;
                         document.getElementById('badgeStatus').className = 'status-pill-big badge-success';
                         document.getElementById('assignedVolunteerCard').style.display = 'block';
-                        document.getElementById('lblEta').textContent = `🛵 ${volName} accepted your request and is en route on motorbike (~4 mins ETA • 380m away)`;
-                        document.getElementById('pinVol').style.left = '160px';
+                        const liveGpsStr = localStorage.getItem('reach_live_gps_' + task.id);
+                        let gpsObj = null;
+                        if (liveGpsStr) { try { gpsObj = JSON.parse(liveGpsStr); } catch(e) {} }
+                        if (gpsObj && typeof gpsObj.leftPercent === 'number') {
+                            document.getElementById('lblEta').textContent = gpsObj.etaText || `🛵 ${volName} is en route on motorbike`;
+                            document.getElementById('pinVol').style.left = gpsObj.leftPercent + '%';
+                        } else {
+                            document.getElementById('lblEta').textContent = `🛵 ${volName} accepted your request and is en route on motorbike (~4 mins ETA • 380m away)`;
+                            document.getElementById('pinVol').style.left = '160px';
+                        }
                         updateStepHighlight('step-tracking');
 
                         updateSimulationControls('accepted');

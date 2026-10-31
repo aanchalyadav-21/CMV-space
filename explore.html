@@ -896,6 +896,7 @@
             // Sync active mission
             localStorage.setItem('reach_accepted_task_id', taskId);
             localStorage.setItem('reach_active_volunteer_mission', JSON.stringify(task));
+            localStorage.removeItem('reach_vol_active_mission_done');
             localStorage.setItem('reach_sync_ping', Date.now().toString());
 
             if ('BroadcastChannel' in window) {
