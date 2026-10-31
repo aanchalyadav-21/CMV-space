@@ -148,7 +148,17 @@
 
         <!-- TAB 2: ACTIVE MISSION & GPS TRACKER -->
         <div id="tab-active" style="display: none;">
-            <div class="card" style="border-color: #10B981; margin-bottom: 24px;">
+            <!-- Empty state when no mission is active -->
+            <div class="card" id="noActiveMissionCard" style="display: none; text-align: center; padding: 48px 20px; border-color: var(--border-color);">
+                <span style="font-size: 3rem;">🛵</span>
+                <h3 style="color: var(--text-primary); margin: 12px 0 6px 0;">No Active Mission In Progress</h3>
+                <p style="color: var(--text-secondary); max-width: 480px; margin: 0 auto 18px auto; font-size: 0.95rem;">
+                    You currently have no active delivery or assistance missions. Go to "Available Tasks" to accept a neighborhood request.
+                </p>
+                <button class="btn btn-accent" onclick="showTab('available')" style="padding: 9px 20px; font-weight: 700;">📢 Browse Available Tasks</button>
+            </div>
+
+            <div class="card" id="activeMissionCard" style="border-color: #10B981; margin-bottom: 24px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 14px;">
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <span style="font-size: 1.8rem;">🛵</span>
@@ -486,8 +496,12 @@
             const container = document.getElementById('availableTasksContainer');
             if (!container) return;
 
+            const allTasks = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
+            const declined = allTasks.filter(t => dismissed.includes(t.id));
+
+            let mainHtml = '';
             if (waiting.length === 0) {
-                container.innerHTML = `
+                mainHtml = `
                     <div class="card" style="text-align: center; padding: 40px;">
                         <span style="font-size: 2.5rem;">🎉</span>
                         <h3 style="color: var(--text-primary); margin: 10px 0;">All Neighborhood Tasks Covered!</h3>
@@ -495,7 +509,7 @@
                     </div>
                 `;
             } else {
-                container.innerHTML = waiting.map(req => `
+                mainHtml = waiting.map(req => `
                     <div class="task-card priority-high">
                         <div class="task-card-header">
                             <div>
@@ -527,6 +541,34 @@
                     </div>
                 `).join('');
             }
+
+            let declinedHtml = '';
+            if (declined.length > 0) {
+                declinedHtml = `
+                    <div style="margin-top: 24px; padding: 16px; background: #FEF2F2; border: 1px solid #FECACA; border-radius: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                            <strong style="color: #991B1B; font-size: 0.95rem;">✕ Tasks You Have Declined (${declined.length})</strong>
+                            <span style="font-size: 0.8rem; color: #7F1D1D;">Available for other volunteers • Accept button disabled</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            ${declined.map(d => `
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: #FFFFFF; padding: 10px 14px; border-radius: 8px; border: 1px solid #FCA5A5;">
+                                    <div>
+                                        <strong style="color: #0F172A; font-size: 0.95rem;">${(d.category || '').includes('Medicine') ? '💊' : '🛒'} ${d.title}</strong>
+                                        <div style="font-size: 0.82rem; color: #64748B;">👤 ${d.requester} • 📍 ${d.location}</div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; align-items: center;">
+                                        <span class="badge" style="background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-size: 0.8rem; font-weight: 700;">✕ You Declined</span>
+                                        <button onclick="undoRejectTask('${d.id}')" class="btn-decline" style="padding: 5px 10px; font-size: 0.78rem; background: #F1F5F9; color: #475569; border-color: #CBD5E1;" title="Undo and restore task to available missions">↩ Undo</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+
+            container.innerHTML = mainHtml + declinedHtml;
 
             // Task History
             const history = requests.filter(r => r.status === 'completed');
@@ -583,12 +625,16 @@
             const btnStart = document.getElementById('btnSimStart');
             const btnComplete = document.getElementById('btnSimComplete');
             const badgeCount = document.getElementById('badgeActiveCount');
+            const activeMissionCard = document.getElementById('activeMissionCard');
+            const noActiveMissionCard = document.getElementById('noActiveMissionCard');
 
             // Dynamically populate Active Mission card details
             const tasks = (window.AppStore && typeof AppStore.getTasks === 'function') ? AppStore.getTasks() : [];
             const reqList = (window.ReachData && typeof ReachData.getRequests === 'function') ? ReachData.getRequests() : [];
+            const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+
             let activeTask = null;
-            if (acceptedId) {
+            if (acceptedId && !dismissed.includes(acceptedId)) {
                 activeTask = tasks.find(t => t.id === acceptedId) || reqList.find(r => r.id === acceptedId);
             }
             if (!activeTask && missionStr) {
@@ -596,13 +642,23 @@
                     const m = JSON.parse(missionStr);
                     if (m && (m.taskId || m.id)) {
                         const mid = m.taskId || m.id;
-                        activeTask = tasks.find(t => t.id === mid) || reqList.find(r => r.id === mid);
+                        if (!dismissed.includes(mid)) {
+                            activeTask = tasks.find(t => t.id === mid) || reqList.find(r => r.id === mid);
+                        }
                     }
                 } catch(e) {}
             }
-            if (!activeTask && tasks.length > 0) {
-                activeTask = tasks.find(t => t.assignedVolunteer || t.status === 'Live Location Active');
+
+            // If there is no explicitly accepted task, hide active mission card and display empty state
+            if (!activeTask || activeTask.status === 'Waiting for Volunteer' || !activeTask.assignedVolunteer || dismissed.includes(activeTask.id)) {
+                if (activeMissionCard) activeMissionCard.style.display = 'none';
+                if (noActiveMissionCard) noActiveMissionCard.style.display = 'block';
+                if (badgeCount) badgeCount.textContent = '0';
+                return;
             }
+
+            if (activeMissionCard) activeMissionCard.style.display = 'block';
+            if (noActiveMissionCard) noActiveMissionCard.style.display = 'none';
 
             if (activeTask) {
                 const titleEl = document.getElementById('activeMissionTitle');
@@ -625,7 +681,7 @@
             }
 
             if (badgeCount) {
-                badgeCount.textContent = (acceptedId || missionStr) && status !== 'completed' ? '1' : '0';
+                badgeCount.textContent = status !== 'completed' ? '1' : '0';
             }
 
             // Synchronize all 6 workflow step circles and connectors (all completed steps are green with ✓)
@@ -791,22 +847,43 @@
             if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
                 ReachData.updateRequestStatus(id, 'waiting_volunteer');
             }
+            if (window.AppStore && typeof AppStore.getTasks === 'function') {
+                const tasks = AppStore.getTasks();
+                const t = tasks.find(x => x.id === id);
+                if (t) {
+                    t.status = 'Waiting for Volunteer';
+                    t.assignedVolunteer = null;
+                    AppStore.saveTasks(tasks);
+                }
+            }
             // Clear active mission if it was this task
             if (localStorage.getItem('reach_accepted_task_id') === id) {
                 localStorage.removeItem('reach_accepted_task_id');
                 localStorage.removeItem('reach_active_volunteer_mission');
-                const lastStr = localStorage.getItem('reach_last_confirmed');
-                if (lastStr) {
-                    try {
-                        const item = JSON.parse(lastStr);
+            }
+            const lastStr = localStorage.getItem('reach_last_confirmed');
+            if (lastStr) {
+                try {
+                    const item = JSON.parse(lastStr);
+                    if (item.id === id) {
                         item.status = 'Waiting for Volunteer';
                         item.assignedVolunteer = null;
                         localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
-                    } catch (e) {}
-                }
+                    }
+                } catch (e) {}
             }
             broadcastSync('reject_task', { id });
-            showVolunteerToast(`Task ${id} skipped and returned to the pool.`, 'ℹ️');
+            showVolunteerToast(`Task ${id} declined. Marked as rejected by you.`, '✕');
+            loadVolunteerData();
+            syncActiveMissionUI();
+        }
+
+        function undoRejectTask(id) {
+            let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            dismissed = dismissed.filter(x => x !== id);
+            localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
+            broadcastSync('undo_reject_task', { id });
+            showVolunteerToast(`Task ${id} restored to available tasks.`, '↩');
             loadVolunteerData();
         }
 

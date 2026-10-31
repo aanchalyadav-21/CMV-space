@@ -689,6 +689,7 @@
                 return;
             }
 
+            const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
             emptyBox.style.display = 'none';
 
             container.innerHTML = filtered.map(t => {
@@ -696,9 +697,10 @@
                 const isWaiting = t.status === 'Waiting for Volunteer' || !t.assignedVolunteer;
                 const isDone = t.status === 'Task Completed';
                 const isMyTask = currentUser && (t.requester === currentUser.name || t.requesterPhone === currentUser.phone);
+                const isDismissed = dismissed.includes(t.id);
 
                 return `
-                    <div class="task-item-card">
+                    <div class="task-item-card" style="${isDismissed ? 'background: #FEF2F2; border-color: #FECACA;' : ''}">
                         <div>
                             <div class="task-card-header">
                                 <span class="task-cat-badge">
@@ -720,7 +722,21 @@
 
                         <div class="task-action-row">
                             ${isVolunteer ? `
-                                ${isWaiting ? `
+                                ${isDismissed ? `
+                                    <div style="display: flex; gap: 8px; width: 100%; align-items: center; justify-content: space-between;">
+                                        <span class="badge" style="background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-weight: 700; padding: 7px 10px; border-radius: 6px; font-size: 0.82rem;">
+                                            ✕ You Declined This Task
+                                        </span>
+                                        <div style="display: flex; gap: 6px;">
+                                            <button class="btn btn-secondary" onclick="undoRejectTask('${t.id}')" style="padding: 6px 10px; font-size: 0.78rem; color: #475569;" title="Undo decline">
+                                                ↩ Undo
+                                            </button>
+                                            <button class="btn btn-secondary" onclick="openTaskModal('${t.id}')" style="padding: 6px 10px; font-size: 0.78rem;">
+                                                👁️ Details
+                                            </button>
+                                        </div>
+                                    </div>
+                                ` : isWaiting ? `
                                     <button class="btn btn-accent" onclick="handleDirectAccept('${t.id}')" style="flex: 1; padding: 8px 12px; font-weight: 700; font-size: 0.88rem;">
                                         ✓ Accept Task
                                     </button>
@@ -904,6 +920,9 @@
 
             document.getElementById('modalTaskTitle').innerHTML = `<span>${getCategoryIcon(task.category)}</span> <span>${task.title}</span>`;
 
+            const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            const isDismissed = dismissed.includes(taskId);
+
             document.getElementById('modalTaskBody').innerHTML = `
                 <div class="modal-detail-row">
                     <strong>CATEGORY & URGENCY</strong>
@@ -925,12 +944,18 @@
                     <strong>NOTES / INSTRUCTIONS</strong>
                     <span style="font-weight: 400; color: #334155;">${task.notes || 'Standard errand'}</span>
                 </div>
+                ${isDismissed && isVolunteer ? `
+                    <div style="background: #FEF2F2; color: #991B1B; border: 1px solid #FECACA; padding: 10px 14px; border-radius: 8px; font-weight: 700; margin-top: 14px; font-size: 0.9rem; text-align: center; display: flex; align-items: center; justify-content: space-between;">
+                        <span>✕ You have declined this task</span>
+                        <button class="btn btn-secondary" onclick="undoRejectTask('${task.id}'); closeTaskModal();" style="padding: 4px 10px; font-size: 0.78rem; color: #475569;">↩ Undo</button>
+                    </div>
+                ` : ''}
             `;
 
-            // ONLY show Accept button in modal if viewer is an active Volunteer
+            // ONLY show Accept button in modal if viewer is an active Volunteer and has NOT dismissed it
             const btnAccept = document.getElementById('modalBtnAccept');
             if (btnAccept) {
-                if (isVolunteer && isWaiting) {
+                if (isVolunteer && isWaiting && !isDismissed) {
                     btnAccept.style.display = 'inline-block';
                 } else {
                     btnAccept.style.display = 'none';
@@ -938,6 +963,16 @@
             }
 
             document.getElementById('taskDetailModal').classList.add('active');
+        }
+
+        function undoRejectTask(taskId) {
+            let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            dismissed = dismissed.filter(id => id !== taskId);
+            localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
+            renderTasksList();
+            if ('BroadcastChannel' in window) {
+                try { new BroadcastChannel('reach_sync').postMessage({ action: 'undo_reject_task', taskId }); } catch(e) {}
+            }
         }
 
         function closeTaskModal() {

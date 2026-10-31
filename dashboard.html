@@ -710,24 +710,34 @@
         // Render Volunteer Tasks Feed
         function renderVolunteerTasks() {
             const container = document.getElementById('volTasksFeed');
+            if (!container) return;
             const tasks = AppStore.getTasks();
+            const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
             let html = '<div style="display:flex; flex-direction:column; gap:10px;">';
 
             tasks.forEach(t => {
+                const isDismissed = dismissed.includes(t.id);
                 const isWaiting = t.status === 'Waiting for Volunteer' || !t.assignedVolunteer;
 
                 html += `
-                    <div class="clean-item-row">
+                    <div class="clean-item-row" style="${isDismissed ? 'background: #FEF2F2; border-color: #FECACA;' : ''}">
                         <div style="flex: 1; min-width: 240px;">
                             <strong style="color: #0F172A; font-size: 1.05rem;">
-                                ${t.category.includes('Medicine') ? '💊' : '🛒'} ${t.title}
+                                ${(t.category || '').includes('Medicine') ? '💊' : '🛒'} ${t.title}
                             </strong>
                             <div style="font-size: 0.85rem; color: #64748B; margin-top: 2px;">
                                 👤 ${t.requester} • 📍 ${t.location} • ⏰ ${t.time}
                             </div>
                         </div>
                         <div style="display: flex; gap: 8px; align-items: center;">
-                            ${isWaiting ? `
+                            ${isDismissed ? `
+                                <span class="badge" style="background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; font-weight: 700; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; display: inline-flex; align-items: center; gap: 4px;">
+                                    ✕ You Declined This Task
+                                </span>
+                                <button onclick="undoRejectTask('${t.id}')" class="btn btn-secondary" style="padding: 5px 10px; font-size: 0.78rem; color: #475569; border-color: #CBD5E1;" title="Undo decline and restore accept option">
+                                    ↩ Undo
+                                </button>
+                            ` : isWaiting ? `
                                 <button onclick="acceptTask('${t.id}')" class="btn btn-accent" style="padding: 7px 14px; font-size: 0.88rem; font-weight: 700;">
                                     ✓ Accept
                                 </button>
@@ -793,29 +803,54 @@
         }
 
         function rejectTask(taskId) {
-            if (confirm(`Decline / reject task ${taskId}? It will remain in the pool for other neighborhood volunteers.`)) {
-                let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
-                if (!dismissed.includes(taskId)) {
-                    dismissed.push(taskId);
-                    localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
+            let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            if (!dismissed.includes(taskId)) {
+                dismissed.push(taskId);
+                localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
+            }
+            if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
+                ReachData.updateRequestStatus(taskId, 'waiting_volunteer');
+            }
+            if (window.AppStore && typeof AppStore.getTasks === 'function') {
+                const tasks = AppStore.getTasks();
+                const t = tasks.find(x => x.id === taskId);
+                if (t) {
+                    t.status = 'Waiting for Volunteer';
+                    t.assignedVolunteer = null;
+                    AppStore.saveTasks(tasks);
                 }
-                if (window.ReachData && typeof ReachData.updateRequestStatus === 'function') {
-                    ReachData.updateRequestStatus(taskId, 'waiting_volunteer');
-                }
-                if (window.AppStore && typeof AppStore.getTasks === 'function') {
-                    const tasks = AppStore.getTasks();
-                    const t = tasks.find(x => x.id === taskId);
-                    if (t) {
-                        t.status = 'Waiting for Volunteer';
-                        t.assignedVolunteer = null;
-                        AppStore.saveTasks(tasks);
+            }
+            // Clear active mission or accepted keys if this task was marked active
+            if (localStorage.getItem('reach_accepted_task_id') === taskId) {
+                localStorage.removeItem('reach_accepted_task_id');
+                localStorage.removeItem('reach_active_volunteer_mission');
+            }
+            const lastStr = localStorage.getItem('reach_last_confirmed');
+            if (lastStr) {
+                try {
+                    const item = JSON.parse(lastStr);
+                    if (item.id === taskId) {
+                        item.status = 'Waiting for Volunteer';
+                        item.assignedVolunteer = null;
+                        localStorage.setItem('reach_last_confirmed', JSON.stringify(item));
                     }
-                }
-                renderVolunteerTasks();
-                if ('BroadcastChannel' in window) {
-                    try { new BroadcastChannel('reach_sync').postMessage({ action: 'reject_task', taskId }); } catch(e) {}
-                }
-                alert(`Task ${taskId} declined and kept in the community pool.`);
+                } catch (e) {}
+            }
+            renderVolunteerTasks();
+            renderVolunteerActiveMission();
+            if ('BroadcastChannel' in window) {
+                try { new BroadcastChannel('reach_sync').postMessage({ action: 'reject_task', taskId }); } catch(e) {}
+            }
+        }
+
+        function undoRejectTask(taskId) {
+            let dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            dismissed = dismissed.filter(id => id !== taskId);
+            localStorage.setItem('reach_vol_dismissed_tasks', JSON.stringify(dismissed));
+            renderVolunteerTasks();
+            renderVolunteerActiveMission();
+            if ('BroadcastChannel' in window) {
+                try { new BroadcastChannel('reach_sync').postMessage({ action: 'undo_reject_task', taskId }); } catch(e) {}
             }
         }
 
@@ -825,6 +860,12 @@
             const missionStr = localStorage.getItem('reach_active_volunteer_mission');
             const card = document.getElementById('dashVolActiveMissionCard');
             if (!card) return;
+
+            // Only display if the volunteer has explicitly accepted a mission!
+            if (!acceptedId && !missionStr) {
+                card.style.display = 'none';
+                return;
+            }
 
             let task = null;
             const tasks = AppStore.getTasks();
@@ -842,11 +883,9 @@
                     }
                 } catch(e) {}
             }
-            if (!task && tasks.length > 0) {
-                task = tasks.find(t => t.assignedVolunteer || t.status === 'Live Location Active' || t.status === 'Volunteer Arrived' || t.status === 'Task In Progress');
-            }
 
-            if (!task) {
+            const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+            if (!task || dismissed.includes(task.id) || task.status === 'Waiting for Volunteer' || !task.assignedVolunteer) {
                 card.style.display = 'none';
                 return;
             }

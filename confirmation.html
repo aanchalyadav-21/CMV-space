@@ -470,20 +470,28 @@
             if (reqId) {
                 task = tasks.find(t => t.id === reqId) || reqList.find(r => r.id === reqId);
             }
-            if (!task && acceptedId) {
-                task = tasks.find(t => t.id === acceptedId) || reqList.find(r => r.id === acceptedId);
-            }
             if (!task && currentItem && currentItem.id && currentItem.type !== 'space_booking') {
                 task = tasks.find(t => t.id === currentItem.id) || reqList.find(r => r.id === currentItem.id);
             }
-            if (!task && tasks.length > 0) {
-                task = tasks.find(t => t.status === 'Live Location Active' || t.status === 'Accepted' || t.assignedVolunteer) || tasks[0];
+            if (!task && acceptedId) {
+                task = tasks.find(t => t.id === acceptedId) || reqList.find(r => r.id === acceptedId);
             }
-            if (!task && reqList.length > 0) {
-                task = reqList.find(r => r.status === 'location_active' || r.assignedVolunteer) || reqList[0];
+            if (!task && tasks.length > 0) {
+                task = tasks[0];
             }
                 // HELP / MICRO-VOLUNTEERING TASK
                 if (task) {
+                    const dismissed = JSON.parse(localStorage.getItem('reach_vol_dismissed_tasks') || '[]');
+                    const isDismissed = dismissed.includes(task.id);
+
+                    // If task was dismissed/rejected by volunteer, make sure accepted mission keys are cleared
+                    if (isDismissed) {
+                        if (acceptedId === task.id) localStorage.removeItem('reach_accepted_task_id');
+                        if (activeMission && (activeMission.taskId === task.id || activeMission.id === task.id)) {
+                            localStorage.removeItem('reach_active_volunteer_mission');
+                        }
+                    }
+
                     document.getElementById('valRefId').textContent = '#' + task.id;
                     if (task.category || task.title) {
                         document.getElementById('valCategory').textContent = task.title || task.category;
@@ -496,16 +504,16 @@
 
                     // Check live status across data objects accurately for THIS specific task
                     const status = (task.status || '').toLowerCase();
-                    const matchesActiveMission = !!(activeMission && (activeMission.taskId === task.id || activeMission.id === task.id));
+                    const matchesActiveMission = !isDismissed && !!(activeMission && (activeMission.taskId === task.id || activeMission.id === task.id));
                     const missionStatus = matchesActiveMission && activeMission.status ? activeMission.status.toLowerCase() : '';
-                    const matchesLastConfirmed = !!(currentItem && currentItem.id === task.id);
+                    const matchesLastConfirmed = !isDismissed && !!(currentItem && currentItem.id === task.id);
                     const lastConfirmedStatus = matchesLastConfirmed && currentItem.status ? currentItem.status.toLowerCase() : '';
-                    const hasVolunteer = !!(task.assignedVolunteer || (matchesLastConfirmed && currentItem.assignedVolunteer) || (matchesActiveMission && activeMission.volunteerName) || (acceptedId === task.id));
+                    const hasVolunteer = !isDismissed && !!(task.assignedVolunteer || (matchesLastConfirmed && currentItem.assignedVolunteer) || (matchesActiveMission && activeMission.volunteerName));
                     
-                    const isCompleted = status.includes('completed') || missionStatus === 'completed' || lastConfirmedStatus.includes('completed');
-                    const isInProgress = status.includes('progress') || missionStatus === 'in_progress' || lastConfirmedStatus.includes('progress');
-                    const isArrived = status.includes('arrived') || missionStatus === 'volunteer_arrived' || lastConfirmedStatus.includes('arrived');
-                    const isAccepted = hasVolunteer || status.includes('live') || status.includes('location_active') || status.includes('assigned') || status.includes('accept');
+                    const isCompleted = !isDismissed && (status.includes('completed') || missionStatus === 'completed' || lastConfirmedStatus.includes('completed'));
+                    const isInProgress = !isDismissed && (status.includes('progress') || missionStatus === 'in_progress' || lastConfirmedStatus.includes('progress'));
+                    const isArrived = !isDismissed && (status.includes('arrived') || missionStatus === 'volunteer_arrived' || lastConfirmedStatus.includes('arrived'));
+                    const isAccepted = !isDismissed && hasVolunteer && (status.includes('live') || status.includes('location_active') || status.includes('assigned') || status.includes('accept') || missionStatus === 'location_active');
 
                     if (isCompleted) {
                         const feedbackKey = 'reach_feedback_done_' + (task.id || 'default');
@@ -601,10 +609,11 @@
                     } else if (isAccepted) {
                         const btnCancel = document.getElementById('btnCancelReq');
                         if (btnCancel) btnCancel.style.display = 'inline-block';
-                        document.getElementById('badgeStatus').textContent = '🟢 Status: Volunteer Assigned & En Route (Karan Verma)';
+                        const volName = (task.assignedVolunteer && task.assignedVolunteer.name) ? task.assignedVolunteer.name : 'Karan Verma';
+                        document.getElementById('badgeStatus').textContent = `🟢 Status: Volunteer Assigned & En Route (${volName})`;
                         document.getElementById('badgeStatus').className = 'status-pill-big badge-success';
                         document.getElementById('assignedVolunteerCard').style.display = 'block';
-                        document.getElementById('lblEta').textContent = '🛵 Karan Verma accepted your request and is en route on motorbike (~4 mins ETA • 380m away)';
+                        document.getElementById('lblEta').textContent = `🛵 ${volName} accepted your request and is en route on motorbike (~4 mins ETA • 380m away)`;
                         document.getElementById('pinVol').style.left = '160px';
                         updateStepHighlight('step-tracking');
 
@@ -613,10 +622,17 @@
                         // Still waiting
                         const btnCancel = document.getElementById('btnCancelReq');
                         if (btnCancel) btnCancel.style.display = 'inline-block';
-                        document.getElementById('badgeStatus').textContent = '⏳ Status: Waiting for Nearby Volunteer';
-                        document.getElementById('badgeStatus').className = 'status-pill-big badge-pending';
-                        document.getElementById('assignedVolunteerCard').style.display = 'none';
-                        document.getElementById('lblEta').textContent = 'Searching for nearby verified volunteers...';
+                        if (isDismissed) {
+                            document.getElementById('badgeStatus').textContent = '⏳ Status: Waiting for Volunteer (Karan Verma Passed)';
+                            document.getElementById('badgeStatus').className = 'status-pill-big badge-pending';
+                            document.getElementById('assignedVolunteerCard').style.display = 'none';
+                            document.getElementById('lblEta').textContent = 'Volunteer passed on this request. Broadcast remains live in community pool for other volunteers...';
+                        } else {
+                            document.getElementById('badgeStatus').textContent = '⏳ Status: Waiting for Nearby Volunteer';
+                            document.getElementById('badgeStatus').className = 'status-pill-big badge-pending';
+                            document.getElementById('assignedVolunteerCard').style.display = 'none';
+                            document.getElementById('lblEta').textContent = 'Searching for nearby verified volunteers...';
+                        }
                         document.getElementById('pinVol').style.left = '40px';
                         updateStepHighlight('step-waiting');
 

@@ -87,15 +87,10 @@ const SEED_TASKS = [
         time: 'Today, 11:30 AM',
         urgency: 'Today (Urgent)',
         skillsNeeded: 'Prescription Pickup & Safe Handover',
-        status: 'Live Tracking Active',
-        assignedVolunteer: {
-            name: 'Karan Verma',
-            phone: '+91 98765 43211',
-            rating: 4.9,
-            avatar: '🦸‍♂️'
-        },
+        status: 'Waiting for Volunteer',
+        assignedVolunteer: null,
         safetyPin: '4829',
-        etaMinutes: 10,
+        etaMinutes: null,
         notes: 'Prescription slip will be given at chemist counter. Medicine payment settled.',
         createdAt: 'Today, 10:45 AM',
         rating: null,
@@ -379,9 +374,18 @@ const AppStore = {
         } else {
             try {
                 const stored = JSON.parse(localStorage.getItem('reach_tasks') || '[]');
+                let modified = false;
                 if (!stored.some(t => t.id === 'TSK-105')) {
                     const t105 = SEED_TASKS.find(x => x.id === 'TSK-105');
-                    if (t105) stored.push(t105);
+                    if (t105) { stored.push(t105); modified = true; }
+                }
+                const t101 = stored.find(x => x.id === 'TSK-101');
+                if (t101 && (t101.status === 'Live Tracking Active' || t101.status === 'Live Location Active') && !localStorage.getItem('reach_accepted_task_id')) {
+                    t101.status = 'Waiting for Volunteer';
+                    t101.assignedVolunteer = null;
+                    modified = true;
+                }
+                if (modified) {
                     localStorage.setItem('reach_tasks', JSON.stringify(stored));
                 }
             } catch (e) {}
